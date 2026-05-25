@@ -1,15 +1,23 @@
 import axios from "axios";
 
+export const API_BASE_URL =
+  import.meta.env.VITE_API_URL ?? "http://localhost:8080";
+
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? "http://localhost:8080",
+  baseURL: API_BASE_URL,
 });
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error("Fallo HTTP", {
+      baseURL: error.config?.baseURL,
+      url: error.config?.url,
+      method: error.config?.method,
+      message: error.message,
+      code: error.code,
+    });
 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    return Promise.reject(error);
   }
-
-  return config;
-});
+);
