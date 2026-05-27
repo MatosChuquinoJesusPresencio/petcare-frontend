@@ -7,6 +7,13 @@ export interface ServicioResponse {
   activo: boolean;
 }
 
+export interface ServicioRequest {
+  name: string;
+  description: string;
+  durationMinutes: number;
+  referentialCost: number;
+}
+
 export interface ServicioPageResponse {
   content: ServicioResponse[];
 }
