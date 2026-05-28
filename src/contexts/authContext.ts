@@ -1,9 +1,10 @@
 import { createContext } from 'react'
-import type { LoginRequest, RegisterRequest } from '../api/types'
+import type { LoginRequest, RegisterRequest, AuthResponse } from '../api/types'
 
-export type { LoginRequest, RegisterRequest }
+export type { LoginRequest, RegisterRequest, AuthResponse }
 
 export interface User {
+  id: number
   username: string
   role: string
 }
@@ -13,8 +14,8 @@ export interface AuthContextType {
   isAuthenticated: boolean
   isLoading: boolean
   error: string | null
-  login: (data: LoginRequest) => Promise<void>
-  register: (data: RegisterRequest) => Promise<void>
+  login: (data: LoginRequest) => Promise<AuthResponse>
+  register: (data: RegisterRequest) => Promise<AuthResponse>
   logout: () => Promise<void>
 }
 
