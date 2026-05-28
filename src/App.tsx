@@ -1,5 +1,12 @@
-const App = () => {
-  return <h1>Bienvenido a PetCare</h1>
-}
+import Citas from './pages/Citas';
 
-export default App
+const App = () => {
+  return (
+    <div>
+      {/* Mostrando la página de citas directamente por ahora */}
+      <Citas />
+    </div>
+  );
+};
+
+export default App;
