@@ -1,5 +1,11 @@
-const App = () => {
-  return <h1>Bienvenido a PetCare</h1>
-}
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-export default App
+import { routes } from "./routhe/routes";
+
+const router = createBrowserRouter(routes);
+
+const App = () => {
+  return <RouterProvider router={router} />;
+};
+
+export default App;
