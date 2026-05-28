@@ -34,8 +34,8 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
+    <div className="fullscreen-bg">
+      <div className="glass-card login-card">
         <div className="login-header">
           <h2>PetCare</h2>
           <p>Bienvenido de nuevo a tu clínica de confianza</p>

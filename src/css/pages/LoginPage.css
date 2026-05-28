@@ -1,40 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
-
-.login-container {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-image: url('../assets/login-bg.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  font-family: 'Outfit', sans-serif;
-  position: relative;
-}
-
-/* Oscurecer un poco el fondo para resaltar la tarjeta */
-.login-container::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.3);
-  z-index: 0;
-}
-
 .login-card {
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 24px;
-  padding: 3rem;
-  width: 100%;
   max-width: 420px;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
-  z-index: 1;
-  color: #fff;
-  animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .login-header {
@@ -109,42 +74,4 @@
   background: rgba(255, 255, 255, 0.2);
   color: #fff;
   border-color: rgba(255, 255, 255, 0.3);
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  border: none;
-  border-radius: 12px;
-  padding: 0.9rem;
-  font-weight: 600;
-  font-size: 1.1rem;
-  margin-top: 1.5rem;
-  box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.btn-primary:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 242, 254, 0.4);
-}
-
-.btn-primary:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.btn-primary:disabled {
-  background: rgba(255, 255, 255, 0.2);
-  color: rgba(255,255,255,0.5);
-  box-shadow: none;
-}
-
-@keyframes slideUpFade {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
