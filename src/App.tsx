@@ -1,5 +1,5 @@
-const App = () => {
-  return <h1>Bienvenido a PetCare</h1>
-}
+import AppRouter from './routers/AppRouter'
+
+const App = () => <AppRouter />
 
 export default App

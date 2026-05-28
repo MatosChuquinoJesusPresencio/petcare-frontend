@@ -17,8 +17,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = useCallback(async (data: LoginRequest) => {
     setError(null)
-    const response = await authService.login(data)
-    setUser({ username: response.username, role: response.role })
+    try {
+      const response = await authService.login(data)
+      setUser({ username: response.username, role: response.role })
+    } catch (err) {
+      const message = getErrorMessage(err)
+      setError(message)
+      throw err
+    }
   }, [])
 
   const register = useCallback(async (data: RegisterRequest) => {
