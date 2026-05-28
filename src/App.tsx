@@ -1,11 +1,5 @@
-import { Routes, Route } from 'react-router-dom'
-
 const App = () => {
-  return (
-    <Routes>
-      <Route path="/" element={<h1>Bienvenido a PetCare</h1>} />
-    </Routes>
-  )
+  return <h1>Bienvenido a PetCare</h1>
 }
 
 export default App
