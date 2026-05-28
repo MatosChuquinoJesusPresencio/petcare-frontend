@@ -1,5 +1,16 @@
-const App = () => {
-  return <h1>Bienvenido a PetCare</h1>
+import { BrowserRouter, useRoutes } from "react-router-dom";
+import { routes } from "./routes/routes";
+
+function AppRoutes() {
+  return useRoutes(routes);
 }
 
-export default App
+function App() {
+  return (
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
+  );
+}
+
+export default App;
