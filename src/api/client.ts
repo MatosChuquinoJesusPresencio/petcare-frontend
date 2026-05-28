@@ -18,7 +18,6 @@ apiClient.interceptors.response.use(
         await apiClient.post('/api/auth/refresh')
         return apiClient(originalRequest)
       } catch {
-        window.location.href = '/login'
         return Promise.reject(error)
       }
     }
