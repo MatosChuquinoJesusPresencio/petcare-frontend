@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import DuenoFormDialog from "../components/ClienteFormDialog";
+import DuenoFormDialog from "../components/DuenoFormDialog";
 import ContactoFormDialog from "../components/ContactoFormDialog";
 import ConfirmDialog from "../components/ConfirmDialog";
 
@@ -17,7 +17,7 @@ import {
   getContactosByDuenoId,
 } from "../services/contactoService";
 
-import type { Dueno, DuenoRequest } from "../types/clienteType";
+import type { Dueno, DuenoRequest } from "../types/duenoType";
 import type {
   ContactoEmergencia,
   ContactoEmergenciaRequest,

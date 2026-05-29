@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { vincularDueno } from "../../services/mascotaService";
-import { obtenerDuenos } from "../../services/duenoService";
+import { getDuenos } from "../../services/clienteService";
 
 interface Props {
   show: boolean;
@@ -33,9 +33,8 @@ export default function MascotaVincularModal({
 
   const cargarDuenos = async () => {
     try {
-      const data = await obtenerDuenos();
-
-      setDuenos(data.content);
+      const data = await getDuenos();
+      setDuenos(data);
     } catch (error) {
       console.error(error);
     }

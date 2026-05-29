@@ -1,71 +1,41 @@
-import { api } from "./api";
+import apiClient from "../api/client";
 
-import type { Mascota } from "../types/mascota";
-import type { PageResponse } from "../types/pagination";
-import type { MascotaRequest } from "../types/mascotaRequest";
+import type { MascotaRequest, MascotaResponse, MascotaPageResponse } from "../types/mascotaType";
 
-export async function obtenerMascotas() {
+export async function obtenerMascotas(params?: { nombre?: string; especie?: string; raza?: string; sexo?: string; activo?: boolean; duenoId?: number }): Promise<MascotaResponse[]> {
+  const response = await apiClient.get<MascotaPageResponse>("/api/mascotas", { params });
+  return response.data.content;
+}
 
-  const response = await api.get<PageResponse<Mascota>>(
-    "/api/mascotas?page=0&size=10"
-  );
-
+export async function obtenerMascotaPorId(id: number): Promise<MascotaResponse> {
+  const response = await apiClient.get<MascotaResponse>(`/api/mascotas/${id}`);
   return response.data;
 }
 
-export async function obtenerMascotaPorId(id: number) {
+export async function obtenerMascotasPorDueno(duenoId: number): Promise<MascotaResponse[]> {
+  const response = await apiClient.get<MascotaPageResponse>(`/api/mascotas/dueno/${duenoId}`);
+  return response.data.content;
+}
 
-  const response = await api.get<Mascota>(
-    `/api/mascotas/${id}`
-  );
-
+export async function crearMascota(data: MascotaRequest): Promise<MascotaResponse> {
+  const response = await apiClient.post<MascotaResponse>("/api/mascotas", data);
   return response.data;
 }
 
-export async function obtenerMascotasPorDueno(duenoId: number) {
-
-  const response = await api.get<PageResponse<Mascota>>(
-    `/api/mascotas/dueno/${duenoId}?page=0&size=10`
-  );
-
+export async function actualizarMascota(id: number, data: MascotaRequest): Promise<MascotaResponse> {
+  const response = await apiClient.put<MascotaResponse>(`/api/mascotas/${id}`, data);
   return response.data;
 }
 
-export async function crearMascota(data: MascotaRequest) {
+export async function eliminarMascota(id: number): Promise<void> {
+  await apiClient.delete(`/api/mascotas/${id}`);
+}
 
-  const response = await api.post(
-    "/api/mascotas",
-    data
-  );
-
+export async function toggleMascota(id: number): Promise<MascotaResponse> {
+  const response = await apiClient.patch<MascotaResponse>(`/api/mascotas/${id}/toggle`);
   return response.data;
 }
 
-export async function actualizarMascota(
-  id: number,
-  data: MascotaRequest
-) {
-
-  const response = await api.put(
-    `/api/mascotas/${id}`,
-    data
-  );
-
-  return response.data;
-}
-
-export async function eliminarMascota(id: number) {
-
-  await api.delete(`/api/mascotas/${id}`);
-}
-
-export async function vincularDueno(
-  mascotaId: number,
-  duenoId: number,
-  relacion: string
-) {
-
-  await api.post(
-    `/api/mascotas/${mascotaId}/vincular-dueno/${duenoId}?relacion=${relacion}`
-  );
+export async function vincularDueno(mascotaId: number, duenoId: number, relacion: string): Promise<void> {
+  await apiClient.post(`/api/mascotas/${mascotaId}/vincular-dueno/${duenoId}?relacion=${relacion}`);
 }

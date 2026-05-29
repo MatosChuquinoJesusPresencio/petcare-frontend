@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 
-import type { DuenoRequest } from "../types/clienteType";
+import type { DuenoRequest } from "../types/duenoType";
 
 type DuenoFormDialogProps = {
   isOpen: boolean;
