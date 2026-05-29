@@ -7,7 +7,7 @@ import MascotasPage from '../pages/MascotasPage';
 import DuenosPage from '../pages/DuenosPage';
 import NotFoundPage from '../pages/NotFoundPage';
 import UnauthorizedPage from '../pages/UnauthorizedPage';
-import { ProtectedRoute } from '../components/ProtectedRoute';
+import { ProtectedRoute } from '../components/auth/ProtectedRoute';
 import MainLayout from '../layouts/MainLayout';
 
 const staffRoles = ['ADMINISTRADOR', 'VETERINARIO', 'ASISTENTE'];

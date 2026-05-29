@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import type { ChangeEvent, SubmitEvent } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 
-import type { ServicioRequest } from "../types/serviciosType";
+import type { ServicioRequest } from "../../types/serviciosType";
 
 type ServiceFormDialogProps = {
   isOpen: boolean;
@@ -46,18 +46,14 @@ const ServiceFormDialog = ({
   const [submitError, setSubmitError] = useState("");
 
   useEffect(() => {
-    if (isOpen) {
-      setFormData(
-        initialData ? mapRequestToFormState(initialData) : initialFormState
-      );
+    const next = initialData ? mapRequestToFormState(initialData) : initialFormState;
+    const timer = setTimeout(() => {
+      setFormData(next);
       setSubmitError("");
       setIsSubmitting(false);
-      return;
-    }
+    });
 
-    setFormData(initialFormState);
-    setSubmitError("");
-    setIsSubmitting(false);
+    return () => clearTimeout(timer);
   }, [initialData, isOpen]);
 
   if (!isOpen) {
@@ -75,7 +71,7 @@ const ServiceFormDialog = ({
     }));
   }
 
-  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmitError("");
 
@@ -227,6 +223,22 @@ const ServiceFormDialog = ({
           </div>
         </div>
       </div>
+
+      <style>{`
+        #serviceModal .modal-body,
+        #serviceModal .modal-body .form-label,
+        #serviceModal .modal-body .form-control,
+        #serviceModal .modal-body .form-control::placeholder,
+        #serviceModal .modal-body .modal-footer {
+          color: #000 !important;
+        }
+        #serviceModal .modal-body .form-control {
+          border-color: #ced4da;
+        }
+        #serviceModal .modal-header .modal-title {
+          color: #000 !important;
+        }
+      `}</style>
     </>
   );
 };
