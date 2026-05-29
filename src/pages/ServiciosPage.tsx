@@ -1,10 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
 
-import ActionButtons from "../components/ActionButtons";
-import ConfirmDialog from "../components/ConfirmDialog";
-import NotificationToast from "../components/NotificationToast";
-import type { ToastInfo } from "../components/NotificationToast";
-import ServiceFormDialog from "../components/modal/ServiceFormDialog";
+import ActionButtons from "../components/common/ActionButtons";
+
+import ConfirmDialog from "../components/common/ConfirmDialog";
+
+import DataTable from "../components/common/DataTable";
+
+import NotificationToast from "../components/common/NotificationToast";
+import type { ToastInfo } from "../components/common/NotificationToast";
+
+import PageHeader from "../components/common/PageHeader";
+import ServiceFormDialog from "../components/servicios/ServiceFormDialog";
 import {
   createServicio,
   deleteServicio,
@@ -19,6 +25,7 @@ import type {
 
 const ServiciosPage = () => {
   const [servicios, setServicios] = useState<ServicioResponse[]>([]);
+  const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [loadError, setLoadError] = useState("");
   const [selectedServicio, setSelectedServicio] =
@@ -30,6 +37,7 @@ const ServiciosPage = () => {
 
   const cargarServicios = useCallback(async () => {
     try {
+      setLoading(true);
       setLoadError("");
       const params: { soloActivos?: boolean; nombre?: string } = {};
 
@@ -48,6 +56,8 @@ const ServiciosPage = () => {
     } catch (error) {
       console.error("Error al cargar servicios:", error);
       setLoadError("No se pudieron cargar los servicios.");
+    } finally {
+      setLoading(false);
     }
   }, [filtroActivo, searchNombre]);
 
@@ -117,29 +127,26 @@ const ServiciosPage = () => {
   }
 
   return (
-    <div className="container my-3">
+    <div className="container mt-4">
       <NotificationToast toast={toast} onClose={() => setToast(null)} />
-      <section className="card mb-3">
-        <div className="card-body d-flex flex-row justify-content-between align-items-center">
-          <div>
-            <div className="d-flex gap-2 align-items-center">
-              <span className="d-flex d-inline-flex items-center gap-2">
-                <i className="bi bi-list-check fs-2"></i>
-              </span>
-              <h1 className="mb-2">Servicios</h1>
-            </div>
-            <p>Vista donde podrás revisar y gestionar los servicios</p>
-          </div>
-          <div className="d-flex gap-2 align-items-center">
+      <PageHeader icon="bi-list-check" title="Servicios" description="Vista donde podrás revisar y gestionar los servicios">
+        <button className="btn btn-success" onClick={handleOpenCreateModal}>
+          <i className="bi bi-plus-circle-fill me-2"></i>Nuevo Servicio
+        </button>
+      </PageHeader>
+
+      <div className="card shadow-sm">
+        <div className="card-body">
+          <div className="d-flex flex-wrap gap-2 align-items-center border-bottom pb-3 mb-3">
             <input
               type="text"
-              className="form-control"
+              className="form-control w-auto"
               placeholder="Buscar por nombre..."
               value={searchNombre}
               onChange={(e) => setSearchNombre(e.target.value)}
             />
             <select
-              className="form-select"
+              className="form-select w-auto"
               value={filtroActivo}
               onChange={(e) => setFiltroActivo(e.target.value)}
             >
@@ -147,60 +154,55 @@ const ServiciosPage = () => {
               <option value="activos">Activos</option>
               <option value="inactivos">Inactivos</option>
             </select>
-            <button
-              className="btn btn-success"
-              onClick={handleOpenCreateModal}
-            >
-              <i className="bi bi-plus-circle-fill"></i>
-            </button>
           </div>
+          {loadError ? (
+            <div className="alert alert-danger" role="alert">
+              {loadError}
+            </div>
+          ) : null}
+          {loading ? (
+            <div className="text-center py-4">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Cargando...</span>
+              </div>
+            </div>
+          ) : (
+            <DataTable
+              columns={["#", "Nombre", "Descripción", "Tiempo (Min)", "Costo", "Estado", "Acciones"]}
+              emptyMessage="No hay servicios registrados."
+              colSpan={7}
+            >
+              {servicios.map((servicio, index) => (
+                <tr key={servicio.id || index}>
+                  <td>{index + 1}</td>
+                  <td>{servicio.nombre}</td>
+                  <td>{servicio.descripcion}</td>
+                  <td>{servicio.duracionMinutos}</td>
+                  <td>S/.{servicio.costoReferencial}</td>
+                  <td>
+                    <span
+                      className={`badge ${servicio.activo ? "bg-success" : "bg-danger"}`}
+                    >
+                      {servicio.activo ? "Activo" : "Inactivo"}
+                    </span>
+                  </td>
+                  <td>
+                    <ActionButtons
+                      activo={servicio.activo}
+                      onEdit={() => handleOpenEditModal(servicio)}
+                      onToggle={() => handleToggleServicio(servicio.id)}
+                      onDelete={() => setConfirmDeleteServicio(servicio.id)}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </DataTable>
+          )}
         </div>
-      </section>
-      {loadError ? (
-        <div className="alert alert-danger" role="alert">
-          {loadError}
+        <div className="card-footer text-muted small py-2">
+          Total de servicios: {servicios.length}
         </div>
-      ) : null}
-      <table className="table table-striped table-light table-bordered">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Nombre</th>
-            <th scope="col">Descripción</th>
-            <th scope="col">Tiempo (Min)</th>
-            <th scope="col">Costo</th>
-            <th scope="col">Estado</th>
-            <th scope="col">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {servicios.map((servicio, index) => (
-            <tr key={servicio.id || index}>
-              <th scope="row">{index + 1}</th>
-              <td>{servicio.nombre}</td>
-              <td>{servicio.descripcion}</td>
-              <td>{servicio.duracionMinutos}</td>
-              <td>S/.{servicio.costoReferencial}</td>
-              <td>
-                <span
-                  className={`badge ${servicio.activo ? "bg-success" : "bg-danger"}`}
-                >
-                  {servicio.activo ? "Activo" : "Inactivo"}
-                </span>
-              </td>
-              <td>
-                <ActionButtons
-                  activo={servicio.activo}
-                  onEdit={() => handleOpenEditModal(servicio)}
-                  onToggle={() => handleToggleServicio(servicio.id)}
-                  onDelete={() => setConfirmDeleteServicio(servicio.id)}
-                />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <p>Total de servicios cargados: {servicios.length}</p>
+      </div>
       <ServiceFormDialog
         isOpen={openModal}
         onClose={handleCloseModal}

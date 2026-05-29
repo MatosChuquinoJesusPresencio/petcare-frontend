@@ -17,6 +17,7 @@ export default function CitaReprogramarModal({ show, onClose, onSuccess, cita }:
   const [fecha, setFecha] = useState("");
   const [horaSeleccionada, setHoraSeleccionada] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (cita) {
@@ -27,9 +28,33 @@ export default function CitaReprogramarModal({ show, onClose, onSuccess, cita }:
 
   if (!show || !cita) return null;
 
+  const validate = (): Record<string, string> => {
+    const errors: Record<string, string> = {};
+    if (!fecha) {
+      errors.fecha = "La fecha es obligatoria.";
+    } else {
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+      if (new Date(fecha) < hoy) {
+        errors.fecha = "La fecha no puede ser pasada.";
+      }
+    }
+    if (!horaSeleccionada) {
+      errors.horaSeleccionada = "Selecciona un horario disponible.";
+    }
+    return errors;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    const errors = validate();
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+    setFieldErrors({});
 
     const dateTime = `${fecha}T${horaSeleccionada}`;
 
@@ -44,7 +69,7 @@ export default function CitaReprogramarModal({ show, onClose, onSuccess, cita }:
 
   return (
     <div className="modal fade show d-block modal-bg" tabIndex={-1}>
-      <div className="modal-dialog">
+      <div className="modal-dialog modal-force-dark-text">
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">Reprogramar Cita</h5>
@@ -54,7 +79,8 @@ export default function CitaReprogramarModal({ show, onClose, onSuccess, cita }:
             <form id="formReprogramar" onSubmit={handleSubmit}>
               <div className="mb-3">
                 <label className="form-label">Nueva Fecha *</label>
-                <input type="date" className="form-control" value={fecha} onChange={(e) => setFecha(e.target.value)} required />
+                <input type="date" className={`form-control ${fieldErrors.fecha ? 'is-invalid' : ''}`} value={fecha} onChange={(e) => { setFecha(e.target.value); setFieldErrors((p) => { const n = { ...p }; delete n.fecha; return n; }); }} required />
+                {fieldErrors.fecha && <div className="invalid-feedback">{fieldErrors.fecha}</div>}
               </div>
               <div className="mb-3">
                 <label className="form-label">Horario disponible *</label>
@@ -63,8 +89,9 @@ export default function CitaReprogramarModal({ show, onClose, onSuccess, cita }:
                   serviceId={cita.servicio.id}
                   fecha={fecha}
                   value={horaSeleccionada}
-                  onChange={setHoraSeleccionada}
+                  onChange={(v) => { setHoraSeleccionada(v); setFieldErrors((p) => { const n = { ...p }; delete n.horaSeleccionada; return n; }); }}
                 />
+                {fieldErrors.horaSeleccionada && <div className="invalid-feedback">{fieldErrors.horaSeleccionada}</div>}
               </div>
               {error && <div className="alert alert-danger py-2">{error}</div>}
             </form>

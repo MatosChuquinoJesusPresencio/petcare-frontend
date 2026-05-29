@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
 import type { Dueno } from "../../types";
-import { getDuenos, vincularDueno } from "../../services";
-import NotificationToast from "../NotificationToast";
-import type { ToastInfo } from "../NotificationToast";
+import { getDuenos, vincularDueno, cambiarDuenoPrincipal } from "../../services";
+import NotificationToast from "../common/NotificationToast";
+import type { ToastInfo } from "../common/NotificationToast";
 
 interface Props {
   show: boolean;
@@ -21,7 +21,9 @@ export default function MascotaVincularModal({
   const [duenos, setDuenos] = useState<Dueno[]>([]);
   const [duenoId, setDuenoId] = useState(0);
   const [relacion, setRelacion] = useState("Tutor");
+  const [esPrincipal, setEsPrincipal] = useState(false);
   const [toast, setToast] = useState<ToastInfo | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const cargarDuenos = async () => {
     try {
@@ -40,13 +42,39 @@ export default function MascotaVincularModal({
     }
   }, [show]);
 
+  const validate = (): Record<string, string> => {
+    const errors: Record<string, string> = {};
+    if (!duenoId) {
+      errors.duenoId = "Selecciona un dueño.";
+    }
+    if (!relacion.trim()) {
+      errors.relacion = "La relación es obligatoria.";
+    } else if (relacion.trim().length < 2) {
+      errors.relacion = "Mínimo 2 caracteres.";
+    } else if (relacion.trim().length > 50) {
+      errors.relacion = "Máximo 50 caracteres.";
+    }
+    return errors;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!mascotaId) return;
 
+    const errors = validate();
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+    setFieldErrors({});
+
     try {
-      await vincularDueno(mascotaId, duenoId, relacion);
+      if (esPrincipal) {
+        await cambiarDuenoPrincipal(mascotaId, duenoId, relacion);
+      } else {
+        await vincularDueno(mascotaId, duenoId, relacion);
+      }
       await onSuccess();
       onClose();
     } catch (error) {
@@ -72,9 +100,9 @@ export default function MascotaVincularModal({
               <div className="mb-3">
                 <label className="form-label">Dueño</label>
                 <select
-                  className="form-select"
+                  className={`form-select ${fieldErrors.duenoId ? 'is-invalid' : ''}`}
                   value={duenoId}
-                  onChange={(e) => setDuenoId(Number(e.target.value))}
+                  onChange={(e) => { setDuenoId(Number(e.target.value)); setFieldErrors((p) => { const n = { ...p }; delete n.duenoId; return n; }); }}
                   required
                 >
                   <option value="">Seleccione dueño</option>
@@ -84,17 +112,32 @@ export default function MascotaVincularModal({
                     </option>
                   ))}
                 </select>
+                {fieldErrors.duenoId && <div className="invalid-feedback">{fieldErrors.duenoId}</div>}
               </div>
 
               <div className="mb-3">
                 <label className="form-label">Relación</label>
                 <input
                   type="text"
-                  className="form-control"
+                  className={`form-control ${fieldErrors.relacion ? 'is-invalid' : ''}`}
                   value={relacion}
-                  onChange={(e) => setRelacion(e.target.value)}
+                  onChange={(e) => { setRelacion(e.target.value); setFieldErrors((p) => { const n = { ...p }; delete n.relacion; return n; }); }}
                   required
                 />
+                {fieldErrors.relacion && <div className="invalid-feedback">{fieldErrors.relacion}</div>}
+              </div>
+
+              <div className="form-check mb-3">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  id="chkPrincipal"
+                  checked={esPrincipal}
+                  onChange={(e) => setEsPrincipal(e.target.checked)}
+                />
+                <label className="form-check-label" htmlFor="chkPrincipal">
+                  Establecer como dueño principal
+                </label>
               </div>
             </div>
 
@@ -107,7 +150,7 @@ export default function MascotaVincularModal({
                 Cancelar
               </button>
               <button type="submit" className="btn btn-primary">
-                Vincular
+                {esPrincipal ? "Cambiar dueño principal" : "Vincular"}
               </button>
             </div>
           </form>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 
-import BaseFormDialog from "../BaseFormDialog";
+import BaseFormDialog from "../common/BaseFormDialog";
 import type { ServicioRequest } from "../../types";
 
 type ServiceFormDialogProps = {
@@ -35,6 +35,48 @@ function mapRequestToFormState(data: ServicioRequest): ServiceFormState {
   };
 }
 
+function validate(formData: ServiceFormState): Record<string, string> {
+  const errors: Record<string, string> = {};
+
+  if (!formData.name.trim()) {
+    errors.name = "El nombre del servicio es obligatorio.";
+  } else if (formData.name.trim().length < 2) {
+    errors.name = "Mínimo 2 caracteres.";
+  } else if (formData.name.trim().length > 100) {
+    errors.name = "Máximo 100 caracteres.";
+  }
+
+  if (formData.description && formData.description.length > 500) {
+    errors.description = "Máximo 500 caracteres.";
+  }
+
+  if (!formData.durationMinutes) {
+    errors.durationMinutes = "La duración es obligatoria.";
+  } else {
+    const dur = Number(formData.durationMinutes);
+    if (!Number.isFinite(dur)) {
+      errors.durationMinutes = "Debe ser un número válido.";
+    } else if (dur < 5) {
+      errors.durationMinutes = "Mínimo 5 minutos.";
+    } else if (dur > 480) {
+      errors.durationMinutes = "Máximo 480 minutos (8 horas).";
+    }
+  }
+
+  if (!formData.referentialCost) {
+    errors.referentialCost = "El costo referencial es obligatorio.";
+  } else {
+    const cost = Number(formData.referentialCost);
+    if (!Number.isFinite(cost)) {
+      errors.referentialCost = "Debe ser un número válido.";
+    } else if (cost < 0) {
+      errors.referentialCost = "El costo no puede ser negativo.";
+    }
+  }
+
+  return errors;
+}
+
 const ServiceFormDialog = ({
   isOpen,
   onClose,
@@ -45,12 +87,14 @@ const ServiceFormDialog = ({
   const [formData, setFormData] = useState<ServiceFormState>(initialFormState);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const next = initialData ? mapRequestToFormState(initialData) : initialFormState;
     const timer = setTimeout(() => {
       setFormData(next);
       setSubmitError("");
+      setFieldErrors({});
       setIsSubmitting(false);
     });
 
@@ -66,42 +110,32 @@ const ServiceFormDialog = ({
       ...current,
       [name]: value,
     }));
+    setFieldErrors((prev) => {
+      if (!prev[name]) return prev;
+      const next = { ...prev };
+      delete next[name];
+      return next;
+    });
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmitError("");
 
-    if (!formData.name.trim()) {
-      setSubmitError("Completa el nombre del servicio.");
+    const errors = validate(formData);
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       return;
     }
-
-    if (!formData.durationMinutes || !formData.referentialCost) {
-      setSubmitError("Completa duración y costo referencial.");
-      return;
-    }
-
-    const durationMinutes = Number(formData.durationMinutes);
-    const referentialCost = Number(formData.referentialCost);
-
-    if (!Number.isFinite(durationMinutes) || !Number.isFinite(referentialCost)) {
-      setSubmitError("Duración y costo deben ser numéricos.");
-      return;
-    }
-
-    if (durationMinutes < 5 || referentialCost < 0) {
-      setSubmitError("Duración y costo deben tener valores válidos.");
-      return;
-    }
+    setFieldErrors({});
 
     try {
       setIsSubmitting(true);
       await onSubmit({
         name: formData.name.trim(),
         description: formData.description.trim(),
-        durationMinutes,
-        referentialCost,
+        durationMinutes: Number(formData.durationMinutes),
+        referentialCost: Number(formData.referentialCost),
       });
       onClose();
     } catch (error) {
@@ -129,47 +163,51 @@ const ServiceFormDialog = ({
           <label className="form-label">Nombre del servicio</label>
           <input
             type="text"
-            className="form-control"
+            className={`form-control ${fieldErrors.name ? 'is-invalid' : ''}`}
             name="name"
             value={formData.name}
             onChange={handleChange}
           />
+          {fieldErrors.name && <div className="invalid-feedback">{fieldErrors.name}</div>}
         </div>
 
         <div className="col-md-6">
           <label className="form-label">Duración (minutos)</label>
           <input
             type="number"
-            className="form-control"
+            className={`form-control ${fieldErrors.durationMinutes ? 'is-invalid' : ''}`}
             min="5"
             name="durationMinutes"
             value={formData.durationMinutes}
             onChange={handleChange}
           />
+          {fieldErrors.durationMinutes && <div className="invalid-feedback">{fieldErrors.durationMinutes}</div>}
         </div>
 
         <div className="col-12">
           <label className="form-label">Descripción</label>
           <textarea
-            className="form-control"
+            className={`form-control ${fieldErrors.description ? 'is-invalid' : ''}`}
             rows={3}
             name="description"
             value={formData.description}
             onChange={handleChange}
           ></textarea>
+          {fieldErrors.description && <div className="invalid-feedback">{fieldErrors.description}</div>}
         </div>
 
         <div className="col-md-6">
           <label className="form-label">Costo referencial</label>
           <input
             type="number"
-            className="form-control"
+            className={`form-control ${fieldErrors.referentialCost ? 'is-invalid' : ''}`}
             min="0"
             step="0.01"
             name="referentialCost"
             value={formData.referentialCost}
             onChange={handleChange}
           />
+          {fieldErrors.referentialCost && <div className="invalid-feedback">{fieldErrors.referentialCost}</div>}
         </div>
       </div>
     </BaseFormDialog>

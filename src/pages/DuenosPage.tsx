@@ -1,11 +1,19 @@
 import { useEffect, useState } from "react";
 
-import ActionButtons from "../components/ActionButtons";
-import DuenoFormDialog from "../components/DuenoFormDialog";
-import ContactoFormDialog from "../components/ContactoFormDialog";
-import ConfirmDialog from "../components/ConfirmDialog";
-import NotificationToast from "../components/NotificationToast";
-import type { ToastInfo } from "../components/NotificationToast";
+import ActionButtons from "../components/common/ActionButtons";
+
+import ConfirmDialog from "../components/common/ConfirmDialog";
+
+import ContactoFormDialog from "../components/duenos/ContactoFormDialog";
+
+import DataTable from "../components/common/DataTable";
+
+import DuenoFormDialog from "../components/duenos/DuenoFormDialog";
+
+import NotificationToast from "../components/common/NotificationToast";
+import type { ToastInfo } from "../components/common/NotificationToast";
+
+import PageHeader from "../components/common/PageHeader";
 
 import {
   createContacto,
@@ -36,6 +44,7 @@ const DuenosPage = () => {
   const [searchContactoTelefono, setSearchContactoTelefono] = useState("");
   const [searchContactoRelacion, setSearchContactoRelacion] = useState("");
 
+  const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState("");
 
   const [filtroActivo, setFiltroActivo] = useState<string>("todos");
@@ -48,6 +57,7 @@ const DuenosPage = () => {
 
   async function cargarDuenos() {
     try {
+      setLoading(true);
       setLoadError("");
       const params: { soloActivos?: boolean; nombre?: string; dni?: string } = {};
 
@@ -70,6 +80,8 @@ const DuenosPage = () => {
     } catch (error) {
       console.error("Error al cargar dueños:", error);
       setLoadError("No se pudieron cargar los registros de dueños.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -200,137 +212,109 @@ const DuenosPage = () => {
   }
 
   return (
-    <div className="container my-3">
+    <div className="container mt-4">
       <NotificationToast toast={toast} onClose={() => setToast(null)} />
-      <section className="card mb-3">
-        <div className="card-body d-flex flex-row justify-content-between align-items-center">
-          <div>
-            <div className="d-flex gap-2 align-items-center">
-              <span className="d-flex d-inline-flex items-center gap-2">
-                <i className="bi bi-people-fill fs-2"></i>
-              </span>
-              <h1 className="mb-2">Dueños de Mascotas</h1>
-            </div>
-            <p className="mb-0">
-              Vista donde podrás revisar y gestionar los dueños y sus contactos
-            </p>
-          </div>
-          <div>
-            <button
-              className="btn btn-success"
-              onClick={handleOpenCreateDuenoModal}
+      <PageHeader icon="bi-people-fill" title="Dueños de Mascotas" description="Vista donde podrás revisar y gestionar los dueños y sus contactos">
+        <button
+          className="btn btn-success"
+          onClick={handleOpenCreateDuenoModal}
+        >
+          <i className="bi bi-plus-circle-fill"></i> Nuevo Dueño
+        </button>
+      </PageHeader>
+
+      <p className="text-muted small mb-1">
+        <i className="bi bi-info-circle me-1"></i>
+        Selecciona una fila para administrar sus contactos de emergencia
+      </p>
+
+      <div className="card shadow-sm">
+        <div className="card-body">
+          <div className="d-flex flex-wrap gap-2 align-items-center border-bottom pb-3 mb-3">
+            <input
+              type="text"
+              className="form-control w-auto"
+              placeholder="Buscar por nombre..."
+              value={searchNombre}
+              onChange={(e) => setSearchNombre(e.target.value)}
+            />
+            <input
+              type="text"
+              className="form-control w-auto"
+              placeholder="Buscar por DNI..."
+              value={searchDni}
+              onChange={(e) => setSearchDni(e.target.value)}
+            />
+            <select
+              className="form-select w-auto"
+              value={filtroActivo}
+              onChange={(e) => setFiltroActivo(e.target.value)}
             >
-              <i className="bi bi-plus-circle-fill"></i> Nuevo Dueño
-            </button>
+              <option value="todos">Todos</option>
+              <option value="activos">Activos</option>
+              <option value="inactivos">Inactivos</option>
+            </select>
           </div>
-        </div>
-      </section>
-
-      <section className="card mb-3">
-        <div className="card-body d-flex flex-wrap gap-2 align-items-center">
-          <input
-            type="text"
-            className="form-control w-auto"
-            placeholder="Buscar por nombre..."
-            value={searchNombre}
-            onChange={(e) => setSearchNombre(e.target.value)}
-          />
-          <input
-            type="text"
-            className="form-control w-auto"
-            placeholder="Buscar por DNI..."
-            value={searchDni}
-            onChange={(e) => setSearchDni(e.target.value)}
-          />
-          <select
-            className="form-select w-auto"
-            value={filtroActivo}
-            onChange={(e) => setFiltroActivo(e.target.value)}
-          >
-            <option value="todos">Todos</option>
-            <option value="activos">Activos</option>
-            <option value="inactivos">Inactivos</option>
-          </select>
-        </div>
-      </section>
-
-      {loadError ? (
-        <div className="alert alert-danger" role="alert">
-          {loadError}
-        </div>
-      ) : null}
-
-      <div className="card mb-4">
-        <div className="card-header bg-light">
-          <small className="text-muted fw-bold">
-            Selecciona una fila para administrar sus contactos de emergencia
-          </small>
-        </div>
-        <div className="table-responsive">
-          <table className="table table-striped table-light table-bordered table-hover mb-0">
-            <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Nombre Completo</th>
-                <th scope="col">DNI</th>
-                <th scope="col">Email</th>
-                <th scope="col">Teléfono</th>
-                <th scope="col">Estado</th>
-                <th scope="col" className="text-center">
-                  Acciones
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {duenos.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="text-center py-3 text-muted">
-                    No hay registros de dueños disponibles.
+          {loadError ? (
+            <div className="alert alert-danger" role="alert">
+              {loadError}
+            </div>
+          ) : null}
+          {loading ? (
+            <div className="text-center py-4">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Cargando...</span>
+              </div>
+            </div>
+          ) : (
+            <DataTable
+              columns={["#", "Nombre Completo", "DNI", "Email", "Teléfono", "Estado", "Acciones"]}
+              emptyMessage="No hay registros de dueños disponibles."
+              colSpan={7}
+            >
+              {duenos.map((dueno, index) => (
+                <tr
+                  key={dueno.id || index}
+                  onClick={() => setSelectedDueno(dueno)}
+                  className={
+                    selectedDueno?.id === dueno.id
+                      ? "table-primary fw-bold"
+                      : ""
+                  }
+                  style={{ cursor: "pointer" }}
+                >
+                  <td>{index + 1}</td>
+                  <td>
+                    {dueno.nombre} {dueno.apellido}
+                  </td>
+                  <td>{dueno.dni}</td>
+                  <td>{dueno.email}</td>
+                  <td>{dueno.telefono || "—"}</td>
+                  <td>
+                    <span
+                      className={`badge ${dueno.activo ? "bg-success" : "bg-danger"}`}
+                    >
+                      {dueno.activo ? "Activo" : "Inactivo"}
+                    </span>
+                  </td>
+                  <td>
+                    <ActionButtons
+                      activo={dueno.activo}
+                      onEdit={() => handleOpenEditDuenoModal(dueno)}
+                      onToggle={() => handleToggleDueno(dueno.id)}
+                      onDelete={() => setConfirmDelete(dueno.id)}
+                      size="sm"
+                    />
                   </td>
                 </tr>
-              ) : (
-                duenos.map((dueno, index) => (
-                  <tr
-                    key={dueno.id || index}
-                    onClick={() => setSelectedDueno(dueno)}
-                    className={
-                      selectedDueno?.id === dueno.id
-                        ? "table-primary fw-bold"
-                        : ""
-                    }
-                    style={{ cursor: "pointer" }}
-                  >
-                    <th scope="row">{index + 1}</th>
-                    <td>
-                      {dueno.nombre} {dueno.apellido}
-                    </td>
-                    <td>{dueno.dni}</td>
-                    <td>{dueno.email}</td>
-                    <td>{dueno.telefono || "—"}</td>
-                    <td>
-                      <span
-                        className={`badge ${dueno.activo ? "bg-success" : "bg-danger"}`}
-                      >
-                        {dueno.activo ? "Activo" : "Inactivo"}
-                      </span>
-                    </td>
-                    <td>
-                      <ActionButtons
-                        activo={dueno.activo}
-                        onEdit={() => handleOpenEditDuenoModal(dueno)}
-                        onToggle={() => handleToggleDueno(dueno.id)}
-                        onDelete={() => setConfirmDelete(dueno.id)}
-                        size="sm"
-                      />
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+              ))}
+            </DataTable>
+          )}
+        </div>
+        <div className="card-footer text-muted small py-2">
+          Total de dueños: {duenos.length}
         </div>
       </div>
-      <p>Total de dueños cargados: {duenos.length}</p>
 
       <section className="card p-3 bg-white shadow-sm mt-4">
         <div className="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">

@@ -1,4 +1,4 @@
-import { ROLES_USUARIO, ROL_LABEL } from '../../constants';
+import { ROL_LABEL } from '../../constants';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa';
@@ -17,20 +17,15 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const staffRoles = ROLES_USUARIO.filter((r) => r !== 'DUENO');
-
   const navbarLinks = () => {
     const links: { label: string; to: string }[] = [{ label: 'Dashboard', to: '/' }];
 
     if (!user) return links;
 
-    if (staffRoles.includes(user.role as typeof ROLES_USUARIO[number])) {
+    if (user.role !== 'DUENO') {
       links.push({ label: 'Servicios', to: '/servicios' });
       links.push({ label: 'Citas', to: '/citas' });
       links.push({ label: 'Mascotas', to: '/mascotas' });
-    }
-
-    if (user.role !== 'DUENO') {
       links.push({ label: 'Dueños', to: '/duenos' });
     }
 

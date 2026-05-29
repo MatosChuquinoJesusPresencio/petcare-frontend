@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
-import ActionButtons from "../ActionButtons";
+import ActionButtons from "../common/ActionButtons";
+import DataTable from "../common/DataTable";
 
 import type { Dueno, MascotaResponse } from "../../types";
 import { obtenerDuenoPrincipal } from "../../services";
@@ -42,58 +43,38 @@ export default function MascotaTable({
   onVincular,
 }: Props) {
   return (
-    <div className="table-responsive">
-      <table className="table table-bordered table-hover align-middle">
-        <thead className="table-light">
-          <tr>
-            <th>#</th>
-            <th>Nombre</th>
-            <th>Especie</th>
-            <th>Raza</th>
-            <th>Sexo</th>
-            <th>Dueño</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {mascotas.map((mascota, index) => (
-            <tr key={mascota.id}>
-              <td>{index + 1}</td>
-
-              <td>{mascota.nombre}</td>
-
-              <td>{mascota.especie}</td>
-
-              <td>{mascota.raza}</td>
-
-              <td>{mascota.sexo}</td>
-
-              <td><DueñoInfo mascotaId={mascota.id} /></td>
-
-              <td>
-                {mascota.activo ? (
-                  <span className="badge bg-success">Activo</span>
-                ) : (
-                  <span className="badge bg-danger">Inactivo</span>
-                )}
-              </td>
-
-              <td>
-                <ActionButtons
-                  activo={mascota.activo}
-                  onEdit={() => onEdit(mascota.id)}
-                  onToggle={() => onToggle(mascota.id)}
-                  onDelete={() => onDelete(mascota.id)}
-                  onVincular={() => onVincular(mascota.id)}
-                  size="sm"
-                />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <DataTable
+      columns={["#", "Nombre", "Especie", "Raza", "Sexo", "Dueño", "Estado", "Acciones"]}
+      emptyMessage="No hay mascotas registradas."
+      colSpan={8}
+    >
+      {mascotas.map((mascota, index) => (
+        <tr key={mascota.id}>
+          <td>{index + 1}</td>
+          <td>{mascota.nombre}</td>
+          <td>{mascota.especie}</td>
+          <td>{mascota.raza}</td>
+          <td>{mascota.sexo}</td>
+          <td><DueñoInfo mascotaId={mascota.id} /></td>
+          <td>
+            {mascota.activo ? (
+              <span className="badge bg-success">Activo</span>
+            ) : (
+              <span className="badge bg-danger">Inactivo</span>
+            )}
+          </td>
+          <td>
+            <ActionButtons
+              activo={mascota.activo}
+              onEdit={() => onEdit(mascota.id)}
+              onToggle={() => onToggle(mascota.id)}
+              onDelete={() => onDelete(mascota.id)}
+              onVincular={() => onVincular(mascota.id)}
+              size="sm"
+            />
+          </td>
+        </tr>
+      ))}
+    </DataTable>
   );
 }

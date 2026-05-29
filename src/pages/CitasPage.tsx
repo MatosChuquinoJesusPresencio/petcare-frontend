@@ -13,9 +13,12 @@ import {
 import CitaTable from "../components/citas/CitaTable";
 import CitaFormModal from "../components/citas/CitaFormModal";
 import CitaReprogramarModal from "../components/citas/CitaReprogramarModal";
-import ConfirmDialog from "../components/ConfirmDialog";
-import NotificationToast from "../components/NotificationToast";
-import type { ToastInfo } from "../components/NotificationToast";
+import ConfirmDialog from "../components/common/ConfirmDialog";
+
+import NotificationToast from "../components/common/NotificationToast";
+import type { ToastInfo } from "../components/common/NotificationToast";
+
+import PageHeader from "../components/common/PageHeader";
 
 const CitasPage = () => {
   const [citas, setCitas] = useState<CitaResponse[]>([]);
@@ -93,12 +96,11 @@ const CitasPage = () => {
     <div className="container mt-4">
       <NotificationToast toast={toast} onClose={() => setToast(null)} />
 
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2><i className="bi bi-calendar-check me-2"></i>Gestión de Citas</h2>
-        <button className="btn btn-primary" onClick={() => setShowFormModal(true)}>
-          <i className="bi bi-plus-circle me-2"></i>Nueva Cita
+      <PageHeader icon="bi-calendar-check" title="Gestión de Citas" description="Vista donde podras ver y gestionar las citas">
+        <button className="btn btn-success" onClick={() => setShowFormModal(true)}>
+          <i className="bi bi-plus-circle-fill me-2"></i>Nueva Cita
         </button>
-      </div>
+      </PageHeader>
 
       <div className="card shadow-sm">
         <div className="card-body">
@@ -119,6 +121,9 @@ const CitasPage = () => {
               onCancelar={(id) => setCancelarId(id)}
             />
           )}
+        </div>
+        <div className="card-footer text-muted small py-2">
+          Total de citas: {citas.length}
         </div>
       </div>
 

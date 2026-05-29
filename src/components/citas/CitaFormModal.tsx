@@ -24,12 +24,47 @@ export default function CitaFormModal({ show, onClose, onSuccess, mascotas, serv
   const [notes, setNotes] = useState("");
 
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   if (!show) return null;
+
+  const validate = (): Record<string, string> => {
+    const errors: Record<string, string> = {};
+    if (!petId) errors.petId = "Selecciona una mascota.";
+    if (!veterinarianId) errors.veterinarianId = "Selecciona un veterinario.";
+    if (!serviceId) errors.serviceId = "Selecciona un servicio.";
+    if (!fecha) {
+      errors.fecha = "La fecha es obligatoria.";
+    } else {
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+      if (new Date(fecha) < hoy) {
+        errors.fecha = "La fecha no puede ser pasada.";
+      }
+    }
+    if (!horaSeleccionada) errors.horaSeleccionada = "Selecciona un horario disponible.";
+    return errors;
+  };
+
+  const clearFieldError = (field: string) => {
+    setFieldErrors((p) => {
+      if (!p[field]) return p;
+      const n = { ...p };
+      delete n[field];
+      return n;
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    const errors = validate();
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+    setFieldErrors({});
 
     const dateTime = `${fecha}T${horaSeleccionada}`;
 
@@ -50,7 +85,7 @@ export default function CitaFormModal({ show, onClose, onSuccess, mascotas, serv
 
   return (
     <div className="modal fade show d-block modal-bg" tabIndex={-1}>
-      <div className="modal-dialog">
+      <div className="modal-dialog modal-force-dark-text">
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">Agendar Nueva Cita</h5>
@@ -60,34 +95,38 @@ export default function CitaFormModal({ show, onClose, onSuccess, mascotas, serv
             <form id="formCita" onSubmit={handleSubmit}>
               <div className="mb-3">
                 <label className="form-label">Mascota *</label>
-                <select className="form-select" value={petId} onChange={(e) => setPetId(e.target.value)} required>
+                <select className={`form-select ${fieldErrors.petId ? 'is-invalid' : ''}`} value={petId} onChange={(e) => { setPetId(e.target.value); clearFieldError('petId'); }} required>
                   <option value="">Seleccione mascota...</option>
                   {mascotas.map((m) => (
                     <option key={m.id} value={m.id}>{m.nombre}</option>
                   ))}
                 </select>
+                {fieldErrors.petId && <div className="invalid-feedback">{fieldErrors.petId}</div>}
               </div>
               <div className="mb-3">
                 <label className="form-label">Veterinario *</label>
-                <select className="form-select" value={veterinarianId} onChange={(e) => setVeterinarianId(e.target.value)} required>
+                <select className={`form-select ${fieldErrors.veterinarianId ? 'is-invalid' : ''}`} value={veterinarianId} onChange={(e) => { setVeterinarianId(e.target.value); clearFieldError('veterinarianId'); }} required>
                   <option value="">Seleccione veterinario...</option>
                   {veterinarios.map((v) => (
                     <option key={v.id} value={v.id}>{v.nombre} {v.apellido}</option>
                   ))}
                 </select>
+                {fieldErrors.veterinarianId && <div className="invalid-feedback">{fieldErrors.veterinarianId}</div>}
               </div>
               <div className="mb-3">
                 <label className="form-label">Servicio *</label>
-                <select className="form-select" value={serviceId} onChange={(e) => setServiceId(e.target.value)} required>
+                <select className={`form-select ${fieldErrors.serviceId ? 'is-invalid' : ''}`} value={serviceId} onChange={(e) => { setServiceId(e.target.value); clearFieldError('serviceId'); }} required>
                   <option value="">Seleccione servicio...</option>
                   {servicios.map((s) => (
                     <option key={s.id} value={s.id}>{s.nombre}</option>
                   ))}
                 </select>
+                {fieldErrors.serviceId && <div className="invalid-feedback">{fieldErrors.serviceId}</div>}
               </div>
               <div className="mb-3">
                 <label className="form-label">Fecha *</label>
-                <input type="date" className="form-control" value={fecha} onChange={(e) => setFecha(e.target.value)} required />
+                <input type="date" className={`form-control ${fieldErrors.fecha ? 'is-invalid' : ''}`} value={fecha} onChange={(e) => { setFecha(e.target.value); clearFieldError('fecha'); }} required />
+                {fieldErrors.fecha && <div className="invalid-feedback">{fieldErrors.fecha}</div>}
               </div>
               <div className="mb-3">
                 <label className="form-label">Horario disponible *</label>
@@ -96,8 +135,9 @@ export default function CitaFormModal({ show, onClose, onSuccess, mascotas, serv
                   serviceId={serviceId ? Number(serviceId) : null}
                   fecha={fecha}
                   value={horaSeleccionada}
-                  onChange={setHoraSeleccionada}
+                  onChange={(v) => { setHoraSeleccionada(v); clearFieldError('horaSeleccionada'); }}
                 />
+                {fieldErrors.horaSeleccionada && <div className="invalid-feedback">{fieldErrors.horaSeleccionada}</div>}
               </div>
               <div className="mb-3">
                 <label className="form-label">Notas</label>

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 
-import BaseFormDialog from "./BaseFormDialog";
-import type { ContactoEmergenciaRequest } from "../types";
+import BaseFormDialog from "../common/BaseFormDialog";
+import type { ContactoEmergenciaRequest } from "../../types";
 
 type ContactoFormDialogProps = {
   isOpen: boolean;
@@ -22,6 +22,26 @@ const initialFormState: ContactoFormState = {
   relation: "",
 };
 
+function validate(formData: ContactoFormState): Record<string, string> {
+  const errors: Record<string, string> = {};
+
+  if (!formData.name.trim()) {
+    errors.name = "El nombre del contacto es obligatorio.";
+  } else if (formData.name.trim().length < 2) {
+    errors.name = "Mínimo 2 caracteres.";
+  } else if (formData.name.trim().length > 100) {
+    errors.name = "Máximo 100 caracteres.";
+  }
+
+  if (!formData.phone.trim()) {
+    errors.phone = "El número telefónico es obligatorio.";
+  } else if (!/^[\d\s+\-()]{6,20}$/.test(formData.phone.trim())) {
+    errors.phone = "Ingresa un teléfono válido (6-20 dígitos).";
+  }
+
+  return errors;
+}
+
 const ContactoFormDialog = ({
   isOpen,
   onClose,
@@ -30,11 +50,13 @@ const ContactoFormDialog = ({
   const [formData, setFormData] = useState<ContactoFormState>(initialFormState);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setFormData(initialFormState);
       setSubmitError("");
+      setFieldErrors({});
       setIsSubmitting(false);
     });
 
@@ -50,21 +72,24 @@ const ContactoFormDialog = ({
       ...current,
       [name]: value,
     }));
+    setFieldErrors((prev) => {
+      if (!prev[name]) return prev;
+      const next = { ...prev };
+      delete next[name];
+      return next;
+    });
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmitError("");
 
-    if (!formData.name.trim()) {
-      setSubmitError("Ingresa el nombre completo del contacto.");
+    const errors = validate(formData);
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       return;
     }
-
-    if (!formData.phone.trim()) {
-      setSubmitError("El número telefónico es obligatorio.");
-      return;
-    }
+    setFieldErrors({});
 
     try {
       setIsSubmitting(true);
@@ -102,26 +127,28 @@ const ContactoFormDialog = ({
           <label className="form-label">Nombre del contacto *</label>
           <input
             type="text"
-            className="form-control"
+            className={`form-control ${fieldErrors.name ? 'is-invalid' : ''}`}
             name="name"
             value={formData.name}
             onChange={handleChange}
             placeholder="Ej. María López"
             required
           />
+          {fieldErrors.name && <div className="invalid-feedback">{fieldErrors.name}</div>}
         </div>
 
         <div className="col-12">
           <label className="form-label">Número de teléfono *</label>
           <input
             type="text"
-            className="form-control"
+            className={`form-control ${fieldErrors.phone ? 'is-invalid' : ''}`}
             name="phone"
             value={formData.phone}
             onChange={handleChange}
             placeholder="Ej. 987654321"
             required
           />
+          {fieldErrors.phone && <div className="invalid-feedback">{fieldErrors.phone}</div>}
         </div>
 
         <div className="col-12">

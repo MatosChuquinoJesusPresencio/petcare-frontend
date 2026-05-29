@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-import NotificationToast from "../NotificationToast";
-import type { ToastInfo } from "../NotificationToast";
+import NotificationToast from "../common/NotificationToast";
+import type { ToastInfo } from "../common/NotificationToast";
 
 import { SEXOS_MASCOTA, SEXO_LABEL } from "../../constants";
 import type { Dueno, MascotaRequest } from "../../types";
@@ -49,6 +49,81 @@ const initialForm: FormState = {
   ownerRelation: "Propietario",
 };
 
+function validate(form: FormState, isCreating: boolean): Record<string, string> {
+  const errors: Record<string, string> = {};
+
+  if (!form.nombre.trim()) {
+    errors.nombre = "El nombre es obligatorio.";
+  } else if (form.nombre.trim().length < 2) {
+    errors.nombre = "Mínimo 2 caracteres.";
+  } else if (form.nombre.trim().length > 50) {
+    errors.nombre = "Máximo 50 caracteres.";
+  }
+
+  if (!form.especie.trim()) {
+    errors.especie = "La especie es obligatoria.";
+  } else if (form.especie.trim().length < 2) {
+    errors.especie = "Mínimo 2 caracteres.";
+  } else if (form.especie.trim().length > 50) {
+    errors.especie = "Máximo 50 caracteres.";
+  }
+
+  if (!form.raza.trim()) {
+    errors.raza = "La raza es obligatoria.";
+  } else if (form.raza.trim().length < 2) {
+    errors.raza = "Mínimo 2 caracteres.";
+  } else if (form.raza.trim().length > 50) {
+    errors.raza = "Máximo 50 caracteres.";
+  }
+
+  if (!form.fechaNacimiento) {
+    errors.fechaNacimiento = "La fecha de nacimiento es obligatoria.";
+  } else {
+    const nacimiento = new Date(form.fechaNacimiento);
+    const hoy = new Date();
+    hoy.setHours(23, 59, 59, 999);
+    if (nacimiento > hoy) {
+      errors.fechaNacimiento = "La fecha no puede ser futura.";
+    }
+  }
+
+  if (isCreating && !form.ownerId) {
+    errors.ownerId = "Selecciona un dueño principal.";
+  }
+
+  if (isCreating) {
+    if (!form.ownerRelation.trim()) {
+      errors.ownerRelation = "La relación es obligatoria.";
+    } else if (form.ownerRelation.trim().length < 2) {
+      errors.ownerRelation = "Mínimo 2 caracteres.";
+    } else if (form.ownerRelation.trim().length > 50) {
+      errors.ownerRelation = "Máximo 50 caracteres.";
+    }
+  }
+
+  if (form.microchip && form.microchip.length > 50) {
+    errors.microchip = "Máximo 50 caracteres.";
+  }
+
+  if (form.condicionReproductiva && form.condicionReproductiva.length > 100) {
+    errors.condicionReproductiva = "Máximo 100 caracteres.";
+  }
+
+  if (form.alergias && form.alergias.length > 500) {
+    errors.alergias = "Máximo 500 caracteres.";
+  }
+
+  if (form.enfermedadesCronicas && form.enfermedadesCronicas.length > 500) {
+    errors.enfermedadesCronicas = "Máximo 500 caracteres.";
+  }
+
+  if (form.alertasMedicas && form.alertasMedicas.length > 500) {
+    errors.alertasMedicas = "Máximo 500 caracteres.";
+  }
+
+  return errors;
+}
+
 export default function MascotaModal({
   show,
   onClose,
@@ -58,6 +133,7 @@ export default function MascotaModal({
   const [form, setForm] = useState<FormState>(initialForm);
   const [duenos, setDuenos] = useState<Dueno[]>([]);
   const [toast, setToast] = useState<ToastInfo | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const cargarDuenos = async () => {
     try {
@@ -102,23 +178,33 @@ export default function MascotaModal({
       } else {
         setForm(initialForm);
       }
+      setFieldErrors({});
     });
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [show, mascotaId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+    setFieldErrors((prev) => {
+      if (!prev[name]) return prev;
+      const next = { ...prev };
+      delete next[name];
+      return next;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const isCreating = !mascotaId;
 
-    if (isCreating && !form.ownerId) {
-      setToast({ message: "Debes seleccionar un dueño principal.", type: "error" });
+    const errors = validate(form, isCreating);
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       return;
     }
+    setFieldErrors({});
 
     try {
       const data: MascotaRequest = {
@@ -177,36 +263,39 @@ export default function MascotaModal({
                   <label className="form-label">Nombre</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className={`form-control ${fieldErrors.nombre ? 'is-invalid' : ''}`}
                     name="nombre"
                     value={form.nombre}
                     onChange={handleChange}
                     required
                   />
+                  {fieldErrors.nombre && <div className="invalid-feedback">{fieldErrors.nombre}</div>}
                 </div>
 
                 <div className="col-md-6 mb-3">
                   <label className="form-label">Especie</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className={`form-control ${fieldErrors.especie ? 'is-invalid' : ''}`}
                     name="especie"
                     value={form.especie}
                     onChange={handleChange}
                     required
                   />
+                  {fieldErrors.especie && <div className="invalid-feedback">{fieldErrors.especie}</div>}
                 </div>
 
                 <div className="col-md-6 mb-3">
                   <label className="form-label">Raza</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className={`form-control ${fieldErrors.raza ? 'is-invalid' : ''}`}
                     name="raza"
                     value={form.raza}
                     onChange={handleChange}
                     required
                   />
+                  {fieldErrors.raza && <div className="invalid-feedback">{fieldErrors.raza}</div>}
                 </div>
 
                 <div className="col-md-6 mb-3">
@@ -226,22 +315,24 @@ export default function MascotaModal({
                   <label className="form-label">Fecha Nacimiento</label>
                   <input
                     type="date"
-                    className="form-control"
+                    className={`form-control ${fieldErrors.fechaNacimiento ? 'is-invalid' : ''}`}
                     name="fechaNacimiento"
                     value={form.fechaNacimiento}
                     onChange={handleChange}
                     required
                   />
+                  {fieldErrors.fechaNacimiento && <div className="invalid-feedback">{fieldErrors.fechaNacimiento}</div>}
                 </div>
 
                 <div className="col-md-6 mb-3">
                   <label className="form-label">Dueño Principal</label>
                   <select
-                    className="form-select"
+                    className={`form-select ${fieldErrors.ownerId ? 'is-invalid' : ''}`}
                     value={form.ownerId}
-                    onChange={(e) =>
-                      setForm({ ...form, ownerId: Number(e.target.value) })
-                    }
+                    onChange={(e) => {
+                      setForm((prev) => ({ ...prev, ownerId: Number(e.target.value) }));
+                      setFieldErrors((p) => { const n = { ...p }; delete n.ownerId; return n; });
+                    }}
                     required={!isEditing}
                   >
                     <option value="">
@@ -255,6 +346,7 @@ export default function MascotaModal({
                       </option>
                     ))}
                   </select>
+                  {fieldErrors.ownerId && <div className="invalid-feedback">{fieldErrors.ownerId}</div>}
                   {isEditing && (
                     <small className="text-muted">
                       El dueño principal no se modifica desde aquí. Usa "Vincular Dueño" para agregar owners adicionales.
@@ -266,67 +358,73 @@ export default function MascotaModal({
                   <label className="form-label">Relación</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className={`form-control ${fieldErrors.ownerRelation ? 'is-invalid' : ''}`}
                     name="ownerRelation"
                     value={form.ownerRelation}
                     onChange={handleChange}
                     required={!isEditing}
                   />
+                  {fieldErrors.ownerRelation && <div className="invalid-feedback">{fieldErrors.ownerRelation}</div>}
                 </div>
 
                 <div className="col-md-6 mb-3">
                   <label className="form-label">Microchip</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className={`form-control ${fieldErrors.microchip ? 'is-invalid' : ''}`}
                     name="microchip"
                     value={form.microchip}
                     onChange={handleChange}
                   />
+                  {fieldErrors.microchip && <div className="invalid-feedback">{fieldErrors.microchip}</div>}
                 </div>
 
                 <div className="col-md-6 mb-3">
                   <label className="form-label">Condición Reproductiva</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className={`form-control ${fieldErrors.condicionReproductiva ? 'is-invalid' : ''}`}
                     name="condicionReproductiva"
                     value={form.condicionReproductiva}
                     onChange={handleChange}
                   />
+                  {fieldErrors.condicionReproductiva && <div className="invalid-feedback">{fieldErrors.condicionReproductiva}</div>}
                 </div>
 
                 <div className="col-md-6 mb-3">
                   <label className="form-label">Alergias</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className={`form-control ${fieldErrors.alergias ? 'is-invalid' : ''}`}
                     name="alergias"
                     value={form.alergias}
                     onChange={handleChange}
                   />
+                  {fieldErrors.alergias && <div className="invalid-feedback">{fieldErrors.alergias}</div>}
                 </div>
 
                 <div className="col-md-6 mb-3">
                   <label className="form-label">Enfermedades Crónicas</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className={`form-control ${fieldErrors.enfermedadesCronicas ? 'is-invalid' : ''}`}
                     name="enfermedadesCronicas"
                     value={form.enfermedadesCronicas}
                     onChange={handleChange}
                   />
+                  {fieldErrors.enfermedadesCronicas && <div className="invalid-feedback">{fieldErrors.enfermedadesCronicas}</div>}
                 </div>
 
                 <div className="col-md-6 mb-3">
                   <label className="form-label">Alertas Médicas</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className={`form-control ${fieldErrors.alertasMedicas ? 'is-invalid' : ''}`}
                     name="alertasMedicas"
                     value={form.alertasMedicas}
                     onChange={handleChange}
                   />
+                  {fieldErrors.alertasMedicas && <div className="invalid-feedback">{fieldErrors.alertasMedicas}</div>}
                 </div>
               </div>
             </div>

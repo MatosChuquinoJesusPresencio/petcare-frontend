@@ -40,6 +40,10 @@ export async function vincularDueno(mascotaId: number, duenoId: number, relacion
   await apiClient.post(`/api/mascotas/${mascotaId}/vincular-dueno/${duenoId}?relacion=${relacion}`);
 }
 
+export async function cambiarDuenoPrincipal(mascotaId: number, duenoId: number, relacion: string): Promise<void> {
+  await apiClient.patch(`/api/mascotas/${mascotaId}/cambiar-dueno-principal`, { duenoId, relacion });
+}
+
 export async function obtenerDuenoPrincipal(mascotaId: number): Promise<Dueno | null> {
   try {
     const response = await apiClient.get<Dueno>(`/api/mascotas/${mascotaId}/dueno-principal`);

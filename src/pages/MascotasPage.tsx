@@ -5,15 +5,19 @@ import type { MascotaResponse } from "../types";
 import { eliminarMascota, obtenerMascotas, toggleMascota } from "../services";
 
 import { SEXOS_MASCOTA, SEXO_LABEL } from "../constants";
-import ConfirmDialog from "../components/ConfirmDialog";
-import NotificationToast from "../components/NotificationToast";
-import type { ToastInfo } from "../components/NotificationToast";
+import ConfirmDialog from "../components/common/ConfirmDialog";
+
+import NotificationToast from "../components/common/NotificationToast";
+import type { ToastInfo } from "../components/common/NotificationToast";
+
 import MascotaTable from "../components/mascotas/MascotaTable";
 import MascotaModal from "../components/mascotas/MascotaModal";
 import MascotaVincularModal from "../components/mascotas/MascotaVincularModal";
+import PageHeader from "../components/common/PageHeader";
 
 const MascotasPage = () => {
   const [mascotas, setMascotas] = useState<MascotaResponse[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
   const [mascotaEditarId, setMascotaEditarId] = useState<number | null>(null);
@@ -30,6 +34,7 @@ const MascotasPage = () => {
 
   const cargarMascotas = async () => {
     try {
+      setLoading(true);
       const params: { nombre?: string; especie?: string; raza?: string; sexo?: string; activo?: boolean } = {};
       if (filtroNombre.trim()) params.nombre = filtroNombre.trim();
       if (filtroEspecie.trim()) params.especie = filtroEspecie.trim();
@@ -42,6 +47,8 @@ const MascotasPage = () => {
     } catch (error) {
       console.error(error);
       setToast({ message: "No se pudieron cargar las mascotas.", type: "error" });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -94,74 +101,76 @@ const MascotasPage = () => {
   return (
     <div className="container mt-4">
       <NotificationToast toast={toast} onClose={() => setToast(null)} />
-      <div className="card shadow-sm mb-4">
-        <div className="card-body d-flex flex-row justify-content-between align-items-center">
-          <div>
-            <h1 className="mb-1">Mascotas</h1>
-            <p className="text-muted mb-0">
-              Vista donde podrás revisar y gestionar mascotas
-            </p>
+      <PageHeader icon="bi-heart" title="Mascotas" description="Vista donde podrás revisar y gestionar mascotas">
+        <button className="btn btn-success" onClick={handleNuevaMascota}>
+          <i className="bi bi-plus-circle-fill me-2"></i>Nueva Mascota
+        </button>
+      </PageHeader>
+
+      <div className="card shadow-sm">
+        <div className="card-body">
+          <div className="d-flex flex-wrap gap-2 align-items-center border-bottom pb-3 mb-3">
+            <input
+              type="text"
+              className="form-control w-auto"
+              placeholder="Filtrar por nombre..."
+              value={filtroNombre}
+              onChange={(e) => setFiltroNombre(e.target.value)}
+            />
+            <input
+              type="text"
+              className="form-control w-auto"
+              placeholder="Filtrar por especie..."
+              value={filtroEspecie}
+              onChange={(e) => setFiltroEspecie(e.target.value)}
+            />
+            <input
+              type="text"
+              className="form-control w-auto"
+              placeholder="Filtrar por raza..."
+              value={filtroRaza}
+              onChange={(e) => setFiltroRaza(e.target.value)}
+            />
+            <select
+              className="form-select w-auto"
+              value={filtroSexo}
+              onChange={(e) => setFiltroSexo(e.target.value)}
+            >
+              <option value="todos">Todos los sexos</option>
+              {SEXOS_MASCOTA.map((sexo) => (
+                <option key={sexo} value={sexo}>{SEXO_LABEL[sexo]}</option>
+              ))}
+            </select>
+            <select
+              className="form-select w-auto"
+              value={filtroActivo}
+              onChange={(e) => setFiltroActivo(e.target.value)}
+            >
+              <option value="todos">Todos</option>
+              <option value="activos">Activos</option>
+              <option value="inactivos">Inactivos</option>
+            </select>
           </div>
-          <button className="btn btn-success" onClick={handleNuevaMascota}>
-            <i className="bi bi-plus-circle-fill"></i>
-          </button>
+          {loading ? (
+            <div className="text-center py-4">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Cargando...</span>
+              </div>
+            </div>
+          ) : (
+            <MascotaTable
+              mascotas={mascotas}
+              onEdit={handleEditar}
+              onDelete={(id) => setConfirmDeleteMascota(id)}
+              onToggle={handleToggleMascota}
+              onVincular={handleVincular}
+            />
+          )}
+        </div>
+        <div className="card-footer text-muted small py-2">
+          Total de mascotas: {mascotas.length}
         </div>
       </div>
-
-      <section className="card mb-3">
-        <div className="card-body d-flex flex-wrap gap-2 align-items-center">
-          <input
-            type="text"
-            className="form-control w-auto"
-            placeholder="Filtrar por nombre..."
-            value={filtroNombre}
-            onChange={(e) => setFiltroNombre(e.target.value)}
-          />
-          <input
-            type="text"
-            className="form-control w-auto"
-            placeholder="Filtrar por especie..."
-            value={filtroEspecie}
-            onChange={(e) => setFiltroEspecie(e.target.value)}
-          />
-          <input
-            type="text"
-            className="form-control w-auto"
-            placeholder="Filtrar por raza..."
-            value={filtroRaza}
-            onChange={(e) => setFiltroRaza(e.target.value)}
-          />
-          <select
-            className="form-select w-auto"
-            value={filtroSexo}
-            onChange={(e) => setFiltroSexo(e.target.value)}
-          >
-            <option value="todos">Todos los sexos</option>
-            {SEXOS_MASCOTA.map((sexo) => (
-              <option key={sexo} value={sexo}>{SEXO_LABEL[sexo]}</option>
-            ))}
-          </select>
-          <select
-            className="form-select w-auto"
-            value={filtroActivo}
-            onChange={(e) => setFiltroActivo(e.target.value)}
-          >
-            <option value="todos">Todos</option>
-            <option value="activos">Activos</option>
-            <option value="inactivos">Inactivos</option>
-          </select>
-        </div>
-      </section>
-
-      <MascotaTable
-        mascotas={mascotas}
-        onEdit={handleEditar}
-        onDelete={(id) => setConfirmDeleteMascota(id)}
-        onToggle={handleToggleMascota}
-        onVincular={handleVincular}
-      />
-
-      <p>Total de mascotas cargadas: {mascotas.length}</p>
 
       <MascotaModal
         show={showModal}
