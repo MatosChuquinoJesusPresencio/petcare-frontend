@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import type { LoginRequest, RegisterRequest, AuthResponse } from '../types/authTypes'
+import type { LoginRequest, RegisterRequest, AuthResponse } from '../types/authType'
 
 export type { LoginRequest, RegisterRequest, AuthResponse }
 

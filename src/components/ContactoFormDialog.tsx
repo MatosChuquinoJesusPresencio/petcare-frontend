@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 
-import type { ContactoEmergenciaRequest } from "../types/contacto";
+import type { ContactoEmergenciaRequest } from "../types/contactoType";
 
 type ContactoFormDialogProps = {
   isOpen: boolean;
@@ -31,16 +31,13 @@ const ContactoFormDialog = ({
   const [submitError, setSubmitError] = useState("");
 
   useEffect(() => {
-    if (isOpen) {
+    const timer = setTimeout(() => {
       setFormData(initialFormState);
       setSubmitError("");
       setIsSubmitting(false);
-      return;
-    }
+    });
 
-    setFormData(initialFormState);
-    setSubmitError("");
-    setIsSubmitting(false);
+    return () => clearTimeout(timer);
   }, [isOpen]);
 
   if (!isOpen) {
@@ -184,6 +181,18 @@ const ContactoFormDialog = ({
           </div>
         </div>
       </div>
+
+      <style>{`
+        #contactoModal .modal-body,
+        #contactoModal .modal-body .form-label,
+        #contactoModal .modal-body .form-control,
+        #contactoModal .modal-header .modal-title {
+          color: #000 !important;
+        }
+        #contactoModal .modal-body .form-control {
+          border-color: #ced4da;
+        }
+      `}</style>
     </>
   );
 };

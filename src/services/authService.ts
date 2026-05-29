@@ -4,7 +4,7 @@ import type {
   RegisterRequest,
   AuthResponse,
   TokenRefreshResponse,
-} from '../types/authTypes'
+} from '../types/authType'
 
 export const authService = {
   async login(data: LoginRequest): Promise<AuthResponse> {

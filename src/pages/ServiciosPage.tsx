@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
+import ConfirmDialog from "../components/ConfirmDialog";
 import ServiceFormDialog from "../components/modal/ServiceFormDialog";
 import {
   createServicio,
@@ -7,11 +8,11 @@ import {
   getServicios,
   toggleServicio,
   updateServicio,
-} from "../services/servicioApi";
+} from "../services/servicioService";
 import type {
   ServicioRequest,
   ServicioResponse,
-} from "../types/serviciosType";
+} from "../types/servicioType";
 
 const ServiciosPage = () => {
   const [servicios, setServicios] = useState<ServicioResponse[]>([]);
@@ -21,6 +22,7 @@ const ServiciosPage = () => {
     useState<ServicioResponse | null>(null);
   const [filtroActivo, setFiltroActivo] = useState<string>("todos");
   const [searchNombre, setSearchNombre] = useState("");
+  const [confirmDeleteServicio, setConfirmDeleteServicio] = useState<number | null>(null);
 
   const cargarServicios = useCallback(async () => {
     try {
@@ -46,7 +48,6 @@ const ServiciosPage = () => {
   }, [filtroActivo, searchNombre]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     cargarServicios();
   }, [cargarServicios]);
 
@@ -77,18 +78,14 @@ const ServiciosPage = () => {
   }
 
   async function handleDeleteServicio(id: number) {
-    const confirmed = window.confirm("¿Desea eliminar este Servicio?");
-
-    if (!confirmed) {
-      return;
-    }
-
     try {
       await deleteServicio(id);
       await cargarServicios();
     } catch (error) {
       console.error("Error al eliminar servicio:", error);
       setLoadError("No se pudo eliminar el servicio.");
+    } finally {
+      setConfirmDeleteServicio(null);
     }
   }
 
@@ -197,7 +194,7 @@ const ServiciosPage = () => {
                 </button>
                 <button
                   className="btn btn-danger"
-                  onClick={() => handleDeleteServicio(servicio.id)}
+                  onClick={() => setConfirmDeleteServicio(servicio.id)}
                 >
                   <i className="bi bi-trash3-fill"></i>
                 </button>
@@ -215,6 +212,21 @@ const ServiciosPage = () => {
         }
         mode={selectedServicio ? "edit" : "create"}
         onSubmit={handleSaveServicio}
+      />
+
+      <ConfirmDialog
+        isOpen={confirmDeleteServicio !== null}
+        title="Eliminar servicio"
+        message="¿Estás seguro de eliminar permanentemente este servicio? Esta acción no se puede deshacer."
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        variant="danger"
+        onConfirm={() => {
+          if (confirmDeleteServicio !== null) {
+            handleDeleteServicio(confirmDeleteServicio);
+          }
+        }}
+        onCancel={() => setConfirmDeleteServicio(null)}
       />
     </div>
   );

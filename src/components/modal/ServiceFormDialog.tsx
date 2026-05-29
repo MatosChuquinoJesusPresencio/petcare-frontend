@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 
-import type { ServicioRequest } from "../../types/serviciosType";
+import type { ServicioRequest } from "../../types/servicioType";
 
 type ServiceFormDialogProps = {
   isOpen: boolean;

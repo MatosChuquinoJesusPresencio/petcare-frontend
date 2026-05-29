@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 
-import type { DuenoRequest } from "../types/cliente";
+import type { DuenoRequest } from "../types/clienteType";
 
 type DuenoFormDialogProps = {
   isOpen: boolean;
@@ -55,18 +55,17 @@ const DuenoFormDialog = ({
   const [submitError, setSubmitError] = useState("");
 
   useEffect(() => {
-    if (isOpen) {
+    const timer = setTimeout(() => {
       setFormData(
-        initialData ? mapRequestToFormState(initialData) : initialFormState
+        initialData && isOpen
+          ? mapRequestToFormState(initialData)
+          : initialFormState
       );
       setSubmitError("");
       setIsSubmitting(false);
-      return;
-    }
+    });
 
-    setFormData(initialFormState);
-    setSubmitError("");
-    setIsSubmitting(false);
+    return () => clearTimeout(timer);
   }, [initialData, isOpen]);
 
   if (!isOpen) {
@@ -275,6 +274,18 @@ const DuenoFormDialog = ({
           </div>
         </div>
       </div>
+
+      <style>{`
+        #duenoModal .modal-body,
+        #duenoModal .modal-body .form-label,
+        #duenoModal .modal-body .form-control,
+        #duenoModal .modal-header .modal-title {
+          color: #000 !important;
+        }
+        #duenoModal .modal-body .form-control {
+          border-color: #ced4da;
+        }
+      `}</style>
     </>
   );
 };

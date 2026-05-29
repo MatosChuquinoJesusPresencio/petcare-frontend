@@ -3,7 +3,7 @@ import type {
   ServicioPageResponse,
   ServicioRequest,
   ServicioResponse,
-} from '../types/serviciosType';
+} from '../types/servicioType';
 
 export async function getServicios(params?: {
   soloActivos?: boolean;
