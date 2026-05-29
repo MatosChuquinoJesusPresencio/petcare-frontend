@@ -1,6 +1,7 @@
 import apiClient from "../api/client";
 
 import type { MascotaRequest, MascotaResponse, MascotaPageResponse } from "../types/mascotaType";
+import type { Dueno } from "../types/duenoType";
 
 export async function obtenerMascotas(params?: { nombre?: string; especie?: string; raza?: string; sexo?: string; activo?: boolean; duenoId?: number }): Promise<MascotaResponse[]> {
   const response = await apiClient.get<MascotaPageResponse>("/api/mascotas", { params });
@@ -38,4 +39,13 @@ export async function toggleMascota(id: number): Promise<MascotaResponse> {
 
 export async function vincularDueno(mascotaId: number, duenoId: number, relacion: string): Promise<void> {
   await apiClient.post(`/api/mascotas/${mascotaId}/vincular-dueno/${duenoId}?relacion=${relacion}`);
+}
+
+export async function obtenerDuenoPrincipal(mascotaId: number): Promise<Dueno | null> {
+  try {
+    const response = await apiClient.get<Dueno>(`/api/mascotas/${mascotaId}/dueno-principal`);
+    return response.data;
+  } catch {
+    return null;
+  }
 }

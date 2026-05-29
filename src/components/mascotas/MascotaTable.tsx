@@ -1,4 +1,8 @@
+import { useEffect, useState } from "react";
+
 import type { MascotaResponse } from "../../types/mascotaType";
+import type { Dueno } from "../../types/duenoType";
+import { obtenerDuenoPrincipal } from "../../services/mascotaService";
 
 interface Props {
   mascotas: MascotaResponse[];
@@ -6,6 +10,27 @@ interface Props {
   onDelete: (id: number) => void;
   onToggle: (id: number) => void;
   onVincular: (id: number) => void;
+}
+
+function DueñoInfo({ mascotaId }: { mascotaId: number }) {
+  const [dueno, setDueno] = useState<Dueno | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let ignore = false;
+    setLoading(true);
+    obtenerDuenoPrincipal(mascotaId).then((d) => {
+      if (!ignore) {
+        setDueno(d);
+        setLoading(false);
+      }
+    });
+    return () => { ignore = true; };
+  }, [mascotaId]);
+
+  if (loading) return <span className="text-muted small">Cargando...</span>;
+  if (!dueno) return <span className="text-muted fst-italic">Sin dueño</span>;
+  return <span>{dueno.nombre} {dueno.apellido}</span>;
 }
 
 export default function MascotaTable({
@@ -44,13 +69,7 @@ export default function MascotaTable({
 
               <td>{mascota.sexo}</td>
 
-              <td>
-                {mascota.duenoPrincipal ? (
-                  <span>{mascota.duenoPrincipal}</span>
-                ) : (
-                  <span className="text-muted fst-italic">Sin dueño</span>
-                )}
-              </td>
+              <td><DueñoInfo mascotaId={mascota.id} /></td>
 
               <td>
                 {mascota.activo ? (

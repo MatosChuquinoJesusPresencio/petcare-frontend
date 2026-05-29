@@ -26,7 +26,6 @@ export interface MascotaResponse {
   enfermedadesCronicas: string;
   alertasMedicas: string;
   activo: boolean;
-  duenoPrincipal?: string;
 }
 
 export interface MascotaPageResponse {
