@@ -1,5 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
+:root {
+  --brand-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.bg-brand-gradient {
+  background: var(--brand-gradient);
+}
+
 .fullscreen-bg {
   min-height: 100vh;
   display: flex;
@@ -37,7 +45,7 @@
 }
 
 .fullscreen-bg .btn-primary {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  background: var(--brand-gradient);
   border: none;
   border-radius: 12px;
   padding: 0.9rem 2rem;
@@ -60,6 +68,21 @@
   background: rgba(255, 255, 255, 0.2);
   color: rgba(255, 255, 255, 0.5);
   box-shadow: none;
+}
+
+.modal-bg {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-force-dark-text .modal-body,
+.modal-force-dark-text .modal-body .form-label,
+.modal-force-dark-text .modal-body .form-control,
+.modal-force-dark-text .modal-header .modal-title {
+  color: #000 !important;
+}
+
+.modal-force-dark-text .modal-body .form-control {
+  border-color: #ced4da;
 }
 
 @keyframes slideUpFade {

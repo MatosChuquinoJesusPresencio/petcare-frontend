@@ -1,3 +1,4 @@
+import { ROLES_USUARIO, ROL_LABEL } from '../../constants';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa';
@@ -16,23 +17,14 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const roleLabels: Record<string, string> = {
-    ADMINISTRADOR: 'Administrador',
-    VETERINARIO: 'Veterinario',
-    ASISTENTE: 'Asistente',
-    DUENO: 'Dueño',
-  };
-
-  const gradient = 'linear-gradient(135deg, #4facfe, #00f2fe)';
+  const staffRoles = ROLES_USUARIO.filter((r) => r !== 'DUENO');
 
   const navbarLinks = () => {
     const links: { label: string; to: string }[] = [{ label: 'Dashboard', to: '/' }];
 
     if (!user) return links;
 
-    const staffRoles = ['ADMINISTRADOR', 'VETERINARIO', 'ASISTENTE'];
-
-    if (staffRoles.includes(user.role)) {
+    if (staffRoles.includes(user.role as typeof ROLES_USUARIO[number])) {
       links.push({ label: 'Servicios', to: '/servicios' });
       links.push({ label: 'Citas', to: '/citas' });
       links.push({ label: 'Mascotas', to: '/mascotas' });
@@ -51,7 +43,7 @@ const Header = () => {
   };
 
   return (
-    <nav className="navbar navbar-expand-md" style={{ background: gradient }}>
+    <nav className="navbar navbar-expand-md bg-brand-gradient">
       <div className="container">
         <span className="navbar-brand text-white fw-bold" style={{ cursor: 'pointer' }} onClick={() => navigate('/')}>
           PetCare
@@ -78,7 +70,7 @@ const Header = () => {
 
           {user && (
             <div className="d-flex align-items-center gap-3">
-              <Tooltip text={`Nombre: ${user.username}\nRol: ${roleLabels[user.role] || user.role}`}>
+              <Tooltip text={`Nombre: ${user.username}\nRol: ${ROL_LABEL[user.role as keyof typeof ROL_LABEL] || user.role}`}>
                 <FaUserCircle size={26} className="text-white" />
               </Tooltip>
               <button className="btn btn-outline-light btn-sm d-flex align-items-center gap-1" onClick={handleLogout}>

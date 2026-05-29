@@ -14,10 +14,4 @@ export interface ServicioResponse {
   activo: boolean
 }
 
-export interface ServicioPageResponse {
-  content: ServicioResponse[]
-  totalElements: number
-  totalPages: number
-  size: number
-  number: number
-}
+

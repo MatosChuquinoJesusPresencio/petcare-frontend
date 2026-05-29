@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 
-import type { DuenoRequest } from "../types/duenoType";
+import BaseFormDialog from "./BaseFormDialog";
+import type { DuenoRequest } from "../types";
 
 type DuenoFormDialogProps = {
   isOpen: boolean;
@@ -18,7 +19,6 @@ type DuenoFormState = {
   email: string;
   phone: string;
   address: string;
-  userId: string;
 };
 
 const initialFormState: DuenoFormState = {
@@ -28,7 +28,6 @@ const initialFormState: DuenoFormState = {
   email: "",
   phone: "",
   address: "",
-  userId: "",
 };
 
 function mapRequestToFormState(data: DuenoRequest): DuenoFormState {
@@ -39,7 +38,6 @@ function mapRequestToFormState(data: DuenoRequest): DuenoFormState {
     email: data.email,
     phone: data.phone ?? "",
     address: data.address ?? "",
-    userId: data.userId !== null && data.userId !== undefined ? String(data.userId) : "",
   };
 }
 
@@ -68,10 +66,6 @@ const DuenoFormDialog = ({
     return () => clearTimeout(timer);
   }, [initialData, isOpen]);
 
-  if (!isOpen) {
-    return null;
-  }
-
   function handleChange(
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) {
@@ -87,7 +81,6 @@ const DuenoFormDialog = ({
     event.preventDefault();
     setSubmitError("");
 
-    // Validaciones de frontend
     if (!formData.firstName.trim() || !formData.lastName.trim()) {
       setSubmitError("Completa el nombre y apellido del dueño.");
       return;
@@ -110,7 +103,7 @@ const DuenoFormDialog = ({
 
     try {
       setIsSubmitting(true);
-      
+
       await onSubmit({
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
@@ -118,9 +111,8 @@ const DuenoFormDialog = ({
         email: formData.email.trim(),
         phone: formData.phone.trim() || undefined,
         address: formData.address.trim() || undefined,
-        userId: formData.userId ? Number(formData.userId) : null,
       });
-      
+
       onClose();
     } catch (error) {
       console.error("Error al procesar dueño:", error);
@@ -131,162 +123,89 @@ const DuenoFormDialog = ({
   }
 
   return (
-    <>
-      <div className="modal-backdrop fade show"></div>
-      <div
-        className="modal fade show d-block"
-        id="duenoModal"
-        aria-hidden="false"
-        aria-modal="true"
-        role="dialog"
-        tabIndex={-1}
-      >
-        <div className="modal-dialog modal-lg modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title">
-                {mode === "edit" ? "Editar dueño" : "Nuevo dueño"}
-              </h5>
-              <button
-                type="button"
-                className="btn-close"
-                aria-label="Cerrar"
-                onClick={onClose}
-                disabled={isSubmitting}
-              ></button>
-            </div>
+    <BaseFormDialog
+      isOpen={isOpen}
+      onClose={onClose}
+      onSubmit={handleSubmit}
+      title={mode === "edit" ? "Editar dueño" : "Nuevo dueño"}
+      submitLabel={mode === "edit" ? "Actualizar" : "Guardar"}
+      submitBusyLabel="Guardando..."
+      isSubmitting={isSubmitting}
+      submitError={submitError}
+      modalId="duenoModal"
+    >
+      <div className="row g-3">
+        <div className="col-md-6">
+          <label className="form-label">Nombre *</label>
+          <input
+            type="text"
+            className="form-control"
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-            <div className="modal-body">
-              <form onSubmit={handleSubmit}>
-                <div className="row g-3">
-                  <div className="col-md-6">
-                    <label className="form-label">Nombre *</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
+        <div className="col-md-6">
+          <label className="form-label">Apellido *</label>
+          <input
+            type="text"
+            className="form-control"
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-                  <div className="col-md-6">
-                    <label className="form-label">Apellido *</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
+        <div className="col-md-6">
+          <label className="form-label">DNI / Documento *</label>
+          <input
+            type="text"
+            className="form-control"
+            name="dni"
+            value={formData.dni}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-                  <div className="col-md-6">
-                    <label className="form-label">DNI / Documento *</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="dni"
-                      value={formData.dni}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
+        <div className="col-md-6">
+          <label className="form-label">Email *</label>
+          <input
+            type="email"
+            className="form-control"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-                  <div className="col-md-6">
-                    <label className="form-label">Email *</label>
-                    <input
-                      type="email"
-                      className="form-control"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
+        <div className="col-md-6">
+          <label className="form-label">Teléfono</label>
+          <input
+            type="text"
+            className="form-control"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+          />
+        </div>
 
-                  <div className="col-md-6">
-                    <label className="form-label">Teléfono</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">ID de Usuario Vinculado</label>
-                    <input
-                      type="number"
-                      className="form-control"
-                      name="userId"
-                      value={formData.userId}
-                      onChange={handleChange}
-                      placeholder="Ej. 42"
-                    />
-                  </div>
-
-                  <div className="col-12">
-                    <label className="form-label">Dirección habitual</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="address"
-                      value={formData.address}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
-
-                {submitError ? (
-                  <div className="alert alert-danger mt-3 mb-0" role="alert">
-                    {submitError}
-                  </div>
-                ) : null}
-
-                <div className="d-flex justify-content-center gap-3 modal-footer mt-4">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={onClose}
-                    disabled={isSubmitting}
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting
-                      ? "Guardando..."
-                      : mode === "edit"
-                        ? "Actualizar"
-                        : "Guardar"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
+        <div className="col-12">
+          <label className="form-label">Dirección habitual</label>
+          <input
+            type="text"
+            className="form-control"
+            name="address"
+            value={formData.address}
+            onChange={handleChange}
+          />
         </div>
       </div>
-
-      <style>{`
-        #duenoModal .modal-body,
-        #duenoModal .modal-body .form-label,
-        #duenoModal .modal-body .form-control,
-        #duenoModal .modal-header .modal-title {
-          color: #000 !important;
-        }
-        #duenoModal .modal-body .form-control {
-          border-color: #ced4da;
-        }
-      `}</style>
-    </>
+    </BaseFormDialog>
   );
 };
 

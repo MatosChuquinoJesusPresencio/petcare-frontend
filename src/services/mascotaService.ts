@@ -1,10 +1,9 @@
 import apiClient from "../api/client";
 
-import type { MascotaRequest, MascotaResponse, MascotaPageResponse } from "../types/mascotaType";
-import type { Dueno } from "../types/duenoType";
+import type { Dueno, MascotaRequest, MascotaResponse, PaginatedResponse } from "../types";
 
 export async function obtenerMascotas(params?: { nombre?: string; especie?: string; raza?: string; sexo?: string; activo?: boolean; duenoId?: number }): Promise<MascotaResponse[]> {
-  const response = await apiClient.get<MascotaPageResponse>("/api/mascotas", { params });
+  const response = await apiClient.get<PaginatedResponse<MascotaResponse>>("/api/mascotas", { params });
   return response.data.content;
 }
 
@@ -14,7 +13,7 @@ export async function obtenerMascotaPorId(id: number): Promise<MascotaResponse> 
 }
 
 export async function obtenerMascotasPorDueno(duenoId: number): Promise<MascotaResponse[]> {
-  const response = await apiClient.get<MascotaPageResponse>(`/api/mascotas/dueno/${duenoId}`);
+  const response = await apiClient.get<PaginatedResponse<MascotaResponse>>(`/api/mascotas/dueno/${duenoId}`);
   return response.data.content;
 }
 

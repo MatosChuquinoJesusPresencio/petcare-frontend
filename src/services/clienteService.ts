@@ -1,5 +1,5 @@
 import apiClient from "../api/client";
-import type { Dueno, DuenoRequest, PaginatedResponse } from "../types/duenoType";
+import type { Dueno, DuenoRequest, PaginatedResponse } from "../types";
 
 export async function getDuenos(params?: {
   soloActivos?: boolean;

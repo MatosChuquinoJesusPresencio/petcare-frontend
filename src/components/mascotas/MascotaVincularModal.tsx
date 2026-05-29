@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
 
-import { vincularDueno } from "../../services/mascotaService";
-import { getDuenos } from "../../services/clienteService";
+import type { Dueno } from "../../types";
+import { getDuenos, vincularDueno } from "../../services";
+import NotificationToast from "../NotificationToast";
+import type { ToastInfo } from "../NotificationToast";
 
 interface Props {
   show: boolean;
-
   mascotaId: number | null;
-
   onClose: () => void;
-
   onSuccess: () => Promise<void>;
 }
 
@@ -19,17 +18,10 @@ export default function MascotaVincularModal({
   onClose,
   onSuccess,
 }: Props) {
-  const [duenos, setDuenos] = useState<any[]>([]);
-
+  const [duenos, setDuenos] = useState<Dueno[]>([]);
   const [duenoId, setDuenoId] = useState(0);
-
   const [relacion, setRelacion] = useState("Tutor");
-
-  useEffect(() => {
-    if (show) {
-      cargarDuenos();
-    }
-  }, [show]);
+  const [toast, setToast] = useState<ToastInfo | null>(null);
 
   const cargarDuenos = async () => {
     try {
@@ -37,8 +29,16 @@ export default function MascotaVincularModal({
       setDuenos(data);
     } catch (error) {
       console.error(error);
+      setToast({ message: "No se pudieron cargar los dueños.", type: "error" });
     }
   };
+
+  useEffect(() => {
+    if (show) {
+      const t = setTimeout(cargarDuenos);
+      return () => clearTimeout(t);
+    }
+  }, [show]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,29 +47,23 @@ export default function MascotaVincularModal({
 
     try {
       await vincularDueno(mascotaId, duenoId, relacion);
-
       await onSuccess();
-
       onClose();
     } catch (error) {
       console.error(error);
+      setToast({ message: "No se pudo vincular el dueño.", type: "error" });
     }
   };
 
   if (!show) return null;
 
   return (
-    <div
-      className="modal d-block"
-      style={{
-        backgroundColor: "rgba(0,0,0,0.5)",
-      }}
-    >
+    <div className="modal d-block modal-bg">
+      <NotificationToast toast={toast} onClose={() => setToast(null)} />
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">Vincular Dueño</h5>
-
             <button className="btn-close" onClick={onClose} />
           </div>
 
@@ -77,7 +71,6 @@ export default function MascotaVincularModal({
             <div className="modal-body">
               <div className="mb-3">
                 <label className="form-label">Dueño</label>
-
                 <select
                   className="form-select"
                   value={duenoId}
@@ -85,7 +78,6 @@ export default function MascotaVincularModal({
                   required
                 >
                   <option value="">Seleccione dueño</option>
-
                   {duenos.map((dueno) => (
                     <option key={dueno.id} value={dueno.id}>
                       {dueno.nombre} {dueno.apellido}
@@ -96,7 +88,6 @@ export default function MascotaVincularModal({
 
               <div className="mb-3">
                 <label className="form-label">Relación</label>
-
                 <input
                   type="text"
                   className="form-control"
@@ -115,7 +106,6 @@ export default function MascotaVincularModal({
               >
                 Cancelar
               </button>
-
               <button type="submit" className="btn btn-primary">
                 Vincular
               </button>

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 
-import type { ServicioRequest } from "../../types/servicioType";
+import BaseFormDialog from "../BaseFormDialog";
+import type { ServicioRequest } from "../../types";
 
 type ServiceFormDialogProps = {
   isOpen: boolean;
@@ -55,10 +56,6 @@ const ServiceFormDialog = ({
 
     return () => clearTimeout(timer);
   }, [initialData, isOpen]);
-
-  if (!isOpen) {
-    return null;
-  }
 
   function handleChange(
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -116,130 +113,66 @@ const ServiceFormDialog = ({
   }
 
   return (
-    <>
-      <div className="modal-backdrop fade show"></div>
-      <div
-        className="modal fade show d-block"
-        id="serviceModal"
-        aria-hidden="false"
-        aria-modal="true"
-        role="dialog"
-        tabIndex={-1}
-      >
-        <div className="modal-dialog modal-lg modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title">
-                {mode === "edit" ? "Editar servicio" : "Nuevo servicio"}
-              </h5>
-              <button
-                type="button"
-                className="btn-close"
-                aria-label="Cerrar"
-                onClick={onClose}
-              ></button>
-            </div>
+    <BaseFormDialog
+      isOpen={isOpen}
+      onClose={onClose}
+      onSubmit={handleSubmit}
+      title={mode === "edit" ? "Editar servicio" : "Nuevo servicio"}
+      submitLabel={mode === "edit" ? "Actualizar" : "Guardar"}
+      submitBusyLabel="Guardando..."
+      isSubmitting={isSubmitting}
+      submitError={submitError}
+      modalId="serviceModal"
+    >
+      <div className="row g-3">
+        <div className="col-md-6">
+          <label className="form-label">Nombre del servicio</label>
+          <input
+            type="text"
+            className="form-control"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+          />
+        </div>
 
-            <div className="modal-body">
-              <form onSubmit={handleSubmit}>
-                <div className="row g-3">
-                  <div className="col-md-6">
-                    <label className="form-label">Nombre del servicio</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                    />
-                  </div>
+        <div className="col-md-6">
+          <label className="form-label">Duración (minutos)</label>
+          <input
+            type="number"
+            className="form-control"
+            min="5"
+            name="durationMinutes"
+            value={formData.durationMinutes}
+            onChange={handleChange}
+          />
+        </div>
 
-                  <div className="col-md-6">
-                    <label className="form-label">Duración (minutos)</label>
-                    <input
-                      type="number"
-                      className="form-control"
-                      min="5"
-                      name="durationMinutes"
-                      value={formData.durationMinutes}
-                      onChange={handleChange}
-                    />
-                  </div>
+        <div className="col-12">
+          <label className="form-label">Descripción</label>
+          <textarea
+            className="form-control"
+            rows={3}
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+          ></textarea>
+        </div>
 
-                  <div className="col-12">
-                    <label className="form-label">Descripción</label>
-                    <textarea
-                      className="form-control"
-                      rows={3}
-                      name="description"
-                      value={formData.description}
-                      onChange={handleChange}
-                    ></textarea>
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">Costo referencial</label>
-                    <input
-                      type="number"
-                      className="form-control"
-                      min="0"
-                      step="0.01"
-                      name="referentialCost"
-                      value={formData.referentialCost}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
-
-                {submitError ? (
-                  <div className="alert alert-danger mt-3 mb-0" role="alert">
-                    {submitError}
-                  </div>
-                ) : null}
-
-                <div className="d-flex justify-content-center gap-3 modal-footer mt-4">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={onClose}
-                    disabled={isSubmitting}
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting
-                      ? "Guardando..."
-                      : mode === "edit"
-                        ? "Actualizar"
-                        : "Guardar"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
+        <div className="col-md-6">
+          <label className="form-label">Costo referencial</label>
+          <input
+            type="number"
+            className="form-control"
+            min="0"
+            step="0.01"
+            name="referentialCost"
+            value={formData.referentialCost}
+            onChange={handleChange}
+          />
         </div>
       </div>
-
-      <style>{`
-        #serviceModal .modal-body,
-        #serviceModal .modal-body .form-label,
-        #serviceModal .modal-body .form-control,
-        #serviceModal .modal-body .form-control::placeholder,
-        #serviceModal .modal-body .modal-footer {
-          color: #000 !important;
-        }
-        #serviceModal .modal-body .form-control {
-          border-color: #ced4da;
-        }
-        #serviceModal .modal-header .modal-title {
-          color: #000 !important;
-        }
-      `}</style>
-    </>
+    </BaseFormDialog>
   );
 };
 

@@ -1,15 +1,11 @@
 import apiClient from '../api/client';
-import type {
-  ServicioPageResponse,
-  ServicioRequest,
-  ServicioResponse,
-} from '../types/servicioType';
+import type { PaginatedResponse, ServicioRequest, ServicioResponse } from '../types';
 
 export async function getServicios(params?: {
   soloActivos?: boolean;
   nombre?: string;
 }): Promise<ServicioResponse[]> {
-  const response = await apiClient.get<ServicioPageResponse>('/api/servicios', {
+  const response = await apiClient.get<PaginatedResponse<ServicioResponse>>('/api/servicios', {
     params: {
       soloActivos: params?.soloActivos,
       nombre: params?.nombre || undefined,

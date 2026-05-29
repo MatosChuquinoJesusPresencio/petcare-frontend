@@ -32,7 +32,7 @@ const ConfirmDialog = ({
         aria-modal="true"
         role="dialog"
       >
-        <div className="modal-dialog modal-dialog-centered">
+        <div className="modal-dialog modal-dialog-centered modal-force-dark-text">
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title">{title}</h5>
@@ -66,12 +66,6 @@ const ConfirmDialog = ({
         </div>
       </div>
 
-      <style>{`
-        .modal-title,
-        .modal-body {
-          color: #000 !important;
-        }
-      `}</style>
     </>
   );
 };

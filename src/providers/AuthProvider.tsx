@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, type ReactNode } from 'react'
-import { authService } from '../services/authService'
+import { authService } from '../services'
 import { AuthContext, type LoginRequest, type RegisterRequest, type AuthResponse } from '../contexts/authContext'
 import { getErrorMessage } from '../utils/errorHandler'
 

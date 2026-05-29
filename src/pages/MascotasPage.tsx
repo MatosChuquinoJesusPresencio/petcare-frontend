@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 
-import type { MascotaResponse } from "../types/mascotaType";
+import type { MascotaResponse } from "../types";
 
-import { obtenerMascotas, eliminarMascota, toggleMascota } from "../services/mascotaService";
+import { eliminarMascota, obtenerMascotas, toggleMascota } from "../services";
 
+import { SEXOS_MASCOTA, SEXO_LABEL } from "../constants";
 import ConfirmDialog from "../components/ConfirmDialog";
+import NotificationToast from "../components/NotificationToast";
+import type { ToastInfo } from "../components/NotificationToast";
 import MascotaTable from "../components/mascotas/MascotaTable";
 import MascotaModal from "../components/mascotas/MascotaModal";
 import MascotaVincularModal from "../components/mascotas/MascotaVincularModal";
@@ -17,19 +20,13 @@ const MascotasPage = () => {
   const [showVincularModal, setShowVincularModal] = useState(false);
   const [mascotaVincularId, setMascotaVincularId] = useState<number | null>(null);
   const [confirmDeleteMascota, setConfirmDeleteMascota] = useState<number | null>(null);
+  const [toast, setToast] = useState<ToastInfo | null>(null);
 
   const [filtroNombre, setFiltroNombre] = useState("");
   const [filtroEspecie, setFiltroEspecie] = useState("");
   const [filtroRaza, setFiltroRaza] = useState("");
   const [filtroSexo, setFiltroSexo] = useState<string>("todos");
   const [filtroActivo, setFiltroActivo] = useState<string>("todos");
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      cargarMascotas();
-    });
-    return () => clearTimeout(timer);
-  }, [filtroNombre, filtroEspecie, filtroRaza, filtroSexo, filtroActivo]);
 
   const cargarMascotas = async () => {
     try {
@@ -44,8 +41,15 @@ const MascotasPage = () => {
       setMascotas(data);
     } catch (error) {
       console.error(error);
+      setToast({ message: "No se pudieron cargar las mascotas.", type: "error" });
     }
   };
+
+  useEffect(() => {
+    const timer = setTimeout(cargarMascotas);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtroNombre, filtroEspecie, filtroRaza, filtroSexo, filtroActivo]);
 
   const handleNuevaMascota = () => {
     setMascotaEditarId(null);
@@ -61,8 +65,10 @@ const MascotasPage = () => {
     try {
       await toggleMascota(id);
       await cargarMascotas();
+      setToast({ message: "Estado de la mascota actualizado correctamente.", type: "success" });
     } catch (error) {
       console.error(error);
+      setToast({ message: "No se pudo cambiar el estado de la mascota.", type: "error" });
     }
   };
 
@@ -71,8 +77,10 @@ const MascotasPage = () => {
     try {
       await eliminarMascota(confirmDeleteMascota);
       await cargarMascotas();
+      setToast({ message: "Mascota desactivada correctamente.", type: "success" });
     } catch (error) {
       console.error(error);
+      setToast({ message: "No se pudo desactivar la mascota.", type: "error" });
     } finally {
       setConfirmDeleteMascota(null);
     }
@@ -85,6 +93,7 @@ const MascotasPage = () => {
 
   return (
     <div className="container mt-4">
+      <NotificationToast toast={toast} onClose={() => setToast(null)} />
       <div className="card shadow-sm mb-4">
         <div className="card-body d-flex flex-row justify-content-between align-items-center">
           <div>
@@ -128,8 +137,9 @@ const MascotasPage = () => {
             onChange={(e) => setFiltroSexo(e.target.value)}
           >
             <option value="todos">Todos los sexos</option>
-            <option value="MACHO">Macho</option>
-            <option value="HEMBRA">Hembra</option>
+            {SEXOS_MASCOTA.map((sexo) => (
+              <option key={sexo} value={sexo}>{SEXO_LABEL[sexo]}</option>
+            ))}
           </select>
           <select
             className="form-select w-auto"
@@ -156,7 +166,10 @@ const MascotasPage = () => {
       <MascotaModal
         show={showModal}
         onClose={() => setShowModal(false)}
-        onSuccess={cargarMascotas}
+        onSuccess={async () => {
+          setToast({ message: "Mascota guardada correctamente.", type: "success" });
+          await cargarMascotas();
+        }}
         mascotaId={mascotaEditarId}
       />
 
@@ -164,7 +177,10 @@ const MascotasPage = () => {
         show={showVincularModal}
         mascotaId={mascotaVincularId}
         onClose={() => setShowVincularModal(false)}
-        onSuccess={cargarMascotas}
+        onSuccess={async () => {
+          setToast({ message: "Dueño vinculado correctamente.", type: "success" });
+          await cargarMascotas();
+        }}
       />
 
       <ConfirmDialog

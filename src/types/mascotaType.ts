@@ -28,10 +28,4 @@ export interface MascotaResponse {
   activo: boolean;
 }
 
-export interface MascotaPageResponse {
-  content: MascotaResponse[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
-}
+

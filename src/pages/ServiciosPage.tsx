@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 
+import ActionButtons from "../components/ActionButtons";
 import ConfirmDialog from "../components/ConfirmDialog";
+import NotificationToast from "../components/NotificationToast";
+import type { ToastInfo } from "../components/NotificationToast";
 import ServiceFormDialog from "../components/modal/ServiceFormDialog";
 import {
   createServicio,
@@ -8,11 +11,11 @@ import {
   getServicios,
   toggleServicio,
   updateServicio,
-} from "../services/servicioService";
+} from "../services";
 import type {
   ServicioRequest,
   ServicioResponse,
-} from "../types/servicioType";
+} from "../types";
 
 const ServiciosPage = () => {
   const [servicios, setServicios] = useState<ServicioResponse[]>([]);
@@ -23,6 +26,7 @@ const ServiciosPage = () => {
   const [filtroActivo, setFiltroActivo] = useState<string>("todos");
   const [searchNombre, setSearchNombre] = useState("");
   const [confirmDeleteServicio, setConfirmDeleteServicio] = useState<number | null>(null);
+  const [toast, setToast] = useState<ToastInfo | null>(null);
 
   const cargarServicios = useCallback(async () => {
     try {
@@ -48,7 +52,8 @@ const ServiciosPage = () => {
   }, [filtroActivo, searchNombre]);
 
   useEffect(() => {
-    cargarServicios();
+    const t = setTimeout(cargarServicios);
+    return () => clearTimeout(t);
   }, [cargarServicios]);
 
   async function handleSaveServicio(data: ServicioRequest) {
@@ -60,6 +65,7 @@ const ServiciosPage = () => {
 
     await cargarServicios();
     setSelectedServicio(null);
+    setToast({ message: "Servicio guardado correctamente.", type: "success" });
   }
 
   function handleOpenCreateModal() {
@@ -81,9 +87,10 @@ const ServiciosPage = () => {
     try {
       await deleteServicio(id);
       await cargarServicios();
+      setToast({ message: "Servicio eliminado correctamente.", type: "success" });
     } catch (error) {
       console.error("Error al eliminar servicio:", error);
-      setLoadError("No se pudo eliminar el servicio.");
+      setToast({ message: "No se pudo eliminar el servicio.", type: "error" });
     } finally {
       setConfirmDeleteServicio(null);
     }
@@ -93,9 +100,10 @@ const ServiciosPage = () => {
     try {
       await toggleServicio(id);
       await cargarServicios();
+      setToast({ message: "Estado del servicio actualizado correctamente.", type: "success" });
     } catch (error) {
       console.error("Error al cambiar estado:", error);
-      setLoadError("No se pudo cambiar el estado del servicio.");
+      setToast({ message: "No se pudo cambiar el estado del servicio.", type: "error" });
     }
   }
 
@@ -110,6 +118,7 @@ const ServiciosPage = () => {
 
   return (
     <div className="container my-3">
+      <NotificationToast toast={toast} onClose={() => setToast(null)} />
       <section className="card mb-3">
         <div className="card-body d-flex flex-row justify-content-between align-items-center">
           <div>
@@ -179,25 +188,13 @@ const ServiciosPage = () => {
                   {servicio.activo ? "Activo" : "Inactivo"}
                 </span>
               </td>
-              <td className="d-flex justify-content-evenly">
-                <button
-                  className="btn btn-warning"
-                  onClick={() => handleOpenEditModal(servicio)}
-                >
-                  <i className="bi bi-pencil-fill"></i>
-                </button>
-                <button
-                  className={`btn ${servicio.activo ? "btn-secondary" : "btn-success"}`}
-                  onClick={() => handleToggleServicio(servicio.id)}
-                >
-                  <i className={`bi ${servicio.activo ? "bi-pause-fill" : "bi-play-fill"}`}></i>
-                </button>
-                <button
-                  className="btn btn-danger"
-                  onClick={() => setConfirmDeleteServicio(servicio.id)}
-                >
-                  <i className="bi bi-trash3-fill"></i>
-                </button>
+              <td>
+                <ActionButtons
+                  activo={servicio.activo}
+                  onEdit={() => handleOpenEditModal(servicio)}
+                  onToggle={() => handleToggleServicio(servicio.id)}
+                  onDelete={() => setConfirmDeleteServicio(servicio.id)}
+                />
               </td>
             </tr>
           ))}

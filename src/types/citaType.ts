@@ -1,12 +1,6 @@
 import type { MascotaResponse } from "./mascotaType";
 import type { ServicioResponse } from "./servicioType";
-
-export interface VeterinarioResponse {
-  id: number;
-  nombre: string;
-  apellido: string;
-  email?: string;
-}
+import type { VeterinarioResponse } from "./usuarioType";
 
 export interface CitaResponse {
   id: number;
@@ -35,14 +29,6 @@ export interface CitaEstadoRequest {
 
 export interface CitaReprogramarRequest {
   dateTime: string;
-}
-
-export interface CitaPageResponse {
-  content: CitaResponse[];
-  totalPages: number;
-  totalElements: number;
-  size: number;
-  number: number;
 }
 
 export interface DisponibilidadResponse {

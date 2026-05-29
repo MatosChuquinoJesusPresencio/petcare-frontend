@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 
-import type { MascotaResponse } from "../../types/mascotaType";
-import type { Dueno } from "../../types/duenoType";
-import { obtenerDuenoPrincipal } from "../../services/mascotaService";
+import ActionButtons from "../ActionButtons";
+
+import type { Dueno, MascotaResponse } from "../../types";
+import { obtenerDuenoPrincipal } from "../../services";
 
 interface Props {
   mascotas: MascotaResponse[];
@@ -17,15 +18,15 @@ function DueñoInfo({ mascotaId }: { mascotaId: number }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const t = setTimeout(() => setLoading(true));
     let ignore = false;
-    setLoading(true);
     obtenerDuenoPrincipal(mascotaId).then((d) => {
       if (!ignore) {
         setDueno(d);
         setLoading(false);
       }
     });
-    return () => { ignore = true; };
+    return () => { clearTimeout(t); ignore = true; };
   }, [mascotaId]);
 
   if (loading) return <span className="text-muted small">Cargando...</span>;
@@ -80,32 +81,14 @@ export default function MascotaTable({
               </td>
 
               <td>
-                <div className="d-flex justify-content-evenly">
-                  <button
-                    className="btn btn-warning btn-sm"
-                    onClick={() => onEdit(mascota.id)}
-                  >
-                    <i className="bi bi-pencil-fill"></i>
-                  </button>
-                  <button
-                    className={`btn btn-sm ${mascota.activo ? "btn-secondary" : "btn-success"}`}
-                    onClick={() => onToggle(mascota.id)}
-                  >
-                    <i className={`bi ${mascota.activo ? "bi-pause-fill" : "bi-play-fill"}`}></i>
-                  </button>
-                  <button
-                    className="btn btn-danger btn-sm"
-                    onClick={() => onDelete(mascota.id)}
-                  >
-                    <i className="bi bi-trash3-fill"></i>
-                  </button>
-                  <button
-                    className="btn btn-info btn-sm"
-                    onClick={() => onVincular(mascota.id)}
-                  >
-                    <i className="bi bi-person-plus-fill"></i>
-                  </button>
-                </div>
+                <ActionButtons
+                  activo={mascota.activo}
+                  onEdit={() => onEdit(mascota.id)}
+                  onToggle={() => onToggle(mascota.id)}
+                  onDelete={() => onDelete(mascota.id)}
+                  onVincular={() => onVincular(mascota.id)}
+                  size="sm"
+                />
               </td>
             </tr>
           ))}

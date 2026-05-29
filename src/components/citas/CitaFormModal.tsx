@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
-import type { MascotaResponse } from "../../types/mascotaType";
-import type { ServicioResponse } from "../../types/servicioType";
-import type { VeterinarioResponse } from "../../types/citaType";
-import { agendarCita, obtenerDisponibilidad } from "../../services/citaService";
+import { useState } from "react";
+
+import HorariosDisponibles from "./HorariosDisponibles";
+import { getErrorMessage } from "../../utils/errorHandler";
+
+import type { MascotaResponse, ServicioResponse, VeterinarioResponse } from "../../types";
+import { agendarCita } from "../../services";
 
 interface Props {
   show: boolean;
@@ -21,31 +23,7 @@ export default function CitaFormModal({ show, onClose, onSuccess, mascotas, serv
   const [horaSeleccionada, setHoraSeleccionada] = useState("");
   const [notes, setNotes] = useState("");
 
-  const [slots, setSlots] = useState<string[]>([]);
-  const [loadingSlots, setLoadingSlots] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    setHoraSeleccionada("");
-    setSlots([]);
-    setError(null);
-
-    if (!veterinarianId || !fecha || !serviceId) return;
-
-    const timer = setTimeout(async () => {
-      setLoadingSlots(true);
-      try {
-        const data = await obtenerDisponibilidad(Number(veterinarianId), fecha, Number(serviceId));
-        setSlots(data.horariosDisponibles);
-      } catch {
-        setSlots([]);
-      } finally {
-        setLoadingSlots(false);
-      }
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [veterinarianId, fecha, serviceId]);
 
   if (!show) return null;
 
@@ -66,13 +44,12 @@ export default function CitaFormModal({ show, onClose, onSuccess, mascotas, serv
       onClose();
       await onSuccess();
     } catch (err: unknown) {
-      const msg = (err as any)?.response?.data?.mensaje || "Error al agendar la cita";
-      setError(msg);
+      setError(getErrorMessage(err));
     }
   };
 
   return (
-    <div className="modal fade show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }} tabIndex={-1}>
+    <div className="modal fade show d-block modal-bg" tabIndex={-1}>
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="modal-header">
@@ -114,27 +91,13 @@ export default function CitaFormModal({ show, onClose, onSuccess, mascotas, serv
               </div>
               <div className="mb-3">
                 <label className="form-label">Horario disponible *</label>
-                {!veterinarianId || !fecha || !serviceId ? (
-                  <p className="text-muted small mb-0">Seleccione veterinario, servicio y fecha para ver horarios disponibles.</p>
-                ) : loadingSlots ? (
-                  <p className="text-muted small mb-0">Cargando horarios...</p>
-                ) : slots.length === 0 ? (
-                  <p className="text-danger small mb-0">No hay horarios disponibles para esta fecha.</p>
-                ) : (
-                  <div className="d-flex flex-wrap gap-2">
-                    {slots.map((h) => (
-                      <button
-                        key={h}
-                        type="button"
-                        className={`btn btn-sm ${horaSeleccionada === h ? "btn-primary" : "btn-outline-primary"}`}
-                        onClick={() => setHoraSeleccionada(h)}
-                      >
-                        {h.substring(0, 5)}
-                      </button>
-                    ))}
-                  </div>
-                )}
-                <input type="hidden" value={horaSeleccionada} required={!!veterinarianId && !!fecha && !!serviceId} />
+                <HorariosDisponibles
+                  vetId={veterinarianId ? Number(veterinarianId) : null}
+                  serviceId={serviceId ? Number(serviceId) : null}
+                  fecha={fecha}
+                  value={horaSeleccionada}
+                  onChange={setHoraSeleccionada}
+                />
               </div>
               <div className="mb-3">
                 <label className="form-label">Notas</label>

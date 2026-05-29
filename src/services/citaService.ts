@@ -1,5 +1,5 @@
 import apiClient from "../api/client";
-import type { CitaRequest, CitaEstadoRequest, CitaReprogramarRequest, CitaResponse, CitaPageResponse, DisponibilidadResponse } from "../types/citaType";
+import type { CitaRequest, CitaEstadoRequest, CitaReprogramarRequest, CitaResponse, DisponibilidadResponse, PaginatedResponse } from "../types";
 
 export async function obtenerCitas(params?: {
   mascotaId?: number;
@@ -9,7 +9,7 @@ export async function obtenerCitas(params?: {
   fechaDesde?: string;
   fechaHasta?: string;
 }): Promise<CitaResponse[]> {
-  const response = await apiClient.get<CitaPageResponse>("/api/citas", { params });
+  const response = await apiClient.get<PaginatedResponse<CitaResponse>>("/api/citas", { params });
   return response.data.content;
 }
 

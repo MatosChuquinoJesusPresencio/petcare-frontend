@@ -1,18 +1,21 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-import type { CitaResponse, VeterinarioResponse } from "../types/citaType";
-import type { MascotaResponse } from "../types/mascotaType";
-import type { ServicioResponse } from "../types/servicioType";
-
-import { obtenerCitas, cancelarCita, cambiarEstadoCita } from "../services/citaService";
-import { obtenerMascotas } from "../services/mascotaService";
-import { getServicios } from "../services/servicioService";
-import { obtenerVeterinarios } from "../services/usuarioService";
+import type { CitaResponse, MascotaResponse, ServicioResponse, VeterinarioResponse } from "../types";
+import {
+  cancelarCita,
+  cambiarEstadoCita,
+  getServicios,
+  obtenerCitas,
+  obtenerMascotas,
+  obtenerVeterinarios,
+} from "../services";
 
 import CitaTable from "../components/citas/CitaTable";
 import CitaFormModal from "../components/citas/CitaFormModal";
 import CitaReprogramarModal from "../components/citas/CitaReprogramarModal";
 import ConfirmDialog from "../components/ConfirmDialog";
+import NotificationToast from "../components/NotificationToast";
+import type { ToastInfo } from "../components/NotificationToast";
 
 const CitasPage = () => {
   const [citas, setCitas] = useState<CitaResponse[]>([]);
@@ -26,7 +29,9 @@ const CitasPage = () => {
   const [citaReprogramar, setCitaReprogramar] = useState<CitaResponse | null>(null);
   const [cancelarId, setCancelarId] = useState<number | null>(null);
 
-  const fetchCitas = async () => {
+  const [toast, setToast] = useState<ToastInfo | null>(null);
+
+  const fetchCitas = useCallback(async () => {
     try {
       setLoading(true);
       const data = await obtenerCitas();
@@ -36,9 +41,9 @@ const CitasPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchDependencias = async () => {
+  const fetchDependencias = useCallback(async () => {
     try {
       const [mascotasData, serviciosData, veterinariosData] = await Promise.all([
         obtenerMascotas(),
@@ -51,20 +56,22 @@ const CitasPage = () => {
     } catch (error) {
       console.error("Error fetching dependencias", error);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchCitas();
-    fetchDependencias();
-  }, []);
+    const t1 = setTimeout(fetchCitas);
+    const t2 = setTimeout(fetchDependencias);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [fetchCitas, fetchDependencias]);
 
   const handleEstadoChange = async (id: number, nuevoEstado: string) => {
     try {
       await cambiarEstadoCita(id, nuevoEstado);
       await fetchCitas();
+      setToast({ message: "Estado de la cita actualizado correctamente.", type: "success" });
     } catch (error) {
       console.error("Error cambiando estado", error);
-      alert("Error al cambiar el estado");
+      setToast({ message: "Error al cambiar el estado", type: "error" });
     }
   };
 
@@ -73,9 +80,10 @@ const CitasPage = () => {
     try {
       await cancelarCita(cancelarId);
       await fetchCitas();
+      setToast({ message: "Cita cancelada correctamente.", type: "success" });
     } catch (error) {
       console.error("Error cancelando", error);
-      alert("Error al cancelar la cita");
+      setToast({ message: "Error al cancelar la cita", type: "error" });
     } finally {
       setCancelarId(null);
     }
@@ -83,6 +91,8 @@ const CitasPage = () => {
 
   return (
     <div className="container mt-4">
+      <NotificationToast toast={toast} onClose={() => setToast(null)} />
+
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2><i className="bi bi-calendar-check me-2"></i>Gestión de Citas</h2>
         <button className="btn btn-primary" onClick={() => setShowFormModal(true)}>

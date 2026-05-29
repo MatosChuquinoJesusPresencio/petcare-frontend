@@ -1,27 +1,29 @@
 import { useEffect, useState } from "react";
 
+import ActionButtons from "../components/ActionButtons";
 import DuenoFormDialog from "../components/DuenoFormDialog";
 import ContactoFormDialog from "../components/ContactoFormDialog";
 import ConfirmDialog from "../components/ConfirmDialog";
+import NotificationToast from "../components/NotificationToast";
+import type { ToastInfo } from "../components/NotificationToast";
 
 import {
+  createContacto,
   createDueno,
+  deleteContacto,
   deleteDueno,
+  getContactosByDuenoId,
   getDuenos,
   toggleDueno,
   updateDueno,
-} from "../services/clienteService";
-import {
-  createContacto,
-  deleteContacto,
-  getContactosByDuenoId,
-} from "../services/contactoService";
+} from "../services";
 
-import type { Dueno, DuenoRequest } from "../types/duenoType";
 import type {
   ContactoEmergencia,
   ContactoEmergenciaRequest,
-} from "../types/contactoType";
+  Dueno,
+  DuenoRequest,
+} from "../types";
 
 const DuenosPage = () => {
   const [duenos, setDuenos] = useState<Dueno[]>([]);
@@ -42,6 +44,7 @@ const DuenosPage = () => {
 
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
   const [confirmDeleteContacto, setConfirmDeleteContacto] = useState<number | null>(null);
+  const [toast, setToast] = useState<ToastInfo | null>(null);
 
   async function cargarDuenos() {
     try {
@@ -80,26 +83,27 @@ const DuenosPage = () => {
       setContactos(data);
     } catch (error) {
       console.error("Error al cargar contactos de emergencia:", error);
+      setToast({ message: "No se pudieron cargar los contactos de emergencia.", type: "error" });
     }
   }
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      cargarDuenos();
-    });
+    const timer = setTimeout(cargarDuenos);
 
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filtroActivo, searchNombre, searchDni]);
 
   useEffect(() => {
     if (!selectedDueno) {
-      setContactos([]);
-      return;
+      const t = setTimeout(() => setContactos([]));
+      return () => clearTimeout(t);
     }
     const timer = setTimeout(() => {
       cargarContactos(selectedDueno.id);
     });
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDueno, searchContactoNombre, searchContactoTelefono, searchContactoRelacion]);
 
   async function handleSaveDueno(data: DuenoRequest) {
@@ -114,15 +118,17 @@ const DuenosPage = () => {
 
     await cargarDuenos();
     setOpenDuenoModal(false);
+    setToast({ message: "Dueño guardado correctamente.", type: "success" });
   }
 
   async function handleToggleDueno(id: number) {
     try {
       await toggleDueno(id);
       await cargarDuenos();
+      setToast({ message: "Estado del dueño actualizado correctamente.", type: "success" });
     } catch (error) {
       console.error("Error al cambiar estado:", error);
-      setLoadError("No se pudo cambiar el estado del dueño.");
+      setToast({ message: "No se pudo cambiar el estado del dueño.", type: "error" });
     }
   }
 
@@ -135,9 +141,10 @@ const DuenosPage = () => {
         setSelectedDueno(null);
       }
       await cargarDuenos();
+      setToast({ message: "Dueño eliminado correctamente.", type: "success" });
     } catch (error) {
       console.error("Error al eliminar dueño:", error);
-      setLoadError("No se pudo eliminar el dueño.");
+      setToast({ message: "No se pudo eliminar el dueño.", type: "error" });
     } finally {
       setConfirmDelete(null);
     }
@@ -148,8 +155,7 @@ const DuenosPage = () => {
     setOpenDuenoModal(true);
   }
 
-  function handleOpenEditDuenoModal(dueno: Dueno, e: React.MouseEvent) {
-    e.stopPropagation();
+  function handleOpenEditDuenoModal(dueno: Dueno) {
     setSelectedDueno(dueno);
     setOpenDuenoModal(true);
   }
@@ -163,6 +169,7 @@ const DuenosPage = () => {
     await createContacto(selectedDueno.id, data);
     await cargarContactos(selectedDueno.id);
     setOpenContactoModal(false);
+    setToast({ message: "Contacto de emergencia creado correctamente.", type: "success" });
   }
 
   async function handleDeleteContacto(id: number) {
@@ -171,8 +178,10 @@ const DuenosPage = () => {
       if (selectedDueno) {
         await cargarContactos(selectedDueno.id);
       }
+      setToast({ message: "Contacto de emergencia eliminado correctamente.", type: "success" });
     } catch (error) {
       console.error("Error al eliminar contacto:", error);
+      setToast({ message: "No se pudo eliminar el contacto de emergencia.", type: "error" });
     } finally {
       setConfirmDeleteContacto(null);
     }
@@ -192,6 +201,7 @@ const DuenosPage = () => {
 
   return (
     <div className="container my-3">
+      <NotificationToast toast={toast} onClose={() => setToast(null)} />
       <section className="card mb-3">
         <div className="card-body d-flex flex-row justify-content-between align-items-center">
           <div>
@@ -304,27 +314,14 @@ const DuenosPage = () => {
                         {dueno.activo ? "Activo" : "Inactivo"}
                       </span>
                     </td>
-                    <td onClick={(e) => e.stopPropagation()}>
-                      <div className="d-flex justify-content-evenly">
-                        <button
-                          className="btn btn-warning btn-sm"
-                          onClick={(e) => handleOpenEditDuenoModal(dueno, e)}
-                        >
-                          <i className="bi bi-pencil-fill"></i>
-                        </button>
-                        <button
-                          className={`btn btn-sm ${dueno.activo ? "btn-secondary" : "btn-success"}`}
-                          onClick={() => handleToggleDueno(dueno.id)}
-                        >
-                          <i className={`bi ${dueno.activo ? "bi-pause-fill" : "bi-play-fill"}`}></i>
-                        </button>
-                        <button
-                          className="btn btn-danger btn-sm"
-                          onClick={() => setConfirmDelete(dueno.id)}
-                        >
-                          <i className="bi bi-trash3-fill"></i>
-                        </button>
-                      </div>
+                    <td>
+                      <ActionButtons
+                        activo={dueno.activo}
+                        onEdit={() => handleOpenEditDuenoModal(dueno)}
+                        onToggle={() => handleToggleDueno(dueno.id)}
+                        onDelete={() => setConfirmDelete(dueno.id)}
+                        size="sm"
+                      />
                     </td>
                   </tr>
                 ))

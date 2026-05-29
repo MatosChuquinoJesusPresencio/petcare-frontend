@@ -1,4 +1,5 @@
-import type { CitaResponse } from "../../types/citaType";
+import { ESTADOS_CITA, ESTADO_BADGE, ESTADO_LABEL } from "../../constants";
+import type { CitaResponse } from "../../types";
 
 interface Props {
   citas: CitaResponse[];
@@ -6,19 +7,6 @@ interface Props {
   onReprogramar: (cita: CitaResponse) => void;
   onCancelar: (id: number) => void;
 }
-
-function getStatusBadge(estado: string) {
-  switch (estado) {
-    case "PROGRAMADA": return "bg-primary";
-    case "CONFIRMADA": return "bg-success";
-    case "ATENDIDA": return "bg-info";
-    case "NO_ASISTIDA": return "bg-warning text-dark";
-    case "CANCELADA": return "bg-danger";
-    default: return "bg-secondary";
-  }
-}
-
-const estadosDisponibles = ["CONFIRMADA", "ATENDIDA", "NO_ASISTIDA"];
 
 export default function CitaTable({ citas, onEstadoChange, onReprogramar, onCancelar }: Props) {
   return (
@@ -42,8 +30,8 @@ export default function CitaTable({ citas, onEstadoChange, onReprogramar, onCanc
               <td>{cita.veterinario?.nombre} {cita.veterinario?.apellido}</td>
               <td>{cita.servicio?.nombre}</td>
               <td>
-                <span className={`badge ${getStatusBadge(cita.estado)}`}>
-                  {cita.estado}
+                <span className={`badge ${ESTADO_BADGE[cita.estado as keyof typeof ESTADO_BADGE] || "bg-secondary"}`}>
+                  {ESTADO_LABEL[cita.estado as keyof typeof ESTADO_LABEL] || cita.estado}
                 </span>
               </td>
               <td>
@@ -57,14 +45,14 @@ export default function CitaTable({ citas, onEstadoChange, onReprogramar, onCanc
                     Estado
                   </button>
                   <ul className="dropdown-menu">
-                    {estadosDisponibles.map((est) => (
+                    {ESTADOS_CITA.filter((est) => est !== cita.estado).map((est) => (
                       <li key={est}>
                         <button
                           className="dropdown-item"
                           onClick={() => onEstadoChange(cita.id, est)}
                           disabled={cita.estado === est}
                         >
-                          {est === "CONFIRMADA" ? "Confirmar" : est === "ATENDIDA" ? "Atendida" : "No Asistió"}
+                          {ESTADO_LABEL[est]}
                         </button>
                       </li>
                     ))}

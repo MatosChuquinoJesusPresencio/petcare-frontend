@@ -1,6 +1,5 @@
 import apiClient from "../api/client";
-import type { ContactoEmergencia, ContactoEmergenciaRequest } from "../types/contactoType";
-import type { PaginatedResponse } from "../types/duenoType";
+import type { ContactoEmergencia, ContactoEmergenciaRequest, PaginatedResponse } from "../types";
 
 export async function getContactosByDuenoId(
   duenoId: number,

@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
-import type { CitaResponse } from "../../types/citaType";
-import { reprogramarCita, obtenerDisponibilidad } from "../../services/citaService";
+
+import HorariosDisponibles from "./HorariosDisponibles";
+import { getErrorMessage } from "../../utils/errorHandler";
+
+import type { CitaResponse } from "../../types";
+import { reprogramarCita } from "../../services";
 
 interface Props {
   show: boolean;
@@ -12,37 +16,14 @@ interface Props {
 export default function CitaReprogramarModal({ show, onClose, onSuccess, cita }: Props) {
   const [fecha, setFecha] = useState("");
   const [horaSeleccionada, setHoraSeleccionada] = useState("");
-  const [slots, setSlots] = useState<string[]>([]);
-  const [loadingSlots, setLoadingSlots] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (cita) {
-      setFecha(cita.fechaHora.substring(0, 10));
+      const t = setTimeout(() => setFecha(cita.fechaHora.substring(0, 10)));
+      return () => clearTimeout(t);
     }
   }, [cita]);
-
-  useEffect(() => {
-    setHoraSeleccionada("");
-    setSlots([]);
-    setError(null);
-
-    if (!cita || !fecha) return;
-
-    const timer = setTimeout(async () => {
-      setLoadingSlots(true);
-      try {
-        const data = await obtenerDisponibilidad(cita.veterinario.id, fecha, cita.servicio.id);
-        setSlots(data.horariosDisponibles);
-      } catch {
-        setSlots([]);
-      } finally {
-        setLoadingSlots(false);
-      }
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [cita, fecha]);
 
   if (!show || !cita) return null;
 
@@ -57,13 +38,12 @@ export default function CitaReprogramarModal({ show, onClose, onSuccess, cita }:
       onClose();
       await onSuccess();
     } catch (err: unknown) {
-      const msg = (err as any)?.response?.data?.mensaje || "Error al reprogramar la cita";
-      setError(msg);
+      setError(getErrorMessage(err));
     }
   };
 
   return (
-    <div className="modal fade show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }} tabIndex={-1}>
+    <div className="modal fade show d-block modal-bg" tabIndex={-1}>
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="modal-header">
@@ -78,27 +58,13 @@ export default function CitaReprogramarModal({ show, onClose, onSuccess, cita }:
               </div>
               <div className="mb-3">
                 <label className="form-label">Horario disponible *</label>
-                {!fecha ? (
-                  <p className="text-muted small mb-0">Seleccione una fecha.</p>
-                ) : loadingSlots ? (
-                  <p className="text-muted small mb-0">Cargando horarios...</p>
-                ) : slots.length === 0 ? (
-                  <p className="text-danger small mb-0">No hay horarios disponibles para esta fecha.</p>
-                ) : (
-                  <div className="d-flex flex-wrap gap-2">
-                    {slots.map((h) => (
-                      <button
-                        key={h}
-                        type="button"
-                        className={`btn btn-sm ${horaSeleccionada === h ? "btn-primary" : "btn-outline-primary"}`}
-                        onClick={() => setHoraSeleccionada(h)}
-                      >
-                        {h.substring(0, 5)}
-                      </button>
-                    ))}
-                  </div>
-                )}
-                <input type="hidden" value={horaSeleccionada} required={!!fecha} />
+                <HorariosDisponibles
+                  vetId={cita.veterinario.id}
+                  serviceId={cita.servicio.id}
+                  fecha={fecha}
+                  value={horaSeleccionada}
+                  onChange={setHoraSeleccionada}
+                />
               </div>
               {error && <div className="alert alert-danger py-2">{error}</div>}
             </form>

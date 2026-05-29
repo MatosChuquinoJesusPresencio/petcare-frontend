@@ -1,3 +1,4 @@
+import { ROLES_USUARIO } from '../constants';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LoginPage from '../pages/LoginPage';
 import DashboardPage from '../pages/DashboardPage';
@@ -10,7 +11,7 @@ import UnauthorizedPage from '../pages/UnauthorizedPage';
 import { ProtectedRoute } from '../components/auth/ProtectedRoute';
 import MainLayout from '../layouts/MainLayout';
 
-const staffRoles = ['ADMINISTRADOR', 'VETERINARIO', 'ASISTENTE'];
+const staffRoles = ROLES_USUARIO.filter((r) => r !== 'DUENO');
 
 const AppRouter = () => (
   <BrowserRouter>
@@ -21,7 +22,7 @@ const AppRouter = () => (
       <Route path="/servicios" element={<MainLayout><ProtectedRoute allowedRoles={staffRoles}><ServiciosPage /></ProtectedRoute></MainLayout>} />
       <Route path="/citas" element={<MainLayout><ProtectedRoute allowedRoles={staffRoles}><CitasPage /></ProtectedRoute></MainLayout>} />
       <Route path="/mascotas" element={<MainLayout><ProtectedRoute allowedRoles={staffRoles}><MascotasPage /></ProtectedRoute></MainLayout>} />
-      <Route path="/duenos" element={<MainLayout><ProtectedRoute allowedRoles={['ADMINISTRADOR', 'VETERINARIO', 'ASISTENTE']}><DuenosPage /></ProtectedRoute></MainLayout>} />
+      <Route path="/duenos" element={<MainLayout><ProtectedRoute allowedRoles={staffRoles}><DuenosPage /></ProtectedRoute></MainLayout>} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   </BrowserRouter>

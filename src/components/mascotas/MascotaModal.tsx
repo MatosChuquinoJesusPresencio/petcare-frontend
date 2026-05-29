@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 
-import {
-  crearMascota,
-  actualizarMascota,
-  obtenerMascotaPorId,
-} from "../../services/mascotaService";
+import NotificationToast from "../NotificationToast";
+import type { ToastInfo } from "../NotificationToast";
 
-import type { MascotaRequest } from "../../types/mascotaType";
-import type { Dueno } from "../../types/duenoType";
-import { getDuenos } from "../../services/clienteService";
+import { SEXOS_MASCOTA, SEXO_LABEL } from "../../constants";
+import type { Dueno, MascotaRequest } from "../../types";
+import {
+  actualizarMascota,
+  crearMascota,
+  getDuenos,
+  obtenerMascotaPorId,
+} from "../../services";
 
 interface Props {
   show: boolean;
@@ -36,7 +38,7 @@ const initialForm: FormState = {
   nombre: "",
   especie: "",
   raza: "",
-  sexo: "MACHO",
+  sexo: SEXOS_MASCOTA[0],
   fechaNacimiento: "",
   microchip: "",
   condicionReproductiva: "",
@@ -55,22 +57,16 @@ export default function MascotaModal({
 }: Props) {
   const [form, setForm] = useState<FormState>(initialForm);
   const [duenos, setDuenos] = useState<Dueno[]>([]);
+  const [toast, setToast] = useState<ToastInfo | null>(null);
 
-  useEffect(() => {
-    cargarDuenos();
-  }, []);
-
-  useEffect(() => {
-    if (!show) return;
-    const timer = setTimeout(() => {
-      if (mascotaId) {
-        cargarMascota();
-      } else {
-        setForm(initialForm);
-      }
-    });
-    return () => clearTimeout(timer);
-  }, [show, mascotaId]);
+  const cargarDuenos = async () => {
+    try {
+      const data = await getDuenos({ soloActivos: true });
+      setDuenos(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const cargarMascota = async () => {
     try {
@@ -93,14 +89,23 @@ export default function MascotaModal({
     }
   };
 
-  const cargarDuenos = async () => {
-    try {
-      const data = await getDuenos({ soloActivos: true });
-      setDuenos(data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  useEffect(() => {
+    const t = setTimeout(cargarDuenos);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (!show) return;
+    const timer = setTimeout(() => {
+      if (mascotaId) {
+        cargarMascota();
+      } else {
+        setForm(initialForm);
+      }
+    });
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [show, mascotaId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -111,7 +116,7 @@ export default function MascotaModal({
     const isCreating = !mascotaId;
 
     if (isCreating && !form.ownerId) {
-      alert("Debes seleccionar un dueño principal.");
+      setToast({ message: "Debes seleccionar un dueño principal.", type: "error" });
       return;
     }
 
@@ -141,6 +146,7 @@ export default function MascotaModal({
       onClose();
     } catch (error) {
       console.error(error);
+      setToast({ message: "No se pudo guardar la mascota.", type: "error" });
     }
   };
 
@@ -150,12 +156,12 @@ export default function MascotaModal({
 
   return (
     <>
+    <NotificationToast toast={toast} onClose={() => setToast(null)} />
     <div
       id="mascotaModal"
-      className="modal d-block"
-      style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+      className="modal d-block modal-bg"
     >
-      <div className="modal-dialog modal-lg">
+      <div className="modal-dialog modal-lg modal-force-dark-text">
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">
@@ -210,8 +216,9 @@ export default function MascotaModal({
                     value={form.sexo}
                     onChange={(e) => setForm({ ...form, sexo: e.target.value })}
                   >
-                    <option value="MACHO">MACHO</option>
-                    <option value="HEMBRA">HEMBRA</option>
+                    {SEXOS_MASCOTA.map((sexo) => (
+                      <option key={sexo} value={sexo}>{SEXO_LABEL[sexo]}</option>
+                    ))}
                   </select>
                 </div>
 
@@ -336,17 +343,6 @@ export default function MascotaModal({
         </div>
       </div>
     </div>
-      <style>{`
-        #mascotaModal .modal-body,
-        #mascotaModal .modal-body .form-label,
-        #mascotaModal .modal-body .form-control,
-        #mascotaModal .modal-header .modal-title {
-          color: #000 !important;
-        }
-        #mascotaModal .modal-body .form-control {
-          border-color: #ced4da;
-        }
-      `}</style>
     </>
   );
 }
