@@ -175,78 +175,90 @@ const DuenoFormDialog = ({
     >
       <div className="row g-3">
         <div className="col-md-6">
-          <label className="form-label">Nombre *</label>
-          <input
-            type="text"
-            className={`form-control ${fieldErrors.firstName ? 'is-invalid' : ''}`}
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            required
-          />
-          {fieldErrors.firstName && <div className="invalid-feedback">{fieldErrors.firstName}</div>}
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">Nombre *</label>
+            <input
+              type="text"
+              className={`campo-entrada ${fieldErrors.firstName ? 'campo-entrada--error' : ''}`}
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+              required
+            />
+            {fieldErrors.firstName && <div className="campo-error">{fieldErrors.firstName}</div>}
+          </div>
         </div>
 
         <div className="col-md-6">
-          <label className="form-label">Apellido *</label>
-          <input
-            type="text"
-            className={`form-control ${fieldErrors.lastName ? 'is-invalid' : ''}`}
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            required
-          />
-          {fieldErrors.lastName && <div className="invalid-feedback">{fieldErrors.lastName}</div>}
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">Apellido *</label>
+            <input
+              type="text"
+              className={`campo-entrada ${fieldErrors.lastName ? 'campo-entrada--error' : ''}`}
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              required
+            />
+            {fieldErrors.lastName && <div className="campo-error">{fieldErrors.lastName}</div>}
+          </div>
         </div>
 
         <div className="col-md-6">
-          <label className="form-label">DNI / Documento *</label>
-          <input
-            type="text"
-            className={`form-control ${fieldErrors.dni ? 'is-invalid' : ''}`}
-            name="dni"
-            value={formData.dni}
-            onChange={handleChange}
-            required
-          />
-          {fieldErrors.dni && <div className="invalid-feedback">{fieldErrors.dni}</div>}
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">DNI / Documento *</label>
+            <input
+              type="text"
+              className={`campo-entrada ${fieldErrors.dni ? 'campo-entrada--error' : ''}`}
+              name="dni"
+              value={formData.dni}
+              onChange={handleChange}
+              required
+            />
+            {fieldErrors.dni && <div className="campo-error">{fieldErrors.dni}</div>}
+          </div>
         </div>
 
         <div className="col-md-6">
-          <label className="form-label">Email *</label>
-          <input
-            type="email"
-            className={`form-control ${fieldErrors.email ? 'is-invalid' : ''}`}
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-          {fieldErrors.email && <div className="invalid-feedback">{fieldErrors.email}</div>}
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">Email *</label>
+            <input
+              type="email"
+              className={`campo-entrada ${fieldErrors.email ? 'campo-entrada--error' : ''}`}
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+            {fieldErrors.email && <div className="campo-error">{fieldErrors.email}</div>}
+          </div>
         </div>
 
         <div className="col-md-6">
-          <label className="form-label">Teléfono</label>
-          <input
-            type="text"
-            className={`form-control ${fieldErrors.phone ? 'is-invalid' : ''}`}
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-          />
-          {fieldErrors.phone && <div className="invalid-feedback">{fieldErrors.phone}</div>}
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">Teléfono</label>
+            <input
+              type="text"
+              className={`campo-entrada ${fieldErrors.phone ? 'campo-entrada--error' : ''}`}
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+            />
+            {fieldErrors.phone && <div className="campo-error">{fieldErrors.phone}</div>}
+          </div>
         </div>
 
         <div className="col-12">
-          <label className="form-label">Dirección habitual</label>
-          <input
-            type="text"
-            className="form-control"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-          />
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">Dirección habitual</label>
+            <input
+              type="text"
+              className="campo-entrada"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+            />
+          </div>
         </div>
       </div>
     </BaseFormDialog>
