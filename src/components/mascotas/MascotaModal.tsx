@@ -242,205 +242,150 @@ export default function MascotaModal({
 
   return (
     <>
-    <NotificationToast toast={toast} onClose={() => setToast(null)} />
-    <div
-      id="mascotaModal"
-      className="modal d-block modal-bg"
-    >
-      <div className="modal-dialog modal-lg modal-force-dark-text">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title">
+      <NotificationToast toast={toast} onClose={() => setToast(null)} />
+      <div className="dialogo-fondo" onClick={onClose}></div>
+      <div className="dialogo-contenedor" id="mascotaModal">
+        <div className="dialogo-ventana dialogo-ventana--grande">
+          <div className="dialogo-encabezado">
+            <h5 className="dialogo-titulo">
+              <i className="bi bi-paw me-1"></i>
               {isEditing ? "Editar Mascota" : "Nueva Mascota"}
             </h5>
-            <button className="btn-close" onClick={onClose} />
+            <button type="button" className="dialogo-cerrar" onClick={onClose}>
+              <i className="bi bi-x-lg"></i>
+            </button>
           </div>
 
-          <form onSubmit={handleSubmit}>
-            <div className="modal-body">
+          <div className="dialogo-cuerpo">
+            <form onSubmit={handleSubmit}>
               <div className="row">
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Nombre</label>
-                  <input
-                    type="text"
-                    className={`form-control ${fieldErrors.nombre ? 'is-invalid' : ''}`}
-                    name="nombre"
-                    value={form.nombre}
-                    onChange={handleChange}
-                    required
-                  />
-                  {fieldErrors.nombre && <div className="invalid-feedback">{fieldErrors.nombre}</div>}
+                <div className="col-md-6">
+                  <div className="campo-grupo">
+                    <label className="campo-etiqueta">Nombre</label>
+                    <input type="text" className={`campo-entrada ${fieldErrors.nombre ? 'campo-entrada--error' : ''}`} name="nombre" value={form.nombre} onChange={handleChange} required />
+                    {fieldErrors.nombre && <div className="campo-error">{fieldErrors.nombre}</div>}
+                  </div>
                 </div>
 
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Especie</label>
-                  <input
-                    type="text"
-                    className={`form-control ${fieldErrors.especie ? 'is-invalid' : ''}`}
-                    name="especie"
-                    value={form.especie}
-                    onChange={handleChange}
-                    required
-                  />
-                  {fieldErrors.especie && <div className="invalid-feedback">{fieldErrors.especie}</div>}
+                <div className="col-md-6">
+                  <div className="campo-grupo">
+                    <label className="campo-etiqueta">Especie</label>
+                    <input type="text" className={`campo-entrada ${fieldErrors.especie ? 'campo-entrada--error' : ''}`} name="especie" value={form.especie} onChange={handleChange} required />
+                    {fieldErrors.especie && <div className="campo-error">{fieldErrors.especie}</div>}
+                  </div>
                 </div>
 
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Raza</label>
-                  <input
-                    type="text"
-                    className={`form-control ${fieldErrors.raza ? 'is-invalid' : ''}`}
-                    name="raza"
-                    value={form.raza}
-                    onChange={handleChange}
-                    required
-                  />
-                  {fieldErrors.raza && <div className="invalid-feedback">{fieldErrors.raza}</div>}
+                <div className="col-md-6">
+                  <div className="campo-grupo">
+                    <label className="campo-etiqueta">Raza</label>
+                    <input type="text" className={`campo-entrada ${fieldErrors.raza ? 'campo-entrada--error' : ''}`} name="raza" value={form.raza} onChange={handleChange} required />
+                    {fieldErrors.raza && <div className="campo-error">{fieldErrors.raza}</div>}
+                  </div>
                 </div>
 
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Sexo</label>
-                  <select
-                    className="form-select"
-                    value={form.sexo}
-                    onChange={(e) => setForm({ ...form, sexo: e.target.value })}
-                  >
-                    {SEXOS_MASCOTA.map((sexo) => (
-                      <option key={sexo} value={sexo}>{SEXO_LABEL[sexo]}</option>
-                    ))}
-                  </select>
+                <div className="col-md-6">
+                  <div className="campo-grupo">
+                    <label className="campo-etiqueta">Sexo</label>
+                    <select className="campo-entrada" value={form.sexo} onChange={(e) => setForm({ ...form, sexo: e.target.value })}>
+                      {SEXOS_MASCOTA.map((sexo) => (
+                        <option key={sexo} value={sexo}>{SEXO_LABEL[sexo]}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Fecha Nacimiento</label>
-                  <input
-                    type="date"
-                    className={`form-control ${fieldErrors.fechaNacimiento ? 'is-invalid' : ''}`}
-                    name="fechaNacimiento"
-                    value={form.fechaNacimiento}
-                    onChange={handleChange}
-                    required
-                  />
-                  {fieldErrors.fechaNacimiento && <div className="invalid-feedback">{fieldErrors.fechaNacimiento}</div>}
+                <div className="col-md-6">
+                  <div className="campo-grupo">
+                    <label className="campo-etiqueta">Fecha Nacimiento</label>
+                    <input type="date" className={`campo-entrada ${fieldErrors.fechaNacimiento ? 'campo-entrada--error' : ''}`} name="fechaNacimiento" value={form.fechaNacimiento} onChange={handleChange} required />
+                    {fieldErrors.fechaNacimiento && <div className="campo-error">{fieldErrors.fechaNacimiento}</div>}
+                  </div>
                 </div>
 
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Dueño Principal</label>
-                  <select
-                    className={`form-select ${fieldErrors.ownerId ? 'is-invalid' : ''}`}
-                    value={form.ownerId}
-                    onChange={(e) => {
-                      setForm((prev) => ({ ...prev, ownerId: Number(e.target.value) }));
-                      setFieldErrors((p) => { const n = { ...p }; delete n.ownerId; return n; });
-                    }}
-                    required={!isEditing}
-                  >
-                    <option value="">
-                      {isEditing
-                        ? "No cambiar dueño (opcional)"
-                        : "Seleccione dueño"}
-                    </option>
-                    {duenos.map((dueno) => (
-                      <option key={dueno.id} value={dueno.id}>
-                        {dueno.nombre} {dueno.apellido}
+                <div className="col-md-6">
+                  <div className="campo-grupo">
+                    <label className="campo-etiqueta">Dueño Principal</label>
+                    <select
+                      className={`campo-entrada ${fieldErrors.ownerId ? 'campo-entrada--error' : ''}`}
+                      value={form.ownerId}
+                      onChange={(e) => { setForm((prev) => ({ ...prev, ownerId: Number(e.target.value) })); setFieldErrors((p) => { const n = { ...p }; delete n.ownerId; return n; }); }}
+                      required={!isEditing}
+                    >
+                      <option value="">
+                        {isEditing ? "No cambiar dueño (opcional)" : "Seleccione dueño"}
                       </option>
-                    ))}
-                  </select>
-                  {fieldErrors.ownerId && <div className="invalid-feedback">{fieldErrors.ownerId}</div>}
-                  {isEditing && (
-                    <small className="text-muted">
-                      El dueño principal no se modifica desde aquí. Usa "Vincular Dueño" para agregar owners adicionales.
-                    </small>
-                  )}
+                      {duenos.map((dueno) => (
+                        <option key={dueno.id} value={dueno.id}>
+                          {dueno.nombre} {dueno.apellido}
+                        </option>
+                      ))}
+                    </select>
+                    {fieldErrors.ownerId && <div className="campo-error">{fieldErrors.ownerId}</div>}
+                    {isEditing && (
+                      <div className="campo-ayuda">El dueño principal no se modifica desde aquí. Usa "Vincular Dueño" para agregar owners adicionales.</div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Relación</label>
-                  <input
-                    type="text"
-                    className={`form-control ${fieldErrors.ownerRelation ? 'is-invalid' : ''}`}
-                    name="ownerRelation"
-                    value={form.ownerRelation}
-                    onChange={handleChange}
-                    required={!isEditing}
-                  />
-                  {fieldErrors.ownerRelation && <div className="invalid-feedback">{fieldErrors.ownerRelation}</div>}
+                <div className="col-md-6">
+                  <div className="campo-grupo">
+                    <label className="campo-etiqueta">Relación</label>
+                    <input type="text" className={`campo-entrada ${fieldErrors.ownerRelation ? 'campo-entrada--error' : ''}`} name="ownerRelation" value={form.ownerRelation} onChange={handleChange} required={!isEditing} />
+                    {fieldErrors.ownerRelation && <div className="campo-error">{fieldErrors.ownerRelation}</div>}
+                  </div>
                 </div>
 
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Microchip</label>
-                  <input
-                    type="text"
-                    className={`form-control ${fieldErrors.microchip ? 'is-invalid' : ''}`}
-                    name="microchip"
-                    value={form.microchip}
-                    onChange={handleChange}
-                  />
-                  {fieldErrors.microchip && <div className="invalid-feedback">{fieldErrors.microchip}</div>}
+                <div className="col-md-6">
+                  <div className="campo-grupo">
+                    <label className="campo-etiqueta">Microchip</label>
+                    <input type="text" className={`campo-entrada ${fieldErrors.microchip ? 'campo-entrada--error' : ''}`} name="microchip" value={form.microchip} onChange={handleChange} />
+                    {fieldErrors.microchip && <div className="campo-error">{fieldErrors.microchip}</div>}
+                  </div>
                 </div>
 
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Condición Reproductiva</label>
-                  <input
-                    type="text"
-                    className={`form-control ${fieldErrors.condicionReproductiva ? 'is-invalid' : ''}`}
-                    name="condicionReproductiva"
-                    value={form.condicionReproductiva}
-                    onChange={handleChange}
-                  />
-                  {fieldErrors.condicionReproductiva && <div className="invalid-feedback">{fieldErrors.condicionReproductiva}</div>}
+                <div className="col-md-6">
+                  <div className="campo-grupo">
+                    <label className="campo-etiqueta">Condición Reproductiva</label>
+                    <input type="text" className={`campo-entrada ${fieldErrors.condicionReproductiva ? 'campo-entrada--error' : ''}`} name="condicionReproductiva" value={form.condicionReproductiva} onChange={handleChange} />
+                    {fieldErrors.condicionReproductiva && <div className="campo-error">{fieldErrors.condicionReproductiva}</div>}
+                  </div>
                 </div>
 
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Alergias</label>
-                  <input
-                    type="text"
-                    className={`form-control ${fieldErrors.alergias ? 'is-invalid' : ''}`}
-                    name="alergias"
-                    value={form.alergias}
-                    onChange={handleChange}
-                  />
-                  {fieldErrors.alergias && <div className="invalid-feedback">{fieldErrors.alergias}</div>}
+                <div className="col-md-6">
+                  <div className="campo-grupo">
+                    <label className="campo-etiqueta">Alergias</label>
+                    <input type="text" className={`campo-entrada ${fieldErrors.alergias ? 'campo-entrada--error' : ''}`} name="alergias" value={form.alergias} onChange={handleChange} />
+                    {fieldErrors.alergias && <div className="campo-error">{fieldErrors.alergias}</div>}
+                  </div>
                 </div>
 
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Enfermedades Crónicas</label>
-                  <input
-                    type="text"
-                    className={`form-control ${fieldErrors.enfermedadesCronicas ? 'is-invalid' : ''}`}
-                    name="enfermedadesCronicas"
-                    value={form.enfermedadesCronicas}
-                    onChange={handleChange}
-                  />
-                  {fieldErrors.enfermedadesCronicas && <div className="invalid-feedback">{fieldErrors.enfermedadesCronicas}</div>}
+                <div className="col-md-6">
+                  <div className="campo-grupo">
+                    <label className="campo-etiqueta">Enfermedades Crónicas</label>
+                    <input type="text" className={`campo-entrada ${fieldErrors.enfermedadesCronicas ? 'campo-entrada--error' : ''}`} name="enfermedadesCronicas" value={form.enfermedadesCronicas} onChange={handleChange} />
+                    {fieldErrors.enfermedadesCronicas && <div className="campo-error">{fieldErrors.enfermedadesCronicas}</div>}
+                  </div>
                 </div>
 
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Alertas Médicas</label>
-                  <input
-                    type="text"
-                    className={`form-control ${fieldErrors.alertasMedicas ? 'is-invalid' : ''}`}
-                    name="alertasMedicas"
-                    value={form.alertasMedicas}
-                    onChange={handleChange}
-                  />
-                  {fieldErrors.alertasMedicas && <div className="invalid-feedback">{fieldErrors.alertasMedicas}</div>}
+                <div className="col-md-6">
+                  <div className="campo-grupo">
+                    <label className="campo-etiqueta">Alertas Médicas</label>
+                    <input type="text" className={`campo-entrada ${fieldErrors.alertasMedicas ? 'campo-entrada--error' : ''}`} name="alertasMedicas" value={form.alertasMedicas} onChange={handleChange} />
+                    {fieldErrors.alertasMedicas && <div className="campo-error">{fieldErrors.alertasMedicas}</div>}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" onClick={onClose}>
-                Cancelar
-              </button>
-              <button type="submit" className="btn btn-primary">
-                {isEditing ? "Actualizar" : "Guardar"}
-              </button>
-            </div>
-          </form>
+              <div className="dialogo-pie" style={{ padding: 'var(--espaciado-md) 0 0', borderTop: 'none' }}>
+                <button type="button" className="boton boton--neutro" onClick={onClose}>Cancelar</button>
+                <button type="submit" className="boton boton--primario">
+                  {isEditing ? "Actualizar" : "Guardar"}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
     </>
   );
 }
