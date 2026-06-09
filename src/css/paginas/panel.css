@@ -1,0 +1,107 @@
+.panel-titulo {
+  font-size: var(--tamano-2xl);
+  font-weight: var(--peso-extranegrita);
+  color: var(--color-primario);
+  margin: 0 0 var(--espaciado-xs);
+}
+
+.panel-subtitulo {
+  font-size: var(--tamano-sm);
+  color: var(--color-texto-secundario);
+  margin: 0 0 var(--espaciado-xl);
+}
+
+.panel-tarjetas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--espaciado-lg);
+}
+
+.panel-tarjeta {
+  background: var(--color-fondo-blanco);
+  border-radius: var(--radio-borde-grande);
+  box-shadow: var(--sombra-tarjeta);
+  padding: var(--espaciado-lg);
+  border: 1px solid var(--color-borde-claro);
+  transition: all var(--transicion-normal);
+  cursor: default;
+}
+
+.panel-tarjeta:hover {
+  box-shadow: var(--sombra-tarjeta-hover);
+  transform: translateY(-2px);
+}
+
+.panel-tarjeta-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radio-borde-grande);
+  background: var(--color-secundario-claro);
+  color: var(--color-primario);
+  font-size: var(--tamano-xl);
+  margin-bottom: var(--espaciado-md);
+}
+
+.panel-tarjeta-titulo {
+  font-size: var(--tamano-sm);
+  font-weight: var(--peso-seminegrita);
+  color: var(--color-texto-secundario);
+  margin: 0 0 var(--espaciado-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.panel-tarjeta-valor {
+  font-size: var(--tamano-3xl);
+  font-weight: var(--peso-extranegrita);
+  color: var(--color-primario);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.panel-bienvenida {
+  background: linear-gradient(135deg, var(--color-primario), var(--color-primario-claro));
+  border-radius: var(--radio-borde-grande);
+  padding: var(--espaciado-xl) var(--espaciado-2xl);
+  color: var(--color-fondo-blanco);
+  margin-bottom: var(--espaciado-xl);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel-bienvenida h1 {
+  font-size: var(--tamano-2xl);
+  font-weight: var(--peso-extranegrita);
+  margin: 0 0 var(--espaciado-xs);
+}
+
+.panel-bienvenida p {
+  font-size: var(--tamano-base);
+  opacity: 0.85;
+  margin: 0;
+}
+
+.panel-bienvenida-icono {
+  font-size: 3rem;
+  opacity: 0.3;
+}
+
+@media (max-width: 576px) {
+  .panel-tarjetas {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-bienvenida {
+    flex-direction: column;
+    text-align: center;
+    padding: var(--espaciado-lg);
+  }
+
+  .panel-bienvenida-icono {
+    display: none;
+  }
+}

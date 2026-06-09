@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import '../css/pages/LoginPage.css';
+import Logo from '../components/common/Logo';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -34,28 +34,38 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="fullscreen-bg">
-      <div className="glass-card login-card">
-        <div className="login-header">
-          <h2>PetCare</h2>
-          <p>Bienvenido de nuevo a tu clínica de confianza</p>
+    <div className="inicio-sesion">
+      <div className="inicio-sesion-tarjeta">
+        <div className="inicio-sesion-logo">
+          <Logo height={52} />
         </div>
 
+        <h1 className="inicio-sesion-titulo">Bienvenido</h1>
+        <p className="inicio-sesion-subtitulo">Ingresa a tu cuenta para continuar</p>
+
         {errorMsg && (
-          <div className="alert alert-danger bg-danger text-white border-0 py-2 text-center" style={{ backdropFilter: 'blur(4px)', background: 'rgba(220, 53, 69, 0.7) !important' }}>
-            <i className="bi bi-exclamation-triangle-fill me-2"></i>
+          <div className="inicio-sesion-error">
+            <i className="bi bi-exclamation-triangle-fill me-1"></i>
             {errorMsg}
           </div>
         )}
 
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="form-label">Usuario</label>
-            <div className="input-group">
-              <span className="input-group-text"><i className="bi bi-person-fill"></i></span>
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">Usuario</label>
+            <div className="d-flex align-items-stretch">
+              <span style={{
+                display: 'flex', alignItems: 'center', padding: '0.5rem 0.75rem',
+                background: 'var(--color-fondo)', border: '1.5px solid var(--color-borde)',
+                borderRight: 'none', borderRadius: 'var(--radio-borde) 0 0 var(--radio-borde)',
+                color: 'var(--color-texto-secundario)'
+              }}>
+                <i className="bi bi-person-fill"></i>
+              </span>
               <input
                 type="text"
-                className="form-control"
+                className="campo-entrada"
+                style={{ borderRadius: '0 var(--radio-borde) var(--radio-borde) 0' }}
                 placeholder="Ingresa tu usuario"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -64,13 +74,21 @@ const LoginPage = () => {
             </div>
           </div>
 
-          <div className="mb-4">
-            <label className="form-label">Contraseña</label>
-            <div className="input-group">
-              <span className="input-group-text"><i className="bi bi-lock-fill"></i></span>
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">Contraseña</label>
+            <div className="d-flex align-items-stretch">
+              <span style={{
+                display: 'flex', alignItems: 'center', padding: '0.5rem 0.75rem',
+                background: 'var(--color-fondo)', border: '1.5px solid var(--color-borde)',
+                borderRight: 'none', borderRadius: 'var(--radio-borde) 0 0 var(--radio-borde)',
+                color: 'var(--color-texto-secundario)'
+              }}>
+                <i className="bi bi-lock-fill"></i>
+              </span>
               <input
                 type={showPassword ? "text" : "password"}
-                className="form-control"
+                className="campo-entrada"
+                style={{ borderRadius: '0', borderRight: 'none' }}
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -78,7 +96,8 @@ const LoginPage = () => {
               />
               <button
                 type="button"
-                className="btn btn-outline-light"
+                className="boton boton--neutro"
+                style={{ borderRadius: '0 var(--radio-borde) var(--radio-borde) 0', borderLeft: 'none' }}
                 onClick={() => setShowPassword(!showPassword)}
                 tabIndex={-1}
               >
@@ -87,12 +106,12 @@ const LoginPage = () => {
             </div>
           </div>
 
-          <button type="submit" className="btn btn-primary w-100" disabled={isSubmitting}>
+          <button type="submit" className="boton boton--primario boton--grande inicio-sesion-enviar" disabled={isSubmitting}>
             {isSubmitting ? (
-              <>
-                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              <span className="inicio-sesion-cargando">
+                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                 Ingresando...
-              </>
+              </span>
             ) : (
               'Iniciar Sesión'
             )}

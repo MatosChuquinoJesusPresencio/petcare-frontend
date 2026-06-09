@@ -86,21 +86,27 @@ export default function MascotaVincularModal({
   if (!show) return null;
 
   return (
-    <div className="modal d-block modal-bg">
+    <>
       <NotificationToast toast={toast} onClose={() => setToast(null)} />
-      <div className="modal-dialog">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title">Vincular Dueño</h5>
-            <button className="btn-close" onClick={onClose} />
+      <div className="dialogo-fondo" onClick={onClose}></div>
+      <div className="dialogo-contenedor">
+        <div className="dialogo-ventana">
+          <div className="dialogo-encabezado">
+            <h5 className="dialogo-titulo">
+              <i className="bi bi-person-plus me-1"></i>
+              Vincular Dueño
+            </h5>
+            <button type="button" className="dialogo-cerrar" onClick={onClose}>
+              <i className="bi bi-x-lg"></i>
+            </button>
           </div>
 
-          <form onSubmit={handleSubmit}>
-            <div className="modal-body">
-              <div className="mb-3">
-                <label className="form-label">Dueño</label>
+          <div className="dialogo-cuerpo">
+            <form onSubmit={handleSubmit}>
+              <div className="campo-grupo">
+                <label className="campo-etiqueta">Dueño</label>
                 <select
-                  className={`form-select ${fieldErrors.duenoId ? 'is-invalid' : ''}`}
+                  className={`campo-entrada ${fieldErrors.duenoId ? 'campo-entrada--error' : ''}`}
                   value={duenoId}
                   onChange={(e) => { setDuenoId(Number(e.target.value)); setFieldErrors((p) => { const n = { ...p }; delete n.duenoId; return n; }); }}
                   required
@@ -112,50 +118,42 @@ export default function MascotaVincularModal({
                     </option>
                   ))}
                 </select>
-                {fieldErrors.duenoId && <div className="invalid-feedback">{fieldErrors.duenoId}</div>}
+                {fieldErrors.duenoId && <div className="campo-error">{fieldErrors.duenoId}</div>}
               </div>
 
-              <div className="mb-3">
-                <label className="form-label">Relación</label>
+              <div className="campo-grupo">
+                <label className="campo-etiqueta">Relación</label>
                 <input
                   type="text"
-                  className={`form-control ${fieldErrors.relacion ? 'is-invalid' : ''}`}
+                  className={`campo-entrada ${fieldErrors.relacion ? 'campo-entrada--error' : ''}`}
                   value={relacion}
                   onChange={(e) => { setRelacion(e.target.value); setFieldErrors((p) => { const n = { ...p }; delete n.relacion; return n; }); }}
                   required
                 />
-                {fieldErrors.relacion && <div className="invalid-feedback">{fieldErrors.relacion}</div>}
+                {fieldErrors.relacion && <div className="campo-error">{fieldErrors.relacion}</div>}
               </div>
 
-              <div className="form-check mb-3">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  id="chkPrincipal"
-                  checked={esPrincipal}
-                  onChange={(e) => setEsPrincipal(e.target.checked)}
-                />
-                <label className="form-check-label" htmlFor="chkPrincipal">
+              <div className="campo-grupo">
+                <label className="campo-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={esPrincipal}
+                    onChange={(e) => setEsPrincipal(e.target.checked)}
+                  />
                   Establecer como dueño principal
                 </label>
               </div>
-            </div>
 
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={onClose}
-              >
-                Cancelar
-              </button>
-              <button type="submit" className="btn btn-primary">
-                {esPrincipal ? "Cambiar dueño principal" : "Vincular"}
-              </button>
-            </div>
-          </form>
+              <div className="dialogo-pie" style={{ padding: 'var(--espaciado-md) 0 0', borderTop: 'none' }}>
+                <button type="button" className="boton boton--neutro" onClick={onClose}>Cancelar</button>
+                <button type="submit" className="boton boton--primario">
+                  {esPrincipal ? "Cambiar dueño principal" : "Vincular"}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

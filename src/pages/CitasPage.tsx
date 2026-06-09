@@ -93,66 +93,68 @@ const CitasPage = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <NotificationToast toast={toast} onClose={() => setToast(null)} />
+    <div className="contenedor-pagina">
+      <div className="container">
+        <NotificationToast toast={toast} onClose={() => setToast(null)} />
 
-      <PageHeader icon="bi-calendar-check" title="Gestión de Citas" description="Vista donde podras ver y gestionar las citas">
-        <button className="btn btn-success" onClick={() => setShowFormModal(true)}>
-          <i className="bi bi-plus-circle-fill me-2"></i>Nueva Cita
-        </button>
-      </PageHeader>
+        <PageHeader icon="bi-calendar-check" title="Gestión de Citas" description="Revisa y administra las citas programadas">
+          <button className="boton boton--primario" onClick={() => setShowFormModal(true)}>
+            <i className="bi bi-plus-circle-fill me-1"></i>Nueva Cita
+          </button>
+        </PageHeader>
 
-      <div className="card shadow-sm">
-        <div className="card-body">
-          {loading ? (
-            <div className="text-center py-4">
-              <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Cargando...</span>
+        <div className="tarjeta animacion-entrada">
+          <div className="tarjeta-cuerpo">
+            {loading ? (
+              <div className="estado-cargando">
+                <div className="spinner-border" style={{ color: 'var(--color-primario)' }} role="status">
+                  <span className="visually-hidden">Cargando...</span>
+                </div>
               </div>
-            </div>
-          ) : (
-            <CitaTable
-              citas={citas}
-              onEstadoChange={handleEstadoChange}
-              onReprogramar={(cita) => {
-                setCitaReprogramar(cita);
-                setShowReprogramarModal(true);
-              }}
-              onCancelar={(id) => setCancelarId(id)}
-            />
-          )}
+            ) : (
+              <CitaTable
+                citas={citas}
+                onEstadoChange={handleEstadoChange}
+                onReprogramar={(cita) => {
+                  setCitaReprogramar(cita);
+                  setShowReprogramarModal(true);
+                }}
+                onCancelar={(id) => setCancelarId(id)}
+              />
+            )}
+          </div>
+          <div className="tarjeta-pie" style={{ fontSize: 'var(--tamano-sm)', color: 'var(--color-texto-claro)' }}>
+            Total de citas: {citas.length}
+          </div>
         </div>
-        <div className="card-footer text-muted small py-2">
-          Total de citas: {citas.length}
-        </div>
+
+        <CitaFormModal
+          show={showFormModal}
+          onClose={() => setShowFormModal(false)}
+          onSuccess={fetchCitas}
+          mascotas={mascotas}
+          servicios={servicios}
+          veterinarios={veterinarios}
+        />
+
+        <CitaReprogramarModal
+          show={showReprogramarModal}
+          onClose={() => setShowReprogramarModal(false)}
+          onSuccess={fetchCitas}
+          cita={citaReprogramar}
+        />
+
+        <ConfirmDialog
+          isOpen={cancelarId !== null}
+          title="Cancelar cita"
+          message="¿Estás seguro de cancelar esta cita?"
+          confirmText="Cancelar cita"
+          cancelText="Volver"
+          variant="danger"
+          onConfirm={handleCancelarConfirmado}
+          onCancel={() => setCancelarId(null)}
+        />
       </div>
-
-      <CitaFormModal
-        show={showFormModal}
-        onClose={() => setShowFormModal(false)}
-        onSuccess={fetchCitas}
-        mascotas={mascotas}
-        servicios={servicios}
-        veterinarios={veterinarios}
-      />
-
-      <CitaReprogramarModal
-        show={showReprogramarModal}
-        onClose={() => setShowReprogramarModal(false)}
-        onSuccess={fetchCitas}
-        cita={citaReprogramar}
-      />
-
-      <ConfirmDialog
-        isOpen={cancelarId !== null}
-        title="Cancelar cita"
-        message="¿Estás seguro de cancelar esta cita?"
-        confirmText="Cancelar cita"
-        cancelText="Volver"
-        variant="danger"
-        onConfirm={handleCancelarConfirmado}
-        onCancel={() => setCancelarId(null)}
-      />
     </div>
   );
 };

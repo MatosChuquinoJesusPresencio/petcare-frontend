@@ -124,43 +124,49 @@ const ContactoFormDialog = ({
     >
       <div className="row g-3">
         <div className="col-12">
-          <label className="form-label">Nombre del contacto *</label>
-          <input
-            type="text"
-            className={`form-control ${fieldErrors.name ? 'is-invalid' : ''}`}
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="Ej. María López"
-            required
-          />
-          {fieldErrors.name && <div className="invalid-feedback">{fieldErrors.name}</div>}
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">Nombre del contacto *</label>
+            <input
+              type="text"
+              className={`campo-entrada ${fieldErrors.name ? 'campo-entrada--error' : ''}`}
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Ej. María López"
+              required
+            />
+            {fieldErrors.name && <div className="campo-error">{fieldErrors.name}</div>}
+          </div>
         </div>
 
         <div className="col-12">
-          <label className="form-label">Número de teléfono *</label>
-          <input
-            type="text"
-            className={`form-control ${fieldErrors.phone ? 'is-invalid' : ''}`}
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            placeholder="Ej. 987654321"
-            required
-          />
-          {fieldErrors.phone && <div className="invalid-feedback">{fieldErrors.phone}</div>}
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">Número de teléfono *</label>
+            <input
+              type="text"
+              className={`campo-entrada ${fieldErrors.phone ? 'campo-entrada--error' : ''}`}
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              placeholder="Ej. 987654321"
+              required
+            />
+            {fieldErrors.phone && <div className="campo-error">{fieldErrors.phone}</div>}
+          </div>
         </div>
 
         <div className="col-12">
-          <label className="form-label">Relación / Vínculo (Opcional)</label>
-          <input
-            type="text"
-            className="form-control"
-            name="relation"
-            value={formData.relation}
-            onChange={handleChange}
-            placeholder="Ej. Familiar, Hermano, Vecino"
-          />
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">Relación / Vínculo (Opcional)</label>
+            <input
+              type="text"
+              className="campo-entrada"
+              name="relation"
+              value={formData.relation}
+              onChange={handleChange}
+              placeholder="Ej. Familiar, Hermano, Vecino"
+            />
+          </div>
         </div>
       </div>
     </BaseFormDialog>

@@ -11,9 +11,9 @@ export default function DataTable({ columns, children, emptyMessage = "No hay re
   const isEmpty = Children.count(children) === 0;
 
   return (
-    <div className="table-responsive">
-      <table className="table table-hover align-middle mb-0">
-        <thead className="table-light">
+    <div className="tabla-contenedor">
+      <table className="tabla-datos">
+        <thead>
           <tr>
             {columns.map((col, i) => (
               <th key={i} scope="col">{col}</th>
@@ -23,8 +23,13 @@ export default function DataTable({ columns, children, emptyMessage = "No hay re
         <tbody>
           {isEmpty ? (
             <tr>
-              <td colSpan={colSpan ?? columns.length} className="text-center py-4 text-muted">
-                {emptyMessage}
+              <td colSpan={colSpan ?? columns.length}>
+                <div className="tabla-datos-vacio">
+                  <div className="tabla-datos-vacio-icono">
+                    <i className="bi bi-inbox"></i>
+                  </div>
+                  {emptyMessage}
+                </div>
               </td>
             </tr>
           ) : (

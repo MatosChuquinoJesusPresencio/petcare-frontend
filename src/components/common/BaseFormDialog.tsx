@@ -31,60 +31,40 @@ export default function BaseFormDialog({
 
   return (
     <>
-      <div className="modal-backdrop fade show"></div>
-      <div
-        className="modal fade show d-block"
-        id={modalId}
-        aria-hidden="false"
-        aria-modal="true"
-        role="dialog"
-        tabIndex={-1}
-      >
-        <div className={`modal-dialog modal-${size} modal-dialog-centered modal-force-dark-text`}>
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title">{title}</h5>
-              <button
-                type="button"
-                className="btn-close"
-                aria-label="Cerrar"
-                onClick={onClose}
-                disabled={isSubmitting}
-              ></button>
-            </div>
-            <div className="modal-body">
-              <form onSubmit={onSubmit}>
-                {children}
+      <div className="dialogo-fondo" onClick={!isSubmitting ? onClose : undefined}></div>
+      <div className="dialogo-contenedor" id={modalId} aria-hidden="false" aria-modal="true" role="dialog" tabIndex={-1}>
+        <div className={`dialogo-ventana${size === 'lg' ? ' dialogo-ventana--grande' : ''}`}>
+          <div className="dialogo-encabezado">
+            <h5 className="dialogo-titulo">{title}</h5>
+            <button type="button" className="dialogo-cerrar" aria-label="Cerrar" onClick={onClose} disabled={isSubmitting}>
+              <i className="bi bi-x-lg"></i>
+            </button>
+          </div>
+          <div className="dialogo-cuerpo">
+            <form onSubmit={onSubmit}>
+              {children}
 
-                {submitError && (
-                  <div className="alert alert-danger mt-3 mb-0" role="alert">
-                    {submitError}
-                  </div>
-                )}
-
-                <div className="d-flex justify-content-center gap-3 modal-footer mt-4">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={onClose}
-                    disabled={isSubmitting}
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? submitBusyLabel : submitLabel}
-                  </button>
+              {submitError && (
+                <div className="dialogo-error" role="alert">
+                  <i className="bi bi-exclamation-triangle-fill me-1"></i>
+                  {submitError}
                 </div>
-              </form>
-            </div>
+              )}
+
+              <div className="dialogo-pie">
+                <button type="button" className="boton boton--neutro" onClick={onClose} disabled={isSubmitting}>
+                  Cancelar
+                </button>
+                <button type="submit" className="boton boton--primario" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <><span className="spinner-border spinner-border-sm me-1" role="status"></span>{submitBusyLabel}</>
+                  ) : submitLabel}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
-
     </>
   );
 }

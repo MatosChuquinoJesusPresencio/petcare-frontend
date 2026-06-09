@@ -1,0 +1,117 @@
+.dialogo-fondo {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+  animation: aparecer 0.2s ease;
+}
+
+.dialogo-contenedor {
+  position: fixed;
+  inset: 0;
+  z-index: 1055;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--espaciado-lg);
+  animation: aparecer 0.2s ease;
+}
+
+.dialogo-ventana {
+  background: var(--color-fondo-blanco);
+  border-radius: var(--radio-borde-grande);
+  box-shadow: var(--sombra-modal);
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  animation: escalaAdentro 0.25s ease;
+}
+
+.dialogo-ventana--grande {
+  max-width: 720px;
+}
+
+.dialogo-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--espaciado-lg) var(--espaciado-lg) var(--espaciado-md);
+  border-bottom: 1px solid var(--color-borde-claro);
+}
+
+.dialogo-titulo {
+  font-size: var(--tamano-lg);
+  font-weight: var(--peso-negrita);
+  color: var(--color-texto);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--espaciado-sm);
+}
+
+.dialogo-cerrar {
+  background: none;
+  border: none;
+  font-size: var(--tamano-xl);
+  color: var(--color-texto-claro);
+  cursor: pointer;
+  padding: var(--espaciado-xs);
+  border-radius: var(--radio-borde-pequeno);
+  transition: all var(--transicion-rapida);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.dialogo-cerrar:hover {
+  background: var(--color-fondo);
+  color: var(--color-texto);
+}
+
+.dialogo-cuerpo {
+  padding: var(--espaciado-lg);
+  overflow-y: auto;
+  flex: 1;
+}
+
+.dialogo-pie {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--espaciado-sm);
+  padding: var(--espaciado-md) var(--espaciado-lg);
+  border-top: 1px solid var(--color-borde-claro);
+}
+
+.dialogo-error {
+  background: #fef2f2;
+  color: var(--color-peligro);
+  padding: var(--espaciado-sm) var(--espaciado-md);
+  border-radius: var(--radio-borde);
+  font-size: var(--tamano-sm);
+  margin-bottom: var(--espaciado-md);
+  border: 1px solid #fecaca;
+}
+
+@media (max-width: 576px) {
+  .dialogo-contenedor {
+    padding: 12px;
+    align-items: center;
+  }
+
+  .dialogo-ventana {
+    max-width: calc(100vw - 24px);
+    max-height: 85vh;
+    border-radius: var(--radio-borde-grande);
+  }
+
+  .dialogo-encabezado,
+  .dialogo-cuerpo,
+  .dialogo-pie {
+    padding: var(--espaciado-md);
+  }
+}

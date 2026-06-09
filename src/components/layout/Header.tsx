@@ -1,117 +1,143 @@
+import { useState, useEffect, useCallback } from 'react';
 import { ROL_LABEL } from '../../constants';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa';
-import { FiLogOut } from 'react-icons/fi';
-import type { ReactNode } from 'react';
+import { FiLogOut, FiMenu, FiX, FiHome, FiList, FiCalendar, FiHeart, FiUsers } from 'react-icons/fi';
+import Logo from '../common/Logo';
 
-const Tooltip = ({ children, text }: { children: ReactNode; text: string }) => (
-  <span className="position-relative" style={{ cursor: 'pointer' }}>
-    <span className="d-inline-block" data-tooltip>{children}</span>
-    <span className="tooltip-custom">{text}</span>
-  </span>
-);
+interface Enlace {
+  label: string;
+  to: string;
+  icon: React.ReactNode;
+}
 
 const Header = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [abierto, setAbierto] = useState(window.innerWidth > 768);
+  const [esMovil, setEsMovil] = useState(window.innerWidth <= 768);
 
-  const navbarLinks = () => {
-    const links: { label: string; to: string }[] = [{ label: 'Dashboard', to: '/' }];
+  useEffect(() => {
+    const handleResize = () => {
+      const movil = window.innerWidth <= 768;
+      setEsMovil(movil);
+      if (movil) setAbierto(false);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
-    if (!user) return links;
-
-    if (user.role !== 'DUENO') {
-      links.push({ label: 'Servicios', to: '/servicios' });
-      links.push({ label: 'Citas', to: '/citas' });
-      links.push({ label: 'Mascotas', to: '/mascotas' });
-      links.push({ label: 'Dueños', to: '/duenos' });
+  useEffect(() => {
+    const main = document.querySelector('.contenido-principal');
+    if (main && !esMovil) {
+      main.classList.toggle('contenido-principal--expandido', !abierto);
+    } else if (main) {
+      main.classList.remove('contenido-principal--expandido');
     }
+  }, [abierto, esMovil]);
 
-    return links;
-  };
+  const enlaces: Enlace[] = [
+    { label: 'Dashboard', to: '/', icon: <FiHome /> },
+    ...(user && user.role !== 'DUENO'
+      ? [
+          { label: 'Servicios', to: '/servicios', icon: <FiList /> },
+          { label: 'Citas', to: '/citas', icon: <FiCalendar /> },
+          { label: 'Mascotas', to: '/mascotas', icon: <FiHeart /> },
+          { label: 'Dueños', to: '/duenos', icon: <FiUsers /> },
+        ]
+      : []),
+  ];
+
+  const toggle = useCallback(() => setAbierto((prev) => !prev), []);
 
   const handleLogout = async () => {
     await logout();
     navigate('/login');
   };
 
+  const navegar = useCallback((to: string) => {
+    navigate(to);
+    if (esMovil) setAbierto(false);
+  }, [navigate, esMovil]);
+
   return (
-    <nav className="navbar navbar-expand-md bg-brand-gradient">
-      <div className="container">
-        <span className="navbar-brand text-white fw-bold" style={{ cursor: 'pointer' }} onClick={() => navigate('/')}>
-          PetCare
-        </span>
+    <>
+      {/* Mobile header bar */}
+      {esMovil && (
+        <div className="barra-lateral-header-movil">
+          <button
+            className="barra-lateral-toggle-movil"
+            onClick={toggle}
+            aria-label={abierto ? 'Cerrar menú' : 'Abrir menú'}
+          >
+            {abierto ? <FiX /> : <FiMenu />}
+          </button>
+          <div className="barra-lateral-logo-movil" onClick={() => navegar('/')}>
+            <Logo blanco height={32} />
+          </div>
+        </div>
+      )}
 
-        <button className="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-          <span className="navbar-toggler-icon" style={{ filter: 'invert(1)' }}></span>
+      {/* Overlay for mobile */}
+      {esMovil && abierto && <div className="barra-lateral-overlay" onClick={() => setAbierto(false)} />}
+
+      {/* Desktop toggle button: inside the sidebar when open, floating when closed */}
+      {!esMovil && !abierto && (
+        <button className="barra-lateral-toggle-desktop" onClick={toggle} aria-label="Abrir menú">
+          <FiMenu />
         </button>
+      )}
 
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav me-auto">
-            {navbarLinks().map((link) => (
-              <li className="nav-item" key={link.to}>
-                <span
-                  className={`nav-link ${location.pathname === link.to ? 'text-white fw-semibold' : 'text-white-50'}`}
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => navigate(link.to)}
+      {/* Sidebar */}
+      <aside className={`barra-lateral${abierto ? ' barra-lateral--abierto' : ''}`}>
+        <div className="barra-lateral-logo">
+          <Logo blanco height={48} />
+          {!esMovil && (
+            <button className="barra-lateral-toggle-inner" onClick={toggle} aria-label="Cerrar menú">
+              <FiX />
+            </button>
+          )}
+        </div>
+
+        <nav>
+          <ul className="barra-lateral-enlaces">
+            {enlaces.map((link) => (
+              <li key={link.to}>
+                <button
+                  className={`barra-lateral-enlace${location.pathname === link.to ? ' barra-lateral-enlace--activo' : ''}`}
+                  onClick={() => navegar(link.to)}
                 >
-                  {link.label}
-                </span>
+                  <span className="barra-lateral-icono">{link.icon}</span>
+                  <span className="barra-lateral-etiqueta">{link.label}</span>
+                </button>
               </li>
             ))}
           </ul>
+        </nav>
 
-          {user && (
-            <div className="d-flex align-items-center gap-3">
-              <Tooltip text={`Nombre: ${user.username}\nRol: ${ROL_LABEL[user.role as keyof typeof ROL_LABEL] || user.role}`}>
-                <FaUserCircle size={26} className="text-white" />
-              </Tooltip>
-              <button className="btn btn-outline-light btn-sm d-flex align-items-center gap-1" onClick={handleLogout}>
-                <FiLogOut size={16} />
-                Salir
-              </button>
+        {user && (
+          <div className="barra-lateral-pie">
+            <div className="barra-lateral-usuario">
+              <span className="barra-lateral-usuario-icono">
+                <FaUserCircle size={20} />
+              </span>
+              <div style={{ flex: 1, overflow: 'hidden' }}>
+                <div className="barra-lateral-usuario-nombre">{user.username}</div>
+                <div className="barra-lateral-usuario-rol">
+                  {ROL_LABEL[user.role as keyof typeof ROL_LABEL] || user.role}
+                </div>
+              </div>
             </div>
-          )}
-        </div>
-      </div>
-
-      <style>{`
-        [data-tooltip] + .tooltip-custom {
-          visibility: hidden;
-          opacity: 0;
-          position: absolute;
-          bottom: -30px;
-          left: 50%;
-          transform: translateX(-50%);
-          background: rgba(15, 23, 42, 0.9);
-          color: #fff;
-          padding: 4px 10px;
-          border-radius: 6px;
-          font-size: 0.75rem;
-          white-space: pre-line;
-          line-height: 1.4;
-          pointer-events: none;
-          transition: opacity 0.15s ease;
-          z-index: 10;
-        }
-        [data-tooltip] + .tooltip-custom::before {
-          content: '';
-          position: absolute;
-          top: -4px;
-          left: 50%;
-          transform: translateX(-50%) rotate(45deg);
-          width: 6px;
-          height: 6px;
-          background: rgba(15, 23, 42, 0.9);
-        }
-        [data-tooltip]:hover + .tooltip-custom {
-          visibility: visible;
-          opacity: 1;
-        }
-      `}</style>
-    </nav>
+            <button className="barra-lateral-boton-salir" onClick={handleLogout}>
+              <FiLogOut size={16} />
+              <span>Cerrar sesión</span>
+            </button>
+          </div>
+        )}
+      </aside>
+    </>
   );
 };
 

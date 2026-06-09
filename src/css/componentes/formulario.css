@@ -1,0 +1,121 @@
+.campo-grupo {
+  margin-bottom: var(--espaciado-md);
+}
+
+.campo-etiqueta {
+  display: block;
+  font-size: var(--tamano-sm);
+  font-weight: var(--peso-seminegrita);
+  color: var(--color-texto);
+  margin-bottom: var(--espaciado-xs);
+}
+
+.campo-entrada {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: var(--tamano-sm);
+  font-family: var(--fuente-principal);
+  color: var(--color-texto);
+  background: var(--color-fondo-blanco);
+  border: 1.5px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  transition: all var(--transicion-rapida);
+  outline: none;
+  line-height: 1.5;
+}
+
+.campo-entrada:hover {
+  border-color: var(--color-texto-claro);
+}
+
+.campo-entrada:focus {
+  border-color: var(--color-primario);
+  box-shadow: 0 0 0 3px rgba(21, 67, 58, 0.1);
+}
+
+.campo-entrada::placeholder {
+  color: var(--color-texto-claro);
+}
+
+.campo-entrada:disabled {
+  background: var(--color-fondo);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.campo-entrada--error {
+  border-color: var(--color-peligro);
+}
+
+.campo-entrada--error:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+textarea.campo-entrada {
+  min-height: 80px;
+  resize: vertical;
+}
+
+select.campo-entrada {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2rem;
+  cursor: pointer;
+}
+
+.campo-error {
+  font-size: var(--tamano-xs);
+  color: var(--color-peligro);
+  margin-top: var(--espaciado-xs);
+}
+
+select.campo-entrada option {
+  color: var(--color-texto);
+}
+
+.campo-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--espaciado-sm);
+  cursor: pointer;
+  font-size: var(--tamano-sm);
+}
+
+.campo-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primario);
+  cursor: pointer;
+}
+
+.campo-ayuda {
+  font-size: var(--tamano-xs);
+  color: var(--color-texto-claro);
+  margin-top: var(--espaciado-xs);
+}
+
+.formulario-grilla {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--espaciado-md);
+}
+
+.formulario-grilla--1col {
+  grid-template-columns: 1fr;
+}
+
+@media (max-width: 576px) {
+  .formulario-grilla {
+    grid-template-columns: 1fr;
+  }
+
+  .campo-grupo {
+    margin-bottom: var(--espaciado-sm);
+  }
+
+  .campo-entrada {
+    padding: 0.4rem 0.625rem;
+  }
+}

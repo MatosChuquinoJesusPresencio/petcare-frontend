@@ -13,7 +13,7 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
   if (isLoading) {
     return (
       <div className="d-flex justify-content-center align-items-center vh-100">
-        <div className="spinner-border text-primary" role="status">
+        <div className="spinner-border" style={{ color: 'var(--color-primario)' }} role="status">
           <span className="visually-hidden">Cargando...</span>
         </div>
       </div>

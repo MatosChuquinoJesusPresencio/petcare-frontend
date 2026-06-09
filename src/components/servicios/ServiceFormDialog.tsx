@@ -160,54 +160,62 @@ const ServiceFormDialog = ({
     >
       <div className="row g-3">
         <div className="col-md-6">
-          <label className="form-label">Nombre del servicio</label>
-          <input
-            type="text"
-            className={`form-control ${fieldErrors.name ? 'is-invalid' : ''}`}
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-          />
-          {fieldErrors.name && <div className="invalid-feedback">{fieldErrors.name}</div>}
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">Nombre del servicio</label>
+            <input
+              type="text"
+              className={`campo-entrada ${fieldErrors.name ? 'campo-entrada--error' : ''}`}
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+            />
+            {fieldErrors.name && <div className="campo-error">{fieldErrors.name}</div>}
+          </div>
         </div>
 
         <div className="col-md-6">
-          <label className="form-label">Duración (minutos)</label>
-          <input
-            type="number"
-            className={`form-control ${fieldErrors.durationMinutes ? 'is-invalid' : ''}`}
-            min="5"
-            name="durationMinutes"
-            value={formData.durationMinutes}
-            onChange={handleChange}
-          />
-          {fieldErrors.durationMinutes && <div className="invalid-feedback">{fieldErrors.durationMinutes}</div>}
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">Duración (minutos)</label>
+            <input
+              type="number"
+              className={`campo-entrada ${fieldErrors.durationMinutes ? 'campo-entrada--error' : ''}`}
+              min="5"
+              name="durationMinutes"
+              value={formData.durationMinutes}
+              onChange={handleChange}
+            />
+            {fieldErrors.durationMinutes && <div className="campo-error">{fieldErrors.durationMinutes}</div>}
+          </div>
         </div>
 
         <div className="col-12">
-          <label className="form-label">Descripción</label>
-          <textarea
-            className={`form-control ${fieldErrors.description ? 'is-invalid' : ''}`}
-            rows={3}
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-          ></textarea>
-          {fieldErrors.description && <div className="invalid-feedback">{fieldErrors.description}</div>}
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">Descripción</label>
+            <textarea
+              className={`campo-entrada ${fieldErrors.description ? 'campo-entrada--error' : ''}`}
+              rows={3}
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+            ></textarea>
+            {fieldErrors.description && <div className="campo-error">{fieldErrors.description}</div>}
+          </div>
         </div>
 
         <div className="col-md-6">
-          <label className="form-label">Costo referencial</label>
-          <input
-            type="number"
-            className={`form-control ${fieldErrors.referentialCost ? 'is-invalid' : ''}`}
-            min="0"
-            step="0.01"
-            name="referentialCost"
-            value={formData.referentialCost}
-            onChange={handleChange}
-          />
-          {fieldErrors.referentialCost && <div className="invalid-feedback">{fieldErrors.referentialCost}</div>}
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">Costo referencial</label>
+            <input
+              type="number"
+              className={`campo-entrada ${fieldErrors.referentialCost ? 'campo-entrada--error' : ''}`}
+              min="0"
+              step="0.01"
+              name="referentialCost"
+              value={formData.referentialCost}
+              onChange={handleChange}
+            />
+            {fieldErrors.referentialCost && <div className="campo-error">{fieldErrors.referentialCost}</div>}
+          </div>
         </div>
       </div>
     </BaseFormDialog>

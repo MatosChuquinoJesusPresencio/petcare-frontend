@@ -1,0 +1,183 @@
+.barra-navegacion {
+  background-color: var(--color-primario);
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.barra-navegacion-contenido {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 var(--espaciado-lg);
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.barra-navegacion-logo {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.barra-navegacion-logo img {
+  height: 40px;
+  width: auto;
+  display: block;
+}
+
+.barra-navegacion-enlaces {
+  display: flex;
+  align-items: center;
+  gap: var(--espaciado-xs);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.barra-navegacion-enlace {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  padding: var(--espaciado-sm) var(--espaciado-md);
+  border-radius: var(--radio-borde);
+  font-size: var(--tamano-sm);
+  font-weight: var(--peso-seminegrita);
+  transition: all var(--transicion-rapida);
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: var(--fuente-principal);
+  white-space: nowrap;
+}
+
+.barra-navegacion-enlace:hover {
+  color: var(--color-fondo-blanco);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.barra-navegacion-enlace--activo {
+  color: var(--color-fondo-blanco);
+  font-weight: var(--peso-negrita);
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.barra-navegacion-usuario {
+  display: flex;
+  align-items: center;
+  gap: var(--espaciado-md);
+}
+
+.barra-navegacion-icono-usuario {
+  color: var(--color-fondo-blanco);
+  opacity: 0.85;
+  transition: opacity var(--transicion-rapida);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.barra-navegacion-icono-usuario:hover {
+  opacity: 1;
+}
+
+.barra-navegacion-boton-salir {
+  display: flex;
+  align-items: center;
+  gap: var(--espaciado-xs);
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: var(--espaciado-xs) var(--espaciado-md);
+  border-radius: var(--radio-borde);
+  font-size: var(--tamano-sm);
+  font-family: var(--fuente-principal);
+  cursor: pointer;
+  transition: all var(--transicion-rapida);
+}
+
+.barra-navegacion-boton-salir:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--color-fondo-blanco);
+}
+
+.barra-navegacion-tooltip {
+  position: relative;
+}
+
+.barra-navegacion-tooltip-contenido {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-primario-oscuro);
+  color: var(--color-fondo-blanco);
+  padding: var(--espaciado-sm) var(--espaciado-md);
+  border-radius: var(--radio-borde-pequeno);
+  font-size: var(--tamano-xs);
+  white-space: nowrap;
+  z-index: 1100;
+  transition: all var(--transicion-rapida);
+  margin-top: var(--espaciado-xs);
+  pointer-events: none;
+}
+
+.barra-navegacion-tooltip:hover .barra-navegacion-tooltip-contenido {
+  visibility: visible;
+  opacity: 1;
+}
+
+.barra-navegacion-toggler {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--color-fondo-blanco);
+  font-size: var(--tamano-2xl);
+  cursor: pointer;
+  padding: var(--espaciado-xs);
+}
+
+@media (max-width: 768px) {
+  .barra-navegacion-contenido {
+    height: 56px;
+    padding: 0 var(--espaciado-md);
+  }
+
+  .barra-navegacion-toggler {
+    display: block;
+  }
+
+  .barra-navegacion-menu {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    right: 0;
+    background: var(--color-primario-oscuro);
+    padding: var(--espaciado-md);
+    display: none;
+    flex-direction: column;
+    gap: var(--espaciado-xs);
+  }
+
+  .barra-navegacion-menu--abierto {
+    display: flex;
+  }
+
+  .barra-navegacion-enlace {
+    padding: var(--espaciado-sm) var(--espaciado-md);
+  }
+
+  .barra-navegacion-usuario {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--espaciado-sm);
+    padding-top: var(--espaciado-md);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
