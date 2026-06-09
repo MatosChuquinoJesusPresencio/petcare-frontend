@@ -46,19 +46,19 @@ export default function HorariosDisponibles({
 
   if (!vetId || !fecha || !serviceId) {
     return (
-      <p className="text-muted small mb-0">
+      <p style={{ fontSize: 'var(--tamano-sm)', color: 'var(--color-texto-claro)', margin: 0 }}>
         Seleccione veterinario, servicio y fecha para ver horarios disponibles.
       </p>
     );
   }
 
   if (loading) {
-    return <p className="text-muted small mb-0">Cargando horarios...</p>;
+    return <p style={{ fontSize: 'var(--tamano-sm)', color: 'var(--color-texto-claro)', margin: 0 }}>Cargando horarios...</p>;
   }
 
   if (slots.length === 0) {
     return (
-      <p className="text-danger small mb-0">
+      <p style={{ fontSize: 'var(--tamano-sm)', color: 'var(--color-peligro)', margin: 0 }}>
         No hay horarios disponibles para esta fecha.
       </p>
     );
@@ -70,7 +70,7 @@ export default function HorariosDisponibles({
         <button
           key={h}
           type="button"
-          className={`btn btn-sm ${value === h ? "btn-primary" : "btn-outline-primary"}`}
+          className={`boton boton--pequeno ${value === h ? 'boton--primario' : 'boton--borde'}`}
           onClick={() => onChange(h)}
         >
           {h.substring(0, 5)}
