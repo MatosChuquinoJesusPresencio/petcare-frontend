@@ -19,35 +19,24 @@ export default function ActionButtons({
   onToggle,
   onDelete,
   onVincular,
-  size = "md",
 }: ActionButtonsProps) {
-  const s = size === "sm" ? "btn-sm" : "";
-
   return (
-    <div className="d-flex justify-content-evenly">
-      <button
-        className={`btn btn-warning ${s}`}
-        onClick={(e) => { stop(e); onEdit(); }}
-      >
+    <div className="acciones-tabla">
+      <button className="boton boton--advertencia boton--icono" title="Editar" onClick={(e) => { stop(e); onEdit(); }}>
         <i className="bi bi-pencil-fill"></i>
       </button>
       <button
-        className={`btn ${s} ${activo ? "btn-secondary" : "btn-success"}`}
+        className={`boton boton--icono ${activo ? 'boton--neutro' : 'boton--exito'}`}
+        title={activo ? 'Desactivar' : 'Activar'}
         onClick={(e) => { stop(e); onToggle(); }}
       >
-        <i className={`bi ${activo ? "bi-pause-fill" : "bi-play-fill"}`}></i>
+        <i className={`bi ${activo ? 'bi-pause-fill' : 'bi-play-fill'}`}></i>
       </button>
-      <button
-        className={`btn btn-danger ${s}`}
-        onClick={(e) => { stop(e); onDelete(); }}
-      >
+      <button className="boton boton--peligro boton--icono" title="Eliminar" onClick={(e) => { stop(e); onDelete(); }}>
         <i className="bi bi-trash3-fill"></i>
       </button>
       {onVincular !== undefined && (
-        <button
-          className={`btn btn-info ${s}`}
-          onClick={(e) => { stop(e); onVincular(); }}
-        >
+        <button className="boton boton--informacion boton--icono" title="Vincular dueño" onClick={(e) => { stop(e); onVincular(); }}>
           <i className="bi bi-person-plus-fill"></i>
         </button>
       )}
