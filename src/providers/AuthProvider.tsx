@@ -9,10 +9,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    const onSessionExpired = () => setUser(null)
+    window.addEventListener('auth:session-expired', onSessionExpired)
+
     authService.me()
       .then((data) => setUser({ id: data.id, username: data.username, role: data.role }))
       .catch(() => setUser(null))
       .finally(() => setIsLoading(false))
+
+    return () => window.removeEventListener('auth:session-expired', onSessionExpired)
   }, [])
 
   const login = useCallback(async (data: LoginRequest): Promise<AuthResponse> => {
