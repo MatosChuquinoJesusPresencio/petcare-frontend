@@ -1,0 +1,86 @@
+.etiqueta {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.6rem;
+  font-size: var(--tamano-xs);
+  font-weight: var(--peso-negrita);
+  border-radius: 100px;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  line-height: 1.5;
+}
+
+.etiqueta--agendada {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.etiqueta--confirmada {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.etiqueta--reprogramada {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.etiqueta--cancelada {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.etiqueta--atendida {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.etiqueta--no_asistio {
+  background: #f3e8ff;
+  color: #7c3aed;
+}
+
+.etiqueta--activo {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.etiqueta--inactivo {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.etiqueta--pendiente {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.etiqueta--completado {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.etiqueta--suspendido {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.etiqueta--en_atencion {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.etiqueta--programado {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.etiqueta--primario {
+  background: var(--color-primario);
+  color: var(--color-fondo-blanco);
+}
+
+.etiqueta--secundario {
+  background: var(--color-secundario-claro);
+  color: var(--color-primario-oscuro);
+}

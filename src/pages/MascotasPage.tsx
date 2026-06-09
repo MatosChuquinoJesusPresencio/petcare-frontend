@@ -99,109 +99,102 @@ const MascotasPage = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <NotificationToast toast={toast} onClose={() => setToast(null)} />
-      <PageHeader icon="bi-heart" title="Mascotas" description="Vista donde podrás revisar y gestionar mascotas">
-        <button className="btn btn-success" onClick={handleNuevaMascota}>
-          <i className="bi bi-plus-circle-fill me-2"></i>Nueva Mascota
-        </button>
-      </PageHeader>
+    <div className="contenedor-pagina">
+      <div className="container">
+        <NotificationToast toast={toast} onClose={() => setToast(null)} />
 
-      <div className="card shadow-sm">
-        <div className="card-body">
-          <div className="d-flex flex-wrap gap-2 align-items-center border-bottom pb-3 mb-3">
-            <input
-              type="text"
-              className="form-control w-auto"
-              placeholder="Filtrar por nombre..."
-              value={filtroNombre}
-              onChange={(e) => setFiltroNombre(e.target.value)}
-            />
-            <input
-              type="text"
-              className="form-control w-auto"
-              placeholder="Filtrar por especie..."
-              value={filtroEspecie}
-              onChange={(e) => setFiltroEspecie(e.target.value)}
-            />
-            <input
-              type="text"
-              className="form-control w-auto"
-              placeholder="Filtrar por raza..."
-              value={filtroRaza}
-              onChange={(e) => setFiltroRaza(e.target.value)}
-            />
-            <select
-              className="form-select w-auto"
-              value={filtroSexo}
-              onChange={(e) => setFiltroSexo(e.target.value)}
-            >
+        <PageHeader icon="bi-heart" title="Mascotas" description="Registro y gestión de pacientes">
+          <button className="boton boton--primario" onClick={handleNuevaMascota}>
+            <i className="bi bi-plus-circle-fill me-1"></i>Nueva Mascota
+          </button>
+        </PageHeader>
+
+        <div className="barra-filtros animacion-entrada">
+          <div className="barra-filtros-grupo">
+            <label>Nombre</label>
+            <input type="text" className="campo-entrada" placeholder="Filtrar por nombre..." value={filtroNombre} onChange={(e) => setFiltroNombre(e.target.value)} />
+          </div>
+          <div className="barra-filtros-grupo">
+            <label>Especie</label>
+            <input type="text" className="campo-entrada" placeholder="Filtrar por especie..." value={filtroEspecie} onChange={(e) => setFiltroEspecie(e.target.value)} />
+          </div>
+          <div className="barra-filtros-grupo">
+            <label>Raza</label>
+            <input type="text" className="campo-entrada" placeholder="Filtrar por raza..." value={filtroRaza} onChange={(e) => setFiltroRaza(e.target.value)} />
+          </div>
+          <div className="barra-filtros-grupo">
+            <label>Sexo</label>
+            <select className="campo-entrada" value={filtroSexo} onChange={(e) => setFiltroSexo(e.target.value)}>
               <option value="todos">Todos los sexos</option>
               {SEXOS_MASCOTA.map((sexo) => (
                 <option key={sexo} value={sexo}>{SEXO_LABEL[sexo]}</option>
               ))}
             </select>
-            <select
-              className="form-select w-auto"
-              value={filtroActivo}
-              onChange={(e) => setFiltroActivo(e.target.value)}
-            >
+          </div>
+          <div className="barra-filtros-grupo">
+            <label>Estado</label>
+            <select className="campo-entrada" value={filtroActivo} onChange={(e) => setFiltroActivo(e.target.value)}>
               <option value="todos">Todos</option>
               <option value="activos">Activos</option>
               <option value="inactivos">Inactivos</option>
             </select>
           </div>
-          {loading ? (
-            <div className="text-center py-4">
-              <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Cargando...</span>
+        </div>
+
+        <div className="tarjeta animacion-entrada" style={{ animationDelay: '0.05s' }}>
+          <div className="tarjeta-cuerpo">
+            {loading ? (
+              <div className="estado-cargando">
+                <div className="spinner-border" style={{ color: 'var(--color-primario)' }} role="status">
+                  <span className="visually-hidden">Cargando...</span>
+                </div>
               </div>
-            </div>
-          ) : (
-            <MascotaTable
-              mascotas={mascotas}
-              onEdit={handleEditar}
-              onDelete={(id) => setConfirmDeleteMascota(id)}
-              onToggle={handleToggleMascota}
-              onVincular={handleVincular}
-            />
-          )}
+            ) : (
+              <MascotaTable
+                mascotas={mascotas}
+                onEdit={handleEditar}
+                onDelete={(id) => setConfirmDeleteMascota(id)}
+                onToggle={handleToggleMascota}
+                onVincular={handleVincular}
+              />
+            )}
+          </div>
+          <div className="tarjeta-pie" style={{ fontSize: 'var(--tamano-sm)', color: 'var(--color-texto-claro)' }}>
+            Total de mascotas: {mascotas.length}
+          </div>
         </div>
-        <div className="card-footer text-muted small py-2">
-          Total de mascotas: {mascotas.length}
-        </div>
+
+        <MascotaModal
+          show={showModal}
+          onClose={() => setShowModal(false)}
+          onSuccess={async () => {
+            setToast({ message: "Mascota guardada correctamente.", type: "success" });
+            await cargarMascotas();
+          }}
+          mascotaId={mascotaEditarId}
+        />
+
+        <MascotaVincularModal
+          show={showVincularModal}
+          mascotaId={mascotaVincularId}
+          onClose={() => setShowVincularModal(false)}
+          onSuccess={async () => {
+            setToast({ message: "Dueño vinculado correctamente.", type: "success" });
+            await cargarMascotas();
+          }}
+        />
+
+        <ConfirmDialog
+          isOpen={confirmDeleteMascota !== null}
+          title="Desactivar mascota"
+          message="¿Estás seguro de desactivar esta mascota? Puedes volver a activarla después."
+          confirmText="Desactivar"
+          cancelText="Cancelar"
+          variant="danger"
+          onConfirm={handleDeleteConfirmed}
+          onCancel={() => setConfirmDeleteMascota(null)}
+        />
       </div>
-
-      <MascotaModal
-        show={showModal}
-        onClose={() => setShowModal(false)}
-        onSuccess={async () => {
-          setToast({ message: "Mascota guardada correctamente.", type: "success" });
-          await cargarMascotas();
-        }}
-        mascotaId={mascotaEditarId}
-      />
-
-      <MascotaVincularModal
-        show={showVincularModal}
-        mascotaId={mascotaVincularId}
-        onClose={() => setShowVincularModal(false)}
-        onSuccess={async () => {
-          setToast({ message: "Dueño vinculado correctamente.", type: "success" });
-          await cargarMascotas();
-        }}
-      />
-
-      <ConfirmDialog
-        isOpen={confirmDeleteMascota !== null}
-        title="Desactivar mascota"
-        message="¿Estás seguro de desactivar esta mascota? Puedes volver a activarla después."
-        confirmText="Desactivar"
-        cancelText="Cancelar"
-        variant="danger"
-        onConfirm={handleDeleteConfirmed}
-        onCancel={() => setConfirmDeleteMascota(null)}
-      />
     </div>
   );
 };

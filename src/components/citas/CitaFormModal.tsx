@@ -84,52 +84,58 @@ export default function CitaFormModal({ show, onClose, onSuccess, mascotas, serv
   };
 
   return (
-    <div className="modal fade show d-block modal-bg" tabIndex={-1}>
-      <div className="modal-dialog modal-force-dark-text">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title">Agendar Nueva Cita</h5>
-            <button type="button" className="btn-close" onClick={onClose}></button>
+    <>
+      <div className="dialogo-fondo" onClick={onClose}></div>
+      <div className="dialogo-contenedor" tabIndex={-1}>
+        <div className="dialogo-ventana">
+          <div className="dialogo-encabezado">
+            <h5 className="dialogo-titulo">
+              <i className="bi bi-calendar-plus me-1"></i>
+              Agendar Nueva Cita
+            </h5>
+            <button type="button" className="dialogo-cerrar" onClick={onClose}>
+              <i className="bi bi-x-lg"></i>
+            </button>
           </div>
-          <div className="modal-body">
+          <div className="dialogo-cuerpo">
             <form id="formCita" onSubmit={handleSubmit}>
-              <div className="mb-3">
-                <label className="form-label">Mascota *</label>
-                <select className={`form-select ${fieldErrors.petId ? 'is-invalid' : ''}`} value={petId} onChange={(e) => { setPetId(e.target.value); clearFieldError('petId'); }} required>
+              <div className="campo-grupo">
+                <label className="campo-etiqueta">Mascota *</label>
+                <select className={`campo-entrada ${fieldErrors.petId ? 'campo-entrada--error' : ''}`} value={petId} onChange={(e) => { setPetId(e.target.value); clearFieldError('petId'); }} required>
                   <option value="">Seleccione mascota...</option>
                   {mascotas.map((m) => (
                     <option key={m.id} value={m.id}>{m.nombre}</option>
                   ))}
                 </select>
-                {fieldErrors.petId && <div className="invalid-feedback">{fieldErrors.petId}</div>}
+                {fieldErrors.petId && <div className="campo-error">{fieldErrors.petId}</div>}
               </div>
-              <div className="mb-3">
-                <label className="form-label">Veterinario *</label>
-                <select className={`form-select ${fieldErrors.veterinarianId ? 'is-invalid' : ''}`} value={veterinarianId} onChange={(e) => { setVeterinarianId(e.target.value); clearFieldError('veterinarianId'); }} required>
+              <div className="campo-grupo">
+                <label className="campo-etiqueta">Veterinario *</label>
+                <select className={`campo-entrada ${fieldErrors.veterinarianId ? 'campo-entrada--error' : ''}`} value={veterinarianId} onChange={(e) => { setVeterinarianId(e.target.value); clearFieldError('veterinarianId'); }} required>
                   <option value="">Seleccione veterinario...</option>
                   {veterinarios.map((v) => (
                     <option key={v.id} value={v.id}>{v.nombre} {v.apellido}</option>
                   ))}
                 </select>
-                {fieldErrors.veterinarianId && <div className="invalid-feedback">{fieldErrors.veterinarianId}</div>}
+                {fieldErrors.veterinarianId && <div className="campo-error">{fieldErrors.veterinarianId}</div>}
               </div>
-              <div className="mb-3">
-                <label className="form-label">Servicio *</label>
-                <select className={`form-select ${fieldErrors.serviceId ? 'is-invalid' : ''}`} value={serviceId} onChange={(e) => { setServiceId(e.target.value); clearFieldError('serviceId'); }} required>
+              <div className="campo-grupo">
+                <label className="campo-etiqueta">Servicio *</label>
+                <select className={`campo-entrada ${fieldErrors.serviceId ? 'campo-entrada--error' : ''}`} value={serviceId} onChange={(e) => { setServiceId(e.target.value); clearFieldError('serviceId'); }} required>
                   <option value="">Seleccione servicio...</option>
                   {servicios.map((s) => (
                     <option key={s.id} value={s.id}>{s.nombre}</option>
                   ))}
                 </select>
-                {fieldErrors.serviceId && <div className="invalid-feedback">{fieldErrors.serviceId}</div>}
+                {fieldErrors.serviceId && <div className="campo-error">{fieldErrors.serviceId}</div>}
               </div>
-              <div className="mb-3">
-                <label className="form-label">Fecha *</label>
-                <input type="date" className={`form-control ${fieldErrors.fecha ? 'is-invalid' : ''}`} value={fecha} onChange={(e) => { setFecha(e.target.value); clearFieldError('fecha'); }} required />
-                {fieldErrors.fecha && <div className="invalid-feedback">{fieldErrors.fecha}</div>}
+              <div className="campo-grupo">
+                <label className="campo-etiqueta">Fecha *</label>
+                <input type="date" className={`campo-entrada ${fieldErrors.fecha ? 'campo-entrada--error' : ''}`} value={fecha} onChange={(e) => { setFecha(e.target.value); clearFieldError('fecha'); }} required />
+                {fieldErrors.fecha && <div className="campo-error">{fieldErrors.fecha}</div>}
               </div>
-              <div className="mb-3">
-                <label className="form-label">Horario disponible *</label>
+              <div className="campo-grupo">
+                <label className="campo-etiqueta">Horario disponible *</label>
                 <HorariosDisponibles
                   vetId={veterinarianId ? Number(veterinarianId) : null}
                   serviceId={serviceId ? Number(serviceId) : null}
@@ -137,21 +143,21 @@ export default function CitaFormModal({ show, onClose, onSuccess, mascotas, serv
                   value={horaSeleccionada}
                   onChange={(v) => { setHoraSeleccionada(v); clearFieldError('horaSeleccionada'); }}
                 />
-                {fieldErrors.horaSeleccionada && <div className="invalid-feedback">{fieldErrors.horaSeleccionada}</div>}
+                {fieldErrors.horaSeleccionada && <div className="campo-error">{fieldErrors.horaSeleccionada}</div>}
               </div>
-              <div className="mb-3">
-                <label className="form-label">Notas</label>
-                <textarea className="form-control" rows={3} value={notes} onChange={(e) => setNotes(e.target.value)}></textarea>
+              <div className="campo-grupo">
+                <label className="campo-etiqueta">Notas</label>
+                <textarea className="campo-entrada" rows={3} value={notes} onChange={(e) => setNotes(e.target.value)}></textarea>
               </div>
-              {error && <div className="alert alert-danger py-2">{error}</div>}
+              {error && <div className="dialogo-error">{error}</div>}
+              <div className="dialogo-pie" style={{ padding: 'var(--espaciado-md) 0 0', borderTop: 'none' }}>
+                <button type="button" className="boton boton--neutro" onClick={onClose}>Cerrar</button>
+                <button type="submit" form="formCita" className="boton boton--primario" disabled={!horaSeleccionada}>Guardar</button>
+              </div>
             </form>
-          </div>
-          <div className="modal-footer">
-            <button type="button" className="btn btn-secondary" onClick={onClose}>Cerrar</button>
-            <button type="submit" form="formCita" className="btn btn-primary" disabled={!horaSeleccionada}>Guardar</button>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

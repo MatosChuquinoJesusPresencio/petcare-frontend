@@ -21,51 +21,35 @@ const ConfirmDialog = ({
 }: ConfirmDialogProps) => {
   if (!isOpen) return null;
 
-  const confirmBtnClass = variant === "danger" ? "btn-danger" : "btn-warning";
-
   return (
     <>
-      <div className="modal-backdrop fade show"></div>
-      <div
-        className="modal fade show d-block"
-        aria-hidden="false"
-        aria-modal="true"
-        role="dialog"
-      >
-        <div className="modal-dialog modal-dialog-centered modal-force-dark-text">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title">{title}</h5>
-              <button
-                type="button"
-                className="btn-close"
-                aria-label="Cerrar"
-                onClick={onCancel}
-              ></button>
-            </div>
-            <div className="modal-body">
-              <p className="mb-0">{message}</p>
-            </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={onCancel}
-              >
-                {cancelText}
-              </button>
-              <button
-                type="button"
-                className={`btn ${confirmBtnClass}`}
-                onClick={onConfirm}
-              >
-                {confirmText}
-              </button>
-            </div>
+      <div className="dialogo-fondo" onClick={onCancel}></div>
+      <div className="dialogo-contenedor" aria-hidden="false" aria-modal="true" role="dialog">
+        <div className="dialogo-ventana" style={{ maxWidth: 420 }}>
+          <div className="dialogo-encabezado">
+            <h5 className="dialogo-titulo">
+              <i className={`bi ${variant === 'danger' ? 'bi-exclamation-triangle-fill text-danger' : 'bi-exclamation-circle-fill text-warning'} me-1`}></i>
+              {title}
+            </h5>
+            <button type="button" className="dialogo-cerrar" aria-label="Cerrar" onClick={onCancel}>
+              <i className="bi bi-x-lg"></i>
+            </button>
+          </div>
+          <div className="dialogo-cuerpo">
+            <p style={{ margin: 0, color: 'var(--color-texto-secundario)', fontSize: 'var(--tamano-sm)' }}>{message}</p>
+          </div>
+          <div className="dialogo-pie">
+            <button type="button" className="boton boton--neutro" onClick={onCancel}>{cancelText}</button>
+            <button
+              type="button"
+              className={`boton ${variant === 'danger' ? 'boton--peligro' : 'boton--advertencia'}`}
+              onClick={onConfirm}
+            >
+              {confirmText}
+            </button>
           </div>
         </div>
       </div>
-
     </>
   );
 };

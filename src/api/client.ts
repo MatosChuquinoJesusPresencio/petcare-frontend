@@ -14,10 +14,15 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
 
+      if (originalRequest.url?.endsWith('/api/auth/me')) {
+        return Promise.reject(error)
+      }
+
       try {
         await apiClient.post('/api/auth/refresh')
         return apiClient(originalRequest)
       } catch {
+        window.dispatchEvent(new CustomEvent('auth:session-expired'))
         return Promise.reject(error)
       }
     }

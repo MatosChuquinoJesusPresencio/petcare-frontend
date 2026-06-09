@@ -30,8 +30,8 @@ function DueñoInfo({ mascotaId }: { mascotaId: number }) {
     return () => { clearTimeout(t); ignore = true; };
   }, [mascotaId]);
 
-  if (loading) return <span className="text-muted small">Cargando...</span>;
-  if (!dueno) return <span className="text-muted fst-italic">Sin dueño</span>;
+  if (loading) return <span style={{ color: 'var(--color-texto-claro)', fontSize: 'var(--tamano-sm)' }}>Cargando...</span>;
+  if (!dueno) return <span style={{ color: 'var(--color-texto-claro)', fontStyle: 'italic' }}>Sin dueño</span>;
   return <span>{dueno.nombre} {dueno.apellido}</span>;
 }
 
@@ -50,18 +50,16 @@ export default function MascotaTable({
     >
       {mascotas.map((mascota, index) => (
         <tr key={mascota.id}>
-          <td>{index + 1}</td>
+          <td><span className="numero-fila">{index + 1}</span></td>
           <td>{mascota.nombre}</td>
           <td>{mascota.especie}</td>
           <td>{mascota.raza}</td>
           <td>{mascota.sexo}</td>
           <td><DueñoInfo mascotaId={mascota.id} /></td>
           <td>
-            {mascota.activo ? (
-              <span className="badge bg-success">Activo</span>
-            ) : (
-              <span className="badge bg-danger">Inactivo</span>
-            )}
+            <span className={`etiqueta ${mascota.activo ? 'etiqueta--activo' : 'etiqueta--inactivo'}`}>
+              {mascota.activo ? 'Activo' : 'Inactivo'}
+            </span>
           </td>
           <td>
             <ActionButtons
@@ -70,7 +68,6 @@ export default function MascotaTable({
               onToggle={() => onToggle(mascota.id)}
               onDelete={() => onDelete(mascota.id)}
               onVincular={() => onVincular(mascota.id)}
-              size="sm"
             />
           </td>
         </tr>

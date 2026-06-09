@@ -212,239 +212,218 @@ const DuenosPage = () => {
   }
 
   return (
-    <div className="container mt-4">
-      <NotificationToast toast={toast} onClose={() => setToast(null)} />
-      <PageHeader icon="bi-people-fill" title="Dueños de Mascotas" description="Vista donde podrás revisar y gestionar los dueños y sus contactos">
-        <button
-          className="btn btn-success"
-          onClick={handleOpenCreateDuenoModal}
-        >
-          <i className="bi bi-plus-circle-fill"></i> Nuevo Dueño
-        </button>
-      </PageHeader>
+    <div className="contenedor-pagina">
+      <div className="container">
+        <NotificationToast toast={toast} onClose={() => setToast(null)} />
 
-      <p className="text-muted small mb-1">
-        <i className="bi bi-info-circle me-1"></i>
-        Selecciona una fila para administrar sus contactos de emergencia
-      </p>
+        <PageHeader icon="bi-people-fill" title="Dueños de Mascotas" description="Gestiona los dueños y sus contactos de emergencia">
+          <button className="boton boton--primario" onClick={handleOpenCreateDuenoModal}>
+            <i className="bi bi-plus-circle-fill me-1"></i>Nuevo Dueño
+          </button>
+        </PageHeader>
 
-      <div className="card shadow-sm">
-        <div className="card-body">
-          <div className="d-flex flex-wrap gap-2 align-items-center border-bottom pb-3 mb-3">
-            <input
-              type="text"
-              className="form-control w-auto"
-              placeholder="Buscar por nombre..."
-              value={searchNombre}
-              onChange={(e) => setSearchNombre(e.target.value)}
-            />
-            <input
-              type="text"
-              className="form-control w-auto"
-              placeholder="Buscar por DNI..."
-              value={searchDni}
-              onChange={(e) => setSearchDni(e.target.value)}
-            />
-            <select
-              className="form-select w-auto"
-              value={filtroActivo}
-              onChange={(e) => setFiltroActivo(e.target.value)}
-            >
+        <p style={{ fontSize: 'var(--tamano-sm)', color: 'var(--color-texto-secundario)', marginBottom: 'var(--espaciado-md)' }}>
+          <i className="bi bi-info-circle me-1"></i>
+          Selecciona una fila para administrar sus contactos de emergencia
+        </p>
+
+        <div className="barra-filtros animacion-entrada">
+          <div className="barra-filtros-grupo">
+            <label>Nombre</label>
+            <input type="text" className="campo-entrada" placeholder="Buscar por nombre..." value={searchNombre} onChange={(e) => setSearchNombre(e.target.value)} />
+          </div>
+          <div className="barra-filtros-grupo">
+            <label>DNI</label>
+            <input type="text" className="campo-entrada" placeholder="Buscar por DNI..." value={searchDni} onChange={(e) => setSearchDni(e.target.value)} />
+          </div>
+          <div className="barra-filtros-grupo">
+            <label>Estado</label>
+            <select className="campo-entrada" value={filtroActivo} onChange={(e) => setFiltroActivo(e.target.value)}>
               <option value="todos">Todos</option>
               <option value="activos">Activos</option>
               <option value="inactivos">Inactivos</option>
             </select>
           </div>
-          {loadError ? (
-            <div className="alert alert-danger" role="alert">
-              {loadError}
-            </div>
-          ) : null}
-          {loading ? (
-            <div className="text-center py-4">
-              <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Cargando...</span>
-              </div>
-            </div>
-          ) : (
-            <DataTable
-              columns={["#", "Nombre Completo", "DNI", "Email", "Teléfono", "Estado", "Acciones"]}
-              emptyMessage="No hay registros de dueños disponibles."
-              colSpan={7}
-            >
-              {duenos.map((dueno, index) => (
-                <tr
-                  key={dueno.id || index}
-                  onClick={() => setSelectedDueno(dueno)}
-                  className={
-                    selectedDueno?.id === dueno.id
-                      ? "table-primary fw-bold"
-                      : ""
-                  }
-                  style={{ cursor: "pointer" }}
-                >
-                  <td>{index + 1}</td>
-                  <td>
-                    {dueno.nombre} {dueno.apellido}
-                  </td>
-                  <td>{dueno.dni}</td>
-                  <td>{dueno.email}</td>
-                  <td>{dueno.telefono || "—"}</td>
-                  <td>
-                    <span
-                      className={`badge ${dueno.activo ? "bg-success" : "bg-danger"}`}
-                    >
-                      {dueno.activo ? "Activo" : "Inactivo"}
-                    </span>
-                  </td>
-                  <td>
-                    <ActionButtons
-                      activo={dueno.activo}
-                      onEdit={() => handleOpenEditDuenoModal(dueno)}
-                      onToggle={() => handleToggleDueno(dueno.id)}
-                      onDelete={() => setConfirmDelete(dueno.id)}
-                      size="sm"
-                    />
-                  </td>
-                </tr>
-              ))}
-            </DataTable>
-          )}
-        </div>
-        <div className="card-footer text-muted small py-2">
-          Total de dueños: {duenos.length}
-        </div>
-      </div>
-
-      <section className="card p-3 bg-white shadow-sm mt-4">
-        <div className="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
-          <div>
-            <h3 className="h5 mb-1 text-dark">
-              <i className="bi bi-telephone-forward-fill me-2 text-secondary"></i>
-              Contactos de Emergencia Vinculados
-            </h3>
-            <p className="text-muted small mb-0">
-              {selectedDueno
-                ? `Mostrando registros asignados a: ${selectedDueno.nombre} ${selectedDueno.apellido}`
-                : "Haz clic sobre un dueño de la lista de arriba para cargar sus contactos."}
-            </p>
-          </div>
-          {selectedDueno && (
-            <button
-              className="btn btn-sm btn-dark"
-              onClick={() => setOpenContactoModal(true)}
-            >
-              <i className="bi bi-telephone-plus-fill me-1"></i> Añadir Contacto
-            </button>
-          )}
         </div>
 
-        {selectedDueno && (
-          <div className="d-flex flex-wrap gap-2 mb-3 pb-2 border-bottom">
-            <input
-              type="text"
-              className="form-control form-control-sm w-auto"
-              placeholder="Filtrar por nombre..."
-              value={searchContactoNombre}
-              onChange={(e) => setSearchContactoNombre(e.target.value)}
-            />
-            <input
-              type="text"
-              className="form-control form-control-sm w-auto"
-              placeholder="Filtrar por teléfono..."
-              value={searchContactoTelefono}
-              onChange={(e) => setSearchContactoTelefono(e.target.value)}
-            />
-            <input
-              type="text"
-              className="form-control form-control-sm w-auto"
-              placeholder="Filtrar por relación..."
-              value={searchContactoRelacion}
-              onChange={(e) => setSearchContactoRelacion(e.target.value)}
-            />
-          </div>
-        )}
-
-        {!selectedDueno ? (
-          <div className="text-center py-4 bg-light text-muted border rounded small">
-            Ningún dueño seleccionado en este momento.
-          </div>
-        ) : contactos.length === 0 ? (
-          <div className="text-center py-4 text-muted small">
-            Este dueño no cuenta con contactos de emergencia registrados.
-          </div>
-        ) : (
-          <div className="row g-3">
-            {contactos.map((contacto, idx) => (
-              <div key={contacto.id || idx} className="col-md-6">
-                <div className="p-3 border rounded bg-light d-flex justify-content-between align-items-center">
-                  <div>
-                    <h6 className="mb-1 fw-bold text-dark">{contacto.nombre}</h6>
-                    <p className="mb-0 text-muted small">
-                      <i className="bi bi-telephone-fill me-1"></i>
-                      Teléfono: {contacto.telefono}
-                    </p>
-                    {contacto.relacion && (
-                      <span
-                        className="badge bg-secondary mt-1 text-white"
-                        style={{ fontSize: "10px" }}
-                      >
-                        {contacto.relacion}
-                      </span>
-                    )}
-                  </div>
-                  <button
-                    className="btn btn-sm btn-outline-danger border-0"
-                    onClick={() => setConfirmDeleteContacto(contacto.id)}
-                  >
-                    <i className="bi bi-trash-fill"></i>
-                  </button>
+        <div className="tarjeta animacion-entrada" style={{ animationDelay: '0.05s' }}>
+          <div className="tarjeta-cuerpo">
+            {loadError ? (
+              <div className="dialogo-error" style={{ marginBottom: 0 }}>{loadError}</div>
+            ) : loading ? (
+              <div className="estado-cargando">
+                <div className="spinner-border" style={{ color: 'var(--color-primario)' }} role="status">
+                  <span className="visually-hidden">Cargando...</span>
                 </div>
               </div>
-            ))}
+            ) : (
+              <DataTable
+                columns={["#", "Nombre Completo", "DNI", "Email", "Teléfono", "Estado", "Acciones"]}
+                emptyMessage="No hay registros de dueños disponibles."
+                colSpan={7}
+              >
+                {duenos.map((dueno, index) => (
+                  <tr
+                    key={dueno.id || index}
+                    onClick={() => setSelectedDueno(dueno)}
+                    style={{
+                      cursor: "pointer",
+                      backgroundColor: selectedDueno?.id === dueno.id ? 'rgba(21, 67, 58, 0.06)' : undefined,
+                      fontWeight: selectedDueno?.id === dueno.id ? 'var(--peso-seminegrita)' : undefined,
+                    }}
+                  >
+                    <td><span className="numero-fila">{index + 1}</span></td>
+                    <td>{dueno.nombre} {dueno.apellido}</td>
+                    <td>{dueno.dni}</td>
+                    <td>{dueno.email}</td>
+                    <td>{dueno.telefono || "—"}</td>
+                    <td>
+                      <span className={`etiqueta ${dueno.activo ? 'etiqueta--activo' : 'etiqueta--inactivo'}`}>
+                        {dueno.activo ? "Activo" : "Inactivo"}
+                      </span>
+                    </td>
+                    <td>
+                      <ActionButtons
+                        activo={dueno.activo}
+                        onEdit={() => handleOpenEditDuenoModal(dueno)}
+                        onToggle={() => handleToggleDueno(dueno.id)}
+                        onDelete={() => setConfirmDelete(dueno.id)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </DataTable>
+            )}
           </div>
-        )}
-      </section>
+          <div className="tarjeta-pie" style={{ fontSize: 'var(--tamano-sm)', color: 'var(--color-texto-claro)' }}>
+            Total de dueños: {duenos.length}
+          </div>
+        </div>
 
-      <DuenoFormDialog
-        isOpen={openDuenoModal}
-        onClose={handleCloseDuenoModal}
-        initialData={selectedDueno ? mapDuenoToRequest(selectedDueno) : null}
-        mode={selectedDueno && openDuenoModal ? "edit" : "create"}
-        onSubmit={handleSaveDueno}
-      />
+        <div className="tarjeta animacion-entrada" style={{ marginTop: 'var(--espaciado-lg)', animationDelay: '0.1s' }}>
+          <div className="tarjeta-encabezado">
+            <div>
+              <h5 className="tarjeta-encabezado-titulo">
+                <i className="bi bi-telephone-forward-fill"></i>
+                Contactos de Emergencia
+              </h5>
+              <p className="tarjeta-encabezado-descripcion">
+                {selectedDueno
+                  ? `Mostrando registros asignados a: ${selectedDueno.nombre} ${selectedDueno.apellido}`
+                  : "Haz clic sobre un dueño de la lista para cargar sus contactos."}
+              </p>
+            </div>
+            {selectedDueno && (
+              <button className="boton boton--secundario boton--pequeno" onClick={() => setOpenContactoModal(true)}>
+                <i className="bi bi-telephone-plus-fill me-1"></i>Añadir Contacto
+              </button>
+            )}
+          </div>
 
-      <ContactoFormDialog
-        isOpen={openContactoModal}
-        onClose={() => setOpenContactoModal(false)}
-        onSubmit={handleSaveContacto}
-      />
+          <div className="tarjeta-cuerpo">
+            {selectedDueno && (
+              <div className="barra-filtros" style={{ marginBottom: 'var(--espaciado-md)', padding: 'var(--espaciado-sm) var(--espaciado-md)' }}>
+                <div className="barra-filtros-grupo">
+                  <label>Nombre</label>
+                  <input type="text" className="campo-entrada" placeholder="Filtrar por nombre..." value={searchContactoNombre} onChange={(e) => setSearchContactoNombre(e.target.value)} />
+                </div>
+                <div className="barra-filtros-grupo">
+                  <label>Teléfono</label>
+                  <input type="text" className="campo-entrada" placeholder="Filtrar por teléfono..." value={searchContactoTelefono} onChange={(e) => setSearchContactoTelefono(e.target.value)} />
+                </div>
+                <div className="barra-filtros-grupo">
+                  <label>Relación</label>
+                  <input type="text" className="campo-entrada" placeholder="Filtrar por relación..." value={searchContactoRelacion} onChange={(e) => setSearchContactoRelacion(e.target.value)} />
+                </div>
+              </div>
+            )}
 
-      <ConfirmDialog
-        isOpen={confirmDelete !== null}
-        title="Eliminar dueño"
-        message="¿Estás seguro de eliminar permanentemente este dueño? Esta acción no se puede deshacer."
-        confirmText="Eliminar"
-        cancelText="Cancelar"
-        variant="danger"
-        onConfirm={handleDeleteConfirmed}
-        onCancel={() => setConfirmDelete(null)}
-      />
+            {!selectedDueno ? (
+              <div style={{ textAlign: 'center', padding: 'var(--espaciado-2xl)', color: 'var(--color-texto-claro)', fontSize: 'var(--tamano-sm)' }}>
+                Ningún dueño seleccionado en este momento.
+              </div>
+            ) : contactos.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: 'var(--espaciado-2xl)', color: 'var(--color-texto-claro)', fontSize: 'var(--tamano-sm)' }}>
+                Este dueño no cuenta con contactos de emergencia registrados.
+              </div>
+            ) : (
+              <div className="row g-3">
+                {contactos.map((contacto, idx) => (
+                  <div key={contacto.id || idx} className="col-md-6">
+                    <div style={{
+                      padding: 'var(--espaciado-md)', border: '1px solid var(--color-borde-claro)',
+                      borderRadius: 'var(--radio-borde)', display: 'flex',
+                      justifyContent: 'space-between', alignItems: 'center',
+                      background: 'var(--color-fondo)'
+                    }}>
+                      <div>
+                        <h6 style={{ margin: '0 0 var(--espaciado-xs)', fontWeight: 'var(--peso-negrita)' }}>{contacto.nombre}</h6>
+                        <p style={{ margin: 0, fontSize: 'var(--tamano-sm)', color: 'var(--color-texto-secundario)' }}>
+                          <i className="bi bi-telephone-fill me-1"></i>
+                          {contacto.telefono}
+                        </p>
+                        {contacto.relacion && (
+                          <span className="etiqueta etiqueta--secundario" style={{ marginTop: 'var(--espaciado-xs)', fontSize: '10px' }}>
+                            {contacto.relacion}
+                          </span>
+                        )}
+                      </div>
+                      <button
+                        className="boton boton--peligro boton--icono"
+                        style={{ background: 'transparent', color: 'var(--color-peligro)' }}
+                        onClick={() => setConfirmDeleteContacto(contacto.id)}
+                        title="Eliminar contacto"
+                      >
+                        <i className="bi bi-trash-fill"></i>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
 
-      <ConfirmDialog
-        isOpen={confirmDeleteContacto !== null}
-        title="Eliminar contacto"
-        message="¿Estás seguro de eliminar permanentemente este contacto de emergencia? Esta acción no se puede deshacer."
-        confirmText="Eliminar"
-        cancelText="Cancelar"
-        variant="danger"
-        onConfirm={() => {
-          if (confirmDeleteContacto !== null) {
-            handleDeleteContacto(confirmDeleteContacto);
-          }
-        }}
-        onCancel={() => setConfirmDeleteContacto(null)}
-      />
+        <DuenoFormDialog
+          isOpen={openDuenoModal}
+          onClose={handleCloseDuenoModal}
+          initialData={selectedDueno && openDuenoModal ? mapDuenoToRequest(selectedDueno) : null}
+          mode={selectedDueno && openDuenoModal ? "edit" : "create"}
+          onSubmit={handleSaveDueno}
+        />
+
+        <ContactoFormDialog
+          isOpen={openContactoModal}
+          onClose={() => setOpenContactoModal(false)}
+          onSubmit={handleSaveContacto}
+        />
+
+        <ConfirmDialog
+          isOpen={confirmDelete !== null}
+          title="Eliminar dueño"
+          message="¿Estás seguro de eliminar permanentemente este dueño? Esta acción no se puede deshacer."
+          confirmText="Eliminar"
+          cancelText="Cancelar"
+          variant="danger"
+          onConfirm={handleDeleteConfirmed}
+          onCancel={() => setConfirmDelete(null)}
+        />
+
+        <ConfirmDialog
+          isOpen={confirmDeleteContacto !== null}
+          title="Eliminar contacto"
+          message="¿Estás seguro de eliminar permanentemente este contacto de emergencia? Esta acción no se puede deshacer."
+          confirmText="Eliminar"
+          cancelText="Cancelar"
+          variant="danger"
+          onConfirm={() => {
+            if (confirmDeleteContacto !== null) {
+              handleDeleteContacto(confirmDeleteContacto);
+            }
+          }}
+          onCancel={() => setConfirmDeleteContacto(null)}
+        />
+      </div>
     </div>
   );
 };

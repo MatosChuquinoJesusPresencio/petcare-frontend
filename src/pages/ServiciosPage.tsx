@@ -127,26 +127,31 @@ const ServiciosPage = () => {
   }
 
   return (
-    <div className="container mt-4">
-      <NotificationToast toast={toast} onClose={() => setToast(null)} />
-      <PageHeader icon="bi-list-check" title="Servicios" description="Vista donde podrás revisar y gestionar los servicios">
-        <button className="btn btn-success" onClick={handleOpenCreateModal}>
-          <i className="bi bi-plus-circle-fill me-2"></i>Nuevo Servicio
-        </button>
-      </PageHeader>
+    <div className="contenedor-pagina">
+      <div className="container">
+        <NotificationToast toast={toast} onClose={() => setToast(null)} />
 
-      <div className="card shadow-sm">
-        <div className="card-body">
-          <div className="d-flex flex-wrap gap-2 align-items-center border-bottom pb-3 mb-3">
+        <PageHeader icon="bi-list-check" title="Servicios" description="Gestiona los servicios ofrecidos en la clínica">
+          <button className="boton boton--primario" onClick={handleOpenCreateModal}>
+            <i className="bi bi-plus-circle-fill me-1"></i>Nuevo Servicio
+          </button>
+        </PageHeader>
+
+        <div className="barra-filtros animacion-entrada">
+          <div className="barra-filtros-grupo">
+            <label>Nombre</label>
             <input
               type="text"
-              className="form-control w-auto"
+              className="campo-entrada"
               placeholder="Buscar por nombre..."
               value={searchNombre}
               onChange={(e) => setSearchNombre(e.target.value)}
             />
+          </div>
+          <div className="barra-filtros-grupo">
+            <label>Estado</label>
             <select
-              className="form-select w-auto"
+              className="campo-entrada"
               value={filtroActivo}
               onChange={(e) => setFiltroActivo(e.target.value)}
             >
@@ -155,78 +160,79 @@ const ServiciosPage = () => {
               <option value="inactivos">Inactivos</option>
             </select>
           </div>
-          {loadError ? (
-            <div className="alert alert-danger" role="alert">
-              {loadError}
-            </div>
-          ) : null}
-          {loading ? (
-            <div className="text-center py-4">
-              <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Cargando...</span>
-              </div>
-            </div>
-          ) : (
-            <DataTable
-              columns={["#", "Nombre", "Descripción", "Tiempo (Min)", "Costo", "Estado", "Acciones"]}
-              emptyMessage="No hay servicios registrados."
-              colSpan={7}
-            >
-              {servicios.map((servicio, index) => (
-                <tr key={servicio.id || index}>
-                  <td>{index + 1}</td>
-                  <td>{servicio.nombre}</td>
-                  <td>{servicio.descripcion}</td>
-                  <td>{servicio.duracionMinutos}</td>
-                  <td>S/.{servicio.costoReferencial}</td>
-                  <td>
-                    <span
-                      className={`badge ${servicio.activo ? "bg-success" : "bg-danger"}`}
-                    >
-                      {servicio.activo ? "Activo" : "Inactivo"}
-                    </span>
-                  </td>
-                  <td>
-                    <ActionButtons
-                      activo={servicio.activo}
-                      onEdit={() => handleOpenEditModal(servicio)}
-                      onToggle={() => handleToggleServicio(servicio.id)}
-                      onDelete={() => setConfirmDeleteServicio(servicio.id)}
-                    />
-                  </td>
-                </tr>
-              ))}
-            </DataTable>
-          )}
         </div>
-        <div className="card-footer text-muted small py-2">
-          Total de servicios: {servicios.length}
-        </div>
-      </div>
-      <ServiceFormDialog
-        isOpen={openModal}
-        onClose={handleCloseModal}
-        initialData={
-          selectedServicio ? mapServicioToRequest(selectedServicio) : null
-        }
-        mode={selectedServicio ? "edit" : "create"}
-        onSubmit={handleSaveServicio}
-      />
 
-      <ConfirmDialog
-        isOpen={confirmDeleteServicio !== null}
-        title="Eliminar servicio"
-        message="¿Estás seguro de eliminar permanentemente este servicio? Esta acción no se puede deshacer."
-        confirmText="Eliminar"
-        cancelText="Cancelar"
-        variant="danger"
-        onConfirm={() => {
-          if (confirmDeleteServicio !== null) {
-            handleDeleteServicio(confirmDeleteServicio);
+        <div className="tarjeta animacion-entrada" style={{ animationDelay: '0.05s' }}>
+          <div className="tarjeta-cuerpo">
+            {loadError ? (
+              <div className="dialogo-error" style={{ marginBottom: 0 }}>{loadError}</div>
+            ) : loading ? (
+              <div className="estado-cargando">
+                <div className="spinner-border" style={{ color: 'var(--color-primario)' }} role="status">
+                  <span className="visually-hidden">Cargando...</span>
+                </div>
+              </div>
+            ) : (
+              <DataTable
+                columns={["#", "Nombre", "Descripción", "Tiempo (Min)", "Costo", "Estado", "Acciones"]}
+                emptyMessage="No hay servicios registrados."
+                colSpan={7}
+              >
+                {servicios.map((servicio, index) => (
+                  <tr key={servicio.id || index}>
+                    <td><span className="numero-fila">{index + 1}</span></td>
+                    <td>{servicio.nombre}</td>
+                    <td>{servicio.descripcion}</td>
+                    <td>{servicio.duracionMinutos}</td>
+                    <td>S/.{servicio.costoReferencial}</td>
+                    <td>
+                      <span className={`etiqueta ${servicio.activo ? 'etiqueta--activo' : 'etiqueta--inactivo'}`}>
+                        {servicio.activo ? "Activo" : "Inactivo"}
+                      </span>
+                    </td>
+                    <td>
+                      <ActionButtons
+                        activo={servicio.activo}
+                        onEdit={() => handleOpenEditModal(servicio)}
+                        onToggle={() => handleToggleServicio(servicio.id)}
+                        onDelete={() => setConfirmDeleteServicio(servicio.id)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </DataTable>
+            )}
+          </div>
+          <div className="tarjeta-pie" style={{ fontSize: 'var(--tamano-sm)', color: 'var(--color-texto-claro)' }}>
+            Total de servicios: {servicios.length}
+          </div>
+        </div>
+
+        <ServiceFormDialog
+          isOpen={openModal}
+          onClose={handleCloseModal}
+          initialData={
+            selectedServicio ? mapServicioToRequest(selectedServicio) : null
           }
-        }}
-        onCancel={() => setConfirmDeleteServicio(null)}
-      />
+          mode={selectedServicio ? "edit" : "create"}
+          onSubmit={handleSaveServicio}
+        />
+
+        <ConfirmDialog
+          isOpen={confirmDeleteServicio !== null}
+          title="Eliminar servicio"
+          message="¿Estás seguro de eliminar permanentemente este servicio? Esta acción no se puede deshacer."
+          confirmText="Eliminar"
+          cancelText="Cancelar"
+          variant="danger"
+          onConfirm={() => {
+            if (confirmDeleteServicio !== null) {
+              handleDeleteServicio(confirmDeleteServicio);
+            }
+          }}
+          onCancel={() => setConfirmDeleteServicio(null)}
+        />
+      </div>
     </div>
   );
 };

@@ -1,0 +1,131 @@
+.tabla-contenedor {
+  overflow-x: auto;
+  border-radius: var(--radio-borde);
+  border: 1px solid var(--color-borde-claro);
+}
+
+.tabla-datos {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--tamano-sm);
+  background: var(--color-fondo-blanco);
+}
+
+.tabla-datos thead {
+  background: var(--color-fondo);
+  border-bottom: 2px solid var(--color-secundario);
+}
+
+.tabla-datos th {
+  padding: 0.75rem var(--espaciado-md);
+  text-align: left;
+  font-weight: var(--peso-seminegrita);
+  font-size: var(--tamano-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-texto-secundario);
+  white-space: nowrap;
+}
+
+.tabla-datos td {
+  padding: 0.75rem var(--espaciado-md);
+  color: var(--color-texto);
+  border-bottom: 1px solid var(--color-borde-claro);
+  vertical-align: middle;
+}
+
+.tabla-datos tbody tr {
+  transition: background-color var(--transicion-rapida);
+}
+
+.tabla-datos tbody tr:hover {
+  background-color: rgba(149, 184, 172, 0.06);
+}
+
+.tabla-datos tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tabla-datos-vacio {
+  text-align: center;
+  padding: var(--espaciado-2xl) var(--espaciado-md);
+  color: var(--color-texto-claro);
+  font-size: var(--tamano-sm);
+}
+
+.tabla-datos-vacio-icono {
+  font-size: var(--tamano-3xl);
+  margin-bottom: var(--espaciado-sm);
+  opacity: 0.4;
+}
+
+.numero-fila {
+  color: var(--color-texto-claro);
+  font-weight: var(--peso-seminegrita);
+  font-size: var(--tamano-xs);
+}
+
+.acciones-tabla {
+  display: flex;
+  align-items: center;
+  gap: var(--espaciado-xs);
+  justify-content: flex-start;
+}
+
+.acciones-tabla .boton {
+  padding: 0.3rem;
+  min-width: 30px;
+  min-height: 30px;
+  font-size: var(--tamano-xs);
+}
+
+.tabla-datos td:last-child {
+  overflow: visible;
+  position: relative;
+}
+
+.dropdown-menu--custom {
+  display: block;
+  z-index: 2000;
+  min-width: 160px;
+  padding: 0.25rem 0;
+  margin: 0;
+  font-size: 0.875rem;
+  color: #212529;
+  text-align: left;
+  list-style: none;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 0.375rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.dropdown-menu--custom .dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.375rem 1rem;
+  clear: both;
+  font-weight: 400;
+  color: #212529;
+  text-align: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.dropdown-menu--custom .dropdown-item:hover {
+  background-color: #f0f0f0;
+}
+
+@media (max-width: 768px) {
+  .tabla-datos th,
+  .tabla-datos td {
+    padding: 0.5rem var(--espaciado-sm);
+    font-size: var(--tamano-xs);
+  }
+}
