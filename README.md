@@ -1,5 +1,13 @@
 # PetCare Frontend
 
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite)
+![pnpm](https://img.shields.io/badge/pnpm-11-F69220?logo=pnpm)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?logo=bootstrap)
+![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel)
+![License](https://img.shields.io/badge/License-MIT-green)
+
 Aplicación web para la gestión de una clínica veterinaria. Permite administrar citas, mascotas, dueños, servicios y usuarios del sistema.
 
 **Despliegue:** [https://petcare-frontend-alpha.vercel.app/](https://petcare-frontend-alpha.vercel.app/)
