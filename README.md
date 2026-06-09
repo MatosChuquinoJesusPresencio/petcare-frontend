@@ -1,75 +1,96 @@
-# React + TypeScript + Vite
+# PetCare Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite)
+![pnpm](https://img.shields.io/badge/pnpm-11-F69220?logo=pnpm)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?logo=bootstrap)
+![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-Currently, two official plugins are available:
+Aplicación web para la gestión de una clínica veterinaria. Permite administrar citas, mascotas, dueños, servicios y usuarios del sistema.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+**Despliegue:** [https://petcare-frontend-alpha.vercel.app/](https://petcare-frontend-alpha.vercel.app/)
 
-## React Compiler
+## Tecnologías
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+- **React 19** con TypeScript
+- **Vite 8** como bundler
+- **React Router v7** para enrutamiento
+- **Axios** para consumo de API
+- **pnpm** como gestor de paquetes
+- **Bootstrap 5** + **Bootstrap Icons** para grid e iconos
+- **CSS Modules** con tokens de diseño personalizados
+- **React Compiler** habilitado
 
-Note: This will impact Vite dev & build performances.
+## Características
 
-## Expanding the ESLint configuration
+- Autenticación con refresh de tokens y roles (ADMINISTRADOR, VETERINARIO, ASISTENTE, DUENO)
+- Dashboard con resumen del negocio
+- CRUD completo de servicios
+- Gestión de citas con reprogramación y cancelación
+- Administración de mascotas con vinculación a dueños
+- Gestión de dueños y contactos de emergencia
+- Diseño responsive con sidebar colapsable
+- Sistema de notificaciones toast
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Requisitos
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Node.js >= 18
+- pnpm >= 9
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Instalación
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+pnpm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Variables de entorno
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+| Variable | Descripción | Valor por defecto |
+|---|---|---|
+| `VITE_URL_API` | URL base del backend | `http://localhost:8080` |
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Scripts disponibles
+
+| Comando | Descripción |
+|---|---|
+| `pnpm dev` | Inicia servidor de desarrollo con HMR |
+| `pnpm build` | Compila TypeScript y empaqueta con Vite |
+| `pnpm preview` | Previsualiza la build de producción |
+| `pnpm lint` | Ejecuta ESLint sobre el código |
+
+## Estructura del proyecto
+
 ```
+src/
+├── api/            # Cliente HTTP (Axios)
+├── assets/         # Recursos estáticos (logos, imágenes)
+├── components/     # Componentes React
+│   ├── auth/       #   Protección de rutas
+│   ├── citas/      #   Módulo de citas
+│   ├── common/     #   Componentes reutilizables
+│   ├── duenos/     #   Módulo de dueños
+│   ├── layout/     #   Header, Footer
+│   └── mascotas/   #   Módulo de mascotas
+├── constants/      # Constantes del dominio
+├── contexts/       # Contextos de React
+├── css/            # Estilos
+│   ├── componentes/#   Estilos por componente
+│   └── paginas/    #   Estilos por página
+├── hooks/          # Custom hooks
+├── layouts/        # Layout principal
+├── pages/          # Páginas de la aplicación
+├── providers/      # Providers de React
+├── routers/        # Configuración de rutas
+├── services/       # Servicios de API
+├── types/          # Tipos TypeScript
+└── utils/          # Utilidades
+```
+
+## Despliegue
+
+La aplicación está desplegada en Vercel:
+[https://petcare-frontend-alpha.vercel.app/](https://petcare-frontend-alpha.vercel.app/)
+
+Configurado mediante `vercel.json` con rewrites SPA para manejo de rutas del cliente.
