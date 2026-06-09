@@ -1,0 +1,313 @@
+.barra-lateral {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 240px;
+  height: 100vh;
+  background: var(--color-primario);
+  z-index: 1020;
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--transicion-normal);
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+  transform: translateX(-100%);
+}
+
+.barra-lateral--abierto {
+  transform: translateX(0);
+}
+
+.barra-lateral-logo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--espaciado-lg) var(--espaciado-md);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+  gap: var(--espaciado-sm);
+}
+
+.barra-lateral-logo svg {
+  height: 36px;
+  width: auto;
+  display: block;
+}
+
+/* Close button inside sidebar (desktop) */
+.barra-lateral-toggle-inner {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-fondo-blanco);
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all var(--transicion-rapida);
+}
+
+.barra-lateral-toggle-inner:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.barra-lateral-enlaces {
+  list-style: none;
+  margin: 0;
+  padding: var(--espaciado-sm);
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.barra-lateral-enlace {
+  display: flex;
+  align-items: center;
+  gap: var(--espaciado-sm);
+  padding: 0.625rem var(--espaciado-md);
+  border-radius: var(--radio-borde);
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: var(--tamano-sm);
+  font-weight: var(--peso-seminegrita);
+  font-family: var(--fuente-principal);
+  transition: all var(--transicion-rapida);
+  cursor: pointer;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.barra-lateral-enlace:hover {
+  color: var(--color-fondo-blanco);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.barra-lateral-enlace--activo {
+  color: var(--color-primario);
+  background: var(--color-secundario);
+  font-weight: var(--peso-negrita);
+}
+
+.barra-lateral-enlace--activo:hover {
+  color: var(--color-primario-oscuro);
+  background: var(--color-secundario-hover);
+}
+
+.barra-lateral-icono {
+  font-size: var(--tamano-lg);
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.barra-lateral-etiqueta {
+  flex: 1;
+}
+
+.barra-lateral-pie {
+  padding: var(--espaciado-sm);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.barra-lateral-usuario {
+  display: flex;
+  align-items: center;
+  gap: var(--espaciado-sm);
+  padding: 0.5rem var(--espaciado-md);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: var(--tamano-sm);
+  border-radius: var(--radio-borde);
+}
+
+.barra-lateral-usuario-icono {
+  color: var(--color-secundario-claro);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.barra-lateral-usuario-nombre {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.barra-lateral-usuario-rol {
+  font-size: var(--tamano-xs);
+  opacity: 0.6;
+}
+
+.barra-lateral-boton-salir {
+  display: flex;
+  align-items: center;
+  gap: var(--espaciado-sm);
+  padding: 0.5rem var(--espaciado-md);
+  color: rgba(255, 255, 255, 0.7);
+  background: none;
+  border: none;
+  border-radius: var(--radio-borde);
+  font-size: var(--tamano-sm);
+  font-family: var(--fuente-principal);
+  cursor: pointer;
+  transition: all var(--transicion-rapida);
+  width: 100%;
+  text-align: left;
+  margin-top: 2px;
+}
+
+.barra-lateral-boton-salir:hover {
+  color: var(--color-fondo-blanco);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Overlay para móvil */
+.barra-lateral-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1019;
+  animation: aparecer 0.2s ease;
+}
+
+/* Botón toggle flotante desktop (solo visible cuando sidebar está cerrado) */
+.barra-lateral-toggle-desktop {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 1025;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primario);
+  color: var(--color-fondo-blanco);
+  border: none;
+  border-radius: var(--radio-borde);
+  font-size: var(--tamano-xl);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all var(--transicion-rapida);
+}
+
+.barra-lateral-toggle-desktop:hover {
+  background: var(--color-primario-hover);
+}
+
+/* Header móvil */
+.barra-lateral-header-movil {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: var(--color-primario);
+  z-index: 1025;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--espaciado-md);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.barra-lateral-toggle-movil {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--color-fondo-blanco);
+  border: none;
+  border-radius: var(--radio-borde);
+  font-size: var(--tamano-xl);
+  cursor: pointer;
+  transition: all var(--transicion-rapida);
+}
+
+.barra-lateral-toggle-movil:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.barra-lateral-logo-movil {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.barra-lateral-logo-movil svg {
+  height: 32px;
+  width: auto;
+  display: block;
+}
+
+/* Contenido principal */
+.contenido-principal {
+  margin-left: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left var(--transicion-normal);
+}
+
+/* Desktop */
+@media (min-width: 769px) {
+  .barra-lateral {
+    transform: translateX(0);
+  }
+
+  .barra-lateral--abierto {
+    transform: translateX(0);
+  }
+
+  .barra-lateral:not(.barra-lateral--abierto) {
+    transform: translateX(-100%);
+  }
+
+  .contenido-principal {
+    margin-left: 240px;
+  }
+
+  .contenido-principal--expandido {
+    margin-left: 0;
+  }
+
+  .barra-lateral-overlay {
+    display: none;
+  }
+}
+
+/* Tablet / móvil */
+@media (max-width: 768px) {
+  .barra-lateral {
+    top: 56px;
+    transform: translateX(-100%);
+  }
+
+  .barra-lateral--abierto {
+    transform: translateX(0);
+  }
+
+  .barra-lateral-toggle-desktop {
+    display: none;
+  }
+
+  .contenido-principal {
+    margin-left: 0;
+    padding-top: 56px;
+  }
+
+  .barra-lateral-logo {
+    display: none;
+  }
+}
