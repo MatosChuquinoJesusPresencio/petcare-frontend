@@ -10,7 +10,7 @@
 
 Aplicación web para la gestión de una clínica veterinaria. Permite administrar citas, mascotas, dueños, servicios y usuarios del sistema.
 
-**Despliegue:** [https://petcare-frontend-alpha.vercel.app/](https://petcare-frontend-alpha.vercel.app/)
+**Despliegue:** [https://petcare-frontend-alpha.vercel.app/](https://petcare-frontend-rho.vercel.app/login)
 
 ## Tecnologías
 
