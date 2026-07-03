@@ -213,6 +213,7 @@ const AtencionPage = () => {
         <BaseFormDialog
           isOpen={detalle !== null}
           onClose={() => setDetalle(null)}
+          onSubmit={async (e) => { e.preventDefault(); }}
           title="Detalle de Atención Clínica"
           submitLabel=""
           submitBusyLabel="—"
