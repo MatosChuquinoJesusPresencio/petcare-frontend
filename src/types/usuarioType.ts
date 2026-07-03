@@ -1,6 +1,9 @@
 export interface VeterinarioResponse {
   id: number;
-  nombre: string;
-  apellido: string;
+  names: string;
+  lastNames: string;
   email?: string;
+  phone?: string;
+  rol?: string;
+  active?: boolean;
 }

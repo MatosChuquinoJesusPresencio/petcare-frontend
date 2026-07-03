@@ -15,17 +15,22 @@ export interface MascotaRequest {
 
 export interface MascotaResponse {
   id: number;
-  nombre: string;
+  name: string;
   especie: string;
-  raza: string;
-  sexo: string;
-  fechaNacimiento: string;
+  breed: string;
+  gender: string;
+  dateOfBirth: string;
   microchip: string;
-  condicionReproductiva: string;
-  alergias: string;
-  enfermedadesCronicas: string;
-  alertasMedicas: string;
-  activo: boolean;
+  reproductiveCondition: string;
+  allergies: string;
+  chronicDiseases: string;
+  medicalAlerts: string;
+  medicalNotes?: string;
+  active: boolean;
 }
 
-
+export interface CambioDuenoPrincipalRequest {
+  ownerId: number;
+  relation: string;
+  reason: string;
+}

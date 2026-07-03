@@ -2,33 +2,29 @@ export type UserRole = 'ADMINISTRADOR' | 'VETERINARIO' | 'ASISTENTE' | 'DUENO';
 
 export interface Dueno {
   id: number;
-  nombre: string;
-  apellido: string;
   dni: string;
-  email: string;
-  telefono?: string;
-  direccion?: string;
+  phone?: string;
+  address?: string;
   usuario?: {
     id: number;
-    username: string;
-    nombre: string;
-    apellido: string;
+    names: string;
+    lastNames: string;
     email: string;
-    telefono: string;
+    phone: string;
     rol: string;
-    activo: boolean;
+    active: boolean;
   } | null;
-  activo: boolean;
 }
 
 export interface DuenoRequest {
-  firstName: string;
-  lastName: string;
   dni: string;
-  email: string;
   phone?: string;
   address?: string;
   userId?: number | null;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  password?: string;
 }
 
 export type { PaginatedResponse } from "./pagination";

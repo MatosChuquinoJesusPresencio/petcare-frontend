@@ -1,9 +1,9 @@
 export interface ContactoEmergencia {
   id: number;
-  dueno: { id: number };
-  nombre: string;
-  telefono: string;
-  relacion?: string;
+  ownerId: number;
+  name: string;
+  phone: string;
+  relation?: string;
 }
 
 export interface ContactoEmergenciaRequest {
