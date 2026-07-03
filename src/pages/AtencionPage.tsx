@@ -19,6 +19,7 @@ const AtencionPage = () => {
   const [citas, setCitas] = useState<CitaResponse[]>([]);
   const [triajes, setTriajes] = useState<TriajeResponse[]>([]);
   const [detalle, setDetalle] = useState<AtencionClinicaResponse | null>(null);
+  const [submitError, setSubmitError] = useState("");
 
   const [appointmentId, setAppointmentId] = useState("");
   const [reasonForConsultation, setReasonForConsultation] = useState("");
@@ -102,6 +103,7 @@ const AtencionPage = () => {
     setDiagnosis("");
     setTreatment("");
     setClinicalObservations("");
+    setSubmitError("");
   };
 
   return (
@@ -158,6 +160,7 @@ const AtencionPage = () => {
           submitLabel="Guardar"
           submitBusyLabel="Guardando..."
           isSubmitting={false}
+          submitError={submitError}
           modalId="atencionModal"
         >
           <div className="row g-3">
@@ -212,7 +215,9 @@ const AtencionPage = () => {
           onClose={() => setDetalle(null)}
           title="Detalle de Atención Clínica"
           submitLabel=""
-          hideSubmit
+          submitBusyLabel="—"
+          isSubmitting={false}
+          submitError=""
           modalId="detalleAtencionModal"
         >
           {detalle && (
