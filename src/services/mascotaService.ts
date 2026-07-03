@@ -1,6 +1,6 @@
 import apiClient from "../api/client";
 
-import type { Dueno, MascotaRequest, MascotaResponse, PaginatedResponse } from "../types";
+import type { CambioDuenoPrincipalRequest, Dueno, MascotaRequest, MascotaResponse, PaginatedResponse } from "../types";
 
 export async function obtenerMascotas(params?: { nombre?: string; especie?: string; raza?: string; sexo?: string; activo?: boolean; duenoId?: number }): Promise<MascotaResponse[]> {
   const response = await apiClient.get<PaginatedResponse<MascotaResponse>>("/api/mascotas", { params });
@@ -40,8 +40,8 @@ export async function vincularDueno(mascotaId: number, duenoId: number, relacion
   await apiClient.post(`/api/mascotas/${mascotaId}/vincular-dueno/${duenoId}?relacion=${relacion}`);
 }
 
-export async function cambiarDuenoPrincipal(mascotaId: number, duenoId: number, relacion: string): Promise<void> {
-  await apiClient.patch(`/api/mascotas/${mascotaId}/cambiar-dueno-principal`, { duenoId, relacion });
+export async function cambiarDuenoPrincipal(mascotaId: number, data: CambioDuenoPrincipalRequest): Promise<void> {
+  await apiClient.patch(`/api/mascotas/${mascotaId}/cambiar-dueno-principal`, data);
 }
 
 export async function obtenerDuenoPrincipal(mascotaId: number): Promise<Dueno | null> {
