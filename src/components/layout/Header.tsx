@@ -3,7 +3,7 @@ import { ROL_LABEL } from '../../constants';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa';
-import { FiLogOut, FiMenu, FiX, FiHome, FiList, FiCalendar, FiHeart, FiUsers } from 'react-icons/fi';
+import { FiLogOut, FiMenu, FiX, FiHome, FiList, FiCalendar, FiHeart, FiUsers, FiClock, FiClipboard, FiUserCheck, FiActivity } from 'react-icons/fi';
 import Logo from '../common/Logo';
 
 interface Enlace {
@@ -38,6 +38,7 @@ const Header = () => {
     }
   }, [abierto, esMovil]);
 
+  const puedeVer = (roles: string[]) => user !== null && roles.includes(user.role);
   const enlaces: Enlace[] = [
     { label: 'Dashboard', to: '/', icon: <FiHome /> },
     ...(user && user.role !== 'DUENO'
@@ -46,6 +47,10 @@ const Header = () => {
           { label: 'Citas', to: '/citas', icon: <FiCalendar /> },
           { label: 'Mascotas', to: '/mascotas', icon: <FiHeart /> },
           { label: 'Dueños', to: '/duenos', icon: <FiUsers /> },
+          { label: 'Sala Espera', to: '/sala-espera', icon: <FiClock /> },
+          { label: 'Triaje', to: '/triaje', icon: <FiClipboard /> },
+          { label: 'Atención Clínica', to: '/atencion-clinica', icon: <FiActivity /> },
+          ...(puedeVer(['ADMINISTRADOR', 'ASISTENTE']) ? [{ label: 'Veterinarios', to: '/veterinarios', icon: <FiUserCheck /> }] : []),
         ]
       : []),
   ];
@@ -124,7 +129,7 @@ const Header = () => {
                 <FaUserCircle size={20} />
               </span>
               <div style={{ flex: 1, overflow: 'hidden' }}>
-                <div className="barra-lateral-usuario-nombre">{user.username}</div>
+                <div className="barra-lateral-usuario-nombre">{user.email}</div>
                 <div className="barra-lateral-usuario-rol">
                   {ROL_LABEL[user.role as keyof typeof ROL_LABEL] || user.role}
                 </div>

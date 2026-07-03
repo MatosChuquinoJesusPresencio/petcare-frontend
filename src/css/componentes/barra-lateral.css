@@ -54,12 +54,35 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
+.barra-lateral > nav {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.barra-lateral > nav::-webkit-scrollbar {
+  width: 5px;
+}
+
+.barra-lateral > nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.barra-lateral > nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+.barra-lateral > nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
 .barra-lateral-enlaces {
   list-style: none;
   margin: 0;
   padding: var(--espaciado-sm);
-  flex: 1;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -291,6 +314,8 @@
 @media (max-width: 768px) {
   .barra-lateral {
     top: 56px;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
     transform: translateX(-100%);
   }
 

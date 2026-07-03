@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import Logo from '../components/common/Logo';
 
 const LoginPage = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -20,10 +20,10 @@ const LoginPage = () => {
     e.preventDefault();
     setErrorMsg('');
     setIsSubmitting(true);
-    const cleanUsername = username.trim();
+    const cleanEmail = email.trim();
 
     try {
-      await login({ username: cleanUsername, password });
+      await login({ email: cleanEmail, password });
       navigate('/');
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : 'Error desconocido');
@@ -52,7 +52,7 @@ const LoginPage = () => {
 
         <form onSubmit={handleSubmit}>
           <div className="campo-grupo">
-            <label className="campo-etiqueta">Usuario</label>
+            <label className="campo-etiqueta">Correo electrónico</label>
             <div className="d-flex align-items-stretch">
               <span style={{
                 display: 'flex', alignItems: 'center', padding: '0.5rem 0.75rem',
@@ -60,15 +60,15 @@ const LoginPage = () => {
                 borderRight: 'none', borderRadius: 'var(--radio-borde) 0 0 var(--radio-borde)',
                 color: 'var(--color-texto-secundario)'
               }}>
-                <i className="bi bi-person-fill"></i>
+                <i className="bi bi-envelope-fill"></i>
               </span>
               <input
-                type="text"
+                type="email"
                 className="campo-entrada"
                 style={{ borderRadius: '0 var(--radio-borde) var(--radio-borde) 0' }}
-                placeholder="Ingresa tu usuario"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Ingresa tu correo"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>

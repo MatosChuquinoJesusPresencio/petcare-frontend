@@ -6,6 +6,10 @@ import ServiciosPage from '../pages/ServiciosPage';
 import CitasPage from '../pages/CitasPage';
 import MascotasPage from '../pages/MascotasPage';
 import DuenosPage from '../pages/DuenosPage';
+import SalaEsperaPage from '../pages/SalaEsperaPage';
+import TriajePage from '../pages/TriajePage';
+import AtencionPage from '../pages/AtencionPage';
+import VeterinariosPage from '../pages/VeterinariosPage';
 import NotFoundPage from '../pages/NotFoundPage';
 import UnauthorizedPage from '../pages/UnauthorizedPage';
 import { ProtectedRoute } from '../components/auth/ProtectedRoute';
@@ -23,6 +27,10 @@ const AppRouter = () => (
       <Route path="/citas" element={<MainLayout><ProtectedRoute allowedRoles={staffRoles}><CitasPage /></ProtectedRoute></MainLayout>} />
       <Route path="/mascotas" element={<MainLayout><ProtectedRoute allowedRoles={staffRoles}><MascotasPage /></ProtectedRoute></MainLayout>} />
       <Route path="/duenos" element={<MainLayout><ProtectedRoute allowedRoles={staffRoles}><DuenosPage /></ProtectedRoute></MainLayout>} />
+      <Route path="/sala-espera" element={<MainLayout><ProtectedRoute allowedRoles={staffRoles}><SalaEsperaPage /></ProtectedRoute></MainLayout>} />
+      <Route path="/triaje" element={<MainLayout><ProtectedRoute allowedRoles={staffRoles}><TriajePage /></ProtectedRoute></MainLayout>} />
+      <Route path="/veterinarios" element={<MainLayout><ProtectedRoute allowedRoles={staffRoles}><VeterinariosPage /></ProtectedRoute></MainLayout>} />
+      <Route path="/atencion-clinica" element={<MainLayout><ProtectedRoute allowedRoles={staffRoles}><AtencionPage /></ProtectedRoute></MainLayout>} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   </BrowserRouter>
