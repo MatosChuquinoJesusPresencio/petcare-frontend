@@ -28,7 +28,6 @@ const TriajePage = () => {
   const [openModal, setOpenModal] = useState(false);
   const [toast, setToast] = useState<ToastInfo | null>(null);
   const [citas, setCitas] = useState<CitaResponse[]>([]);
-  const [submitError, setSubmitError] = useState("");
 
   const [appointmentId, setAppointmentId] = useState("");
   const [reasonForVisit, setReasonForVisit] = useState("");
@@ -158,7 +157,7 @@ const TriajePage = () => {
           submitLabel="Guardar"
           submitBusyLabel="Guardando..."
           isSubmitting={false}
-          submitError={submitError}
+          submitError=""
           modalId="triajeModal"
         >
           <div className="row g-3">
