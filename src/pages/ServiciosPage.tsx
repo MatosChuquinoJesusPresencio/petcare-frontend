@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
+import { useAuth } from "../hooks/useAuth";
 import ActionButtons from "../components/common/ActionButtons";
 
 import ConfirmDialog from "../components/common/ConfirmDialog";
@@ -24,6 +25,8 @@ import type {
 } from "../types";
 
 const ServiciosPage = () => {
+  const { user } = useAuth();
+  const puedeGestionar = user?.role === 'ADMINISTRADOR';
   const [servicios, setServicios] = useState<ServicioResponse[]>([]);
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
@@ -119,10 +122,10 @@ const ServiciosPage = () => {
 
   function mapServicioToRequest(servicio: ServicioResponse): ServicioRequest {
     return {
-      name: servicio.nombre,
-      description: servicio.descripcion,
-      durationMinutes: servicio.duracionMinutos,
-      referentialCost: servicio.costoReferencial,
+      name: servicio.name,
+      description: servicio.description,
+      durationMinutes: servicio.durationMinutes,
+      referentialCost: servicio.referenceCost,
     };
   }
 
@@ -132,9 +135,11 @@ const ServiciosPage = () => {
         <NotificationToast toast={toast} onClose={() => setToast(null)} />
 
         <PageHeader icon="bi-list-check" title="Servicios" description="Gestiona los servicios ofrecidos en la clínica">
-          <button className="boton boton--primario" onClick={handleOpenCreateModal}>
-            <i className="bi bi-plus-circle-fill me-1"></i>Nuevo Servicio
-          </button>
+          {puedeGestionar && (
+            <button className="boton boton--primario" onClick={handleOpenCreateModal}>
+              <i className="bi bi-plus-circle-fill me-1"></i>Nuevo Servicio
+            </button>
+          )}
         </PageHeader>
 
         <div className="barra-filtros animacion-entrada">
@@ -174,30 +179,32 @@ const ServiciosPage = () => {
               </div>
             ) : (
               <DataTable
-                columns={["#", "Nombre", "Descripción", "Tiempo (Min)", "Costo", "Estado", "Acciones"]}
+                columns={["#", "Nombre", "Descripción", "Tiempo (Min)", "Costo", "Estado", ...(puedeGestionar ? ["Acciones"] : [])]}
                 emptyMessage="No hay servicios registrados."
-                colSpan={7}
+                colSpan={puedeGestionar ? 7 : 6}
               >
                 {servicios.map((servicio, index) => (
                   <tr key={servicio.id || index}>
                     <td><span className="numero-fila">{index + 1}</span></td>
-                    <td>{servicio.nombre}</td>
-                    <td>{servicio.descripcion}</td>
-                    <td>{servicio.duracionMinutos}</td>
-                    <td>S/.{servicio.costoReferencial}</td>
+                    <td>{servicio.name}</td>
+                    <td>{servicio.description}</td>
+                    <td>{servicio.durationMinutes}</td>
+                    <td>S/.{servicio.referenceCost}</td>
                     <td>
-                      <span className={`etiqueta ${servicio.activo ? 'etiqueta--activo' : 'etiqueta--inactivo'}`}>
-                        {servicio.activo ? "Activo" : "Inactivo"}
+                      <span className={`etiqueta ${servicio.active ? 'etiqueta--activo' : 'etiqueta--inactivo'}`}>
+                        {servicio.active ? "Activo" : "Inactivo"}
                       </span>
                     </td>
-                    <td>
-                      <ActionButtons
-                        activo={servicio.activo}
-                        onEdit={() => handleOpenEditModal(servicio)}
-                        onToggle={() => handleToggleServicio(servicio.id)}
-                        onDelete={() => setConfirmDeleteServicio(servicio.id)}
-                      />
-                    </td>
+                    {puedeGestionar && (
+                      <td>
+                        <ActionButtons
+                          activo={servicio.active}
+                          onEdit={() => handleOpenEditModal(servicio)}
+                          onToggle={() => handleToggleServicio(servicio.id)}
+                          onDelete={() => setConfirmDeleteServicio(servicio.id)}
+                        />
+                      </td>
+                    )}
                   </tr>
                 ))}
               </DataTable>

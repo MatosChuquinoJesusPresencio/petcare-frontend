@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { useAuth } from "../hooks/useAuth";
 import type { MascotaResponse } from "../types";
 
 import { eliminarMascota, obtenerMascotas, toggleMascota } from "../services";
@@ -16,6 +17,8 @@ import MascotaVincularModal from "../components/mascotas/MascotaVincularModal";
 import PageHeader from "../components/common/PageHeader";
 
 const MascotasPage = () => {
+  const { user } = useAuth();
+  const puedeGestionar = user?.role === 'ADMINISTRADOR' || user?.role === 'ASISTENTE';
   const [mascotas, setMascotas] = useState<MascotaResponse[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -104,9 +107,11 @@ const MascotasPage = () => {
         <NotificationToast toast={toast} onClose={() => setToast(null)} />
 
         <PageHeader icon="bi-heart" title="Mascotas" description="Registro y gestión de pacientes">
-          <button className="boton boton--primario" onClick={handleNuevaMascota}>
-            <i className="bi bi-plus-circle-fill me-1"></i>Nueva Mascota
-          </button>
+          {puedeGestionar && (
+            <button className="boton boton--primario" onClick={handleNuevaMascota}>
+              <i className="bi bi-plus-circle-fill me-1"></i>Nueva Mascota
+            </button>
+          )}
         </PageHeader>
 
         <div className="barra-filtros animacion-entrada">
@@ -156,6 +161,7 @@ const MascotasPage = () => {
                 onDelete={(id) => setConfirmDeleteMascota(id)}
                 onToggle={handleToggleMascota}
                 onVincular={handleVincular}
+                showActions={puedeGestionar}
               />
             )}
           </div>

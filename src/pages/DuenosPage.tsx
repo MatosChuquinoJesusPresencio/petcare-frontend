@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { useAuth } from "../hooks/useAuth";
 import ActionButtons from "../components/common/ActionButtons";
 
 import ConfirmDialog from "../components/common/ConfirmDialog";
@@ -9,6 +10,7 @@ import ContactoFormDialog from "../components/duenos/ContactoFormDialog";
 import DataTable from "../components/common/DataTable";
 
 import DuenoFormDialog from "../components/duenos/DuenoFormDialog";
+import type { DuenoFormData } from "../components/duenos/DuenoFormDialog";
 
 import NotificationToast from "../components/common/NotificationToast";
 import type { ToastInfo } from "../components/common/NotificationToast";
@@ -30,10 +32,11 @@ import type {
   ContactoEmergencia,
   ContactoEmergenciaRequest,
   Dueno,
-  DuenoRequest,
 } from "../types";
 
 const DuenosPage = () => {
+  const { user } = useAuth();
+  const puedeGestionar = user?.role === 'ADMINISTRADOR' || user?.role === 'ASISTENTE';
   const [duenos, setDuenos] = useState<Dueno[]>([]);
   const [selectedDueno, setSelectedDueno] = useState<Dueno | null>(null);
   const [openDuenoModal, setOpenDuenoModal] = useState(false);
@@ -118,14 +121,27 @@ const DuenosPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDueno, searchContactoNombre, searchContactoTelefono, searchContactoRelacion]);
 
-  async function handleSaveDueno(data: DuenoRequest) {
+  async function handleSaveDueno(data: DuenoFormData) {
     if (selectedDueno) {
-      const duenoEditado = await updateDueno(selectedDueno.id, data);
+      const duenoEditado = await updateDueno(selectedDueno.id, {
+        dni: data.dni,
+        phone: data.phone || undefined,
+        address: data.address || undefined,
+        userId: selectedDueno.usuario?.id ?? undefined,
+      });
       if (selectedDueno.id === duenoEditado.id) {
         setSelectedDueno(duenoEditado);
       }
     } else {
-      await createDueno(data);
+      await createDueno({
+        dni: data.dni,
+        phone: data.phone || undefined,
+        address: data.address || undefined,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        password: data.dni,
+      });
     }
 
     await cargarDuenos();
@@ -199,15 +215,15 @@ const DuenosPage = () => {
     }
   }
 
-  function mapDuenoToRequest(dueno: Dueno): DuenoRequest {
+  function mapDuenoToFormData(dueno: Dueno): DuenoFormData | null {
+    if (!dueno.usuario) return null;
     return {
-      firstName: dueno.nombre,
-      lastName: dueno.apellido,
+      firstName: dueno.usuario.names,
+      lastName: dueno.usuario.lastNames,
       dni: dueno.dni,
-      email: dueno.email,
-      phone: dueno.telefono,
-      address: dueno.direccion,
-      userId: dueno.usuario?.id ?? null,
+      email: dueno.usuario.email,
+      phone: dueno.phone ?? "",
+      address: dueno.address ?? "",
     };
   }
 
@@ -217,9 +233,11 @@ const DuenosPage = () => {
         <NotificationToast toast={toast} onClose={() => setToast(null)} />
 
         <PageHeader icon="bi-people-fill" title="Dueños de Mascotas" description="Gestiona los dueños y sus contactos de emergencia">
-          <button className="boton boton--primario" onClick={handleOpenCreateDuenoModal}>
-            <i className="bi bi-plus-circle-fill me-1"></i>Nuevo Dueño
-          </button>
+          {puedeGestionar && (
+            <button className="boton boton--primario" onClick={handleOpenCreateDuenoModal}>
+              <i className="bi bi-plus-circle-fill me-1"></i>Nuevo Dueño
+            </button>
+          )}
         </PageHeader>
 
         <p style={{ fontSize: 'var(--tamano-sm)', color: 'var(--color-texto-secundario)', marginBottom: 'var(--espaciado-md)' }}>
@@ -258,9 +276,9 @@ const DuenosPage = () => {
               </div>
             ) : (
               <DataTable
-                columns={["#", "Nombre Completo", "DNI", "Email", "Teléfono", "Estado", "Acciones"]}
+                columns={["#", "Nombre", "DNI", "Teléfono", "Dirección", ...(puedeGestionar ? ["Acciones"] : [])]}
                 emptyMessage="No hay registros de dueños disponibles."
-                colSpan={7}
+                colSpan={puedeGestionar ? 6 : 5}
               >
                 {duenos.map((dueno, index) => (
                   <tr
@@ -273,23 +291,20 @@ const DuenosPage = () => {
                     }}
                   >
                     <td><span className="numero-fila">{index + 1}</span></td>
-                    <td>{dueno.nombre} {dueno.apellido}</td>
+                    <td>{dueno.usuario ? `${dueno.usuario.names} ${dueno.usuario.lastNames}` : dueno.dni}</td>
                     <td>{dueno.dni}</td>
-                    <td>{dueno.email}</td>
-                    <td>{dueno.telefono || "—"}</td>
-                    <td>
-                      <span className={`etiqueta ${dueno.activo ? 'etiqueta--activo' : 'etiqueta--inactivo'}`}>
-                        {dueno.activo ? "Activo" : "Inactivo"}
-                      </span>
-                    </td>
-                    <td>
-                      <ActionButtons
-                        activo={dueno.activo}
-                        onEdit={() => handleOpenEditDuenoModal(dueno)}
-                        onToggle={() => handleToggleDueno(dueno.id)}
-                        onDelete={() => setConfirmDelete(dueno.id)}
-                      />
-                    </td>
+                    <td>{dueno.phone || "—"}</td>
+                    <td>{dueno.address || "—"}</td>
+                    {puedeGestionar && (
+                      <td>
+                        <ActionButtons
+                          activo={true}
+                          onEdit={() => handleOpenEditDuenoModal(dueno)}
+                          onToggle={() => handleToggleDueno(dueno.id)}
+                          onDelete={() => setConfirmDelete(dueno.id)}
+                        />
+                      </td>
+                    )}
                   </tr>
                 ))}
               </DataTable>
@@ -309,11 +324,11 @@ const DuenosPage = () => {
               </h5>
               <p className="tarjeta-encabezado-descripcion">
                 {selectedDueno
-                  ? `Mostrando registros asignados a: ${selectedDueno.nombre} ${selectedDueno.apellido}`
+                  ? `Mostrando registros asignados a: ${selectedDueno.dni}`
                   : "Haz clic sobre un dueño de la lista para cargar sus contactos."}
               </p>
             </div>
-            {selectedDueno && (
+            {selectedDueno && puedeGestionar && (
               <button className="boton boton--secundario boton--pequeno" onClick={() => setOpenContactoModal(true)}>
                 <i className="bi bi-telephone-plus-fill me-1"></i>Añadir Contacto
               </button>
@@ -357,25 +372,27 @@ const DuenosPage = () => {
                       background: 'var(--color-fondo)'
                     }}>
                       <div>
-                        <h6 style={{ margin: '0 0 var(--espaciado-xs)', fontWeight: 'var(--peso-negrita)' }}>{contacto.nombre}</h6>
+                        <h6 style={{ margin: '0 0 var(--espaciado-xs)', fontWeight: 'var(--peso-negrita)' }}>{contacto.name}</h6>
                         <p style={{ margin: 0, fontSize: 'var(--tamano-sm)', color: 'var(--color-texto-secundario)' }}>
                           <i className="bi bi-telephone-fill me-1"></i>
-                          {contacto.telefono}
+                          {contacto.phone}
                         </p>
-                        {contacto.relacion && (
+                        {contacto.relation && (
                           <span className="etiqueta etiqueta--secundario" style={{ marginTop: 'var(--espaciado-xs)', fontSize: '10px' }}>
-                            {contacto.relacion}
+                            {contacto.relation}
                           </span>
                         )}
                       </div>
-                      <button
-                        className="boton boton--peligro boton--icono"
-                        style={{ background: 'transparent', color: 'var(--color-peligro)' }}
-                        onClick={() => setConfirmDeleteContacto(contacto.id)}
-                        title="Eliminar contacto"
-                      >
-                        <i className="bi bi-trash-fill"></i>
-                      </button>
+                      {puedeGestionar && (
+                        <button
+                          className="boton boton--peligro boton--icono"
+                          style={{ background: 'transparent', color: 'var(--color-peligro)' }}
+                          onClick={() => setConfirmDeleteContacto(contacto.id)}
+                          title="Eliminar contacto"
+                        >
+                          <i className="bi bi-trash-fill"></i>
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -387,7 +404,7 @@ const DuenosPage = () => {
         <DuenoFormDialog
           isOpen={openDuenoModal}
           onClose={handleCloseDuenoModal}
-          initialData={selectedDueno && openDuenoModal ? mapDuenoToRequest(selectedDueno) : null}
+          initialData={selectedDueno && openDuenoModal ? mapDuenoToFormData(selectedDueno) : null}
           mode={selectedDueno && openDuenoModal ? "edit" : "create"}
           onSubmit={handleSaveDueno}
         />

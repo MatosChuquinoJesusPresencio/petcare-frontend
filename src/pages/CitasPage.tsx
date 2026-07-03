@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
+import { useAuth } from "../hooks/useAuth";
 import type { CitaResponse, MascotaResponse, ServicioResponse, VeterinarioResponse } from "../types";
 import {
   cancelarCita,
@@ -21,6 +22,8 @@ import type { ToastInfo } from "../components/common/NotificationToast";
 import PageHeader from "../components/common/PageHeader";
 
 const CitasPage = () => {
+  const { user } = useAuth();
+  const puedeGestionar = user?.role === 'ADMINISTRADOR' || user?.role === 'ASISTENTE';
   const [citas, setCitas] = useState<CitaResponse[]>([]);
   const [mascotas, setMascotas] = useState<MascotaResponse[]>([]);
   const [servicios, setServicios] = useState<ServicioResponse[]>([]);
@@ -98,9 +101,11 @@ const CitasPage = () => {
         <NotificationToast toast={toast} onClose={() => setToast(null)} />
 
         <PageHeader icon="bi-calendar-check" title="Gestión de Citas" description="Revisa y administra las citas programadas">
-          <button className="boton boton--primario" onClick={() => setShowFormModal(true)}>
-            <i className="bi bi-plus-circle-fill me-1"></i>Nueva Cita
-          </button>
+          {puedeGestionar && (
+            <button className="boton boton--primario" onClick={() => setShowFormModal(true)}>
+              <i className="bi bi-plus-circle-fill me-1"></i>Nueva Cita
+            </button>
+          )}
         </PageHeader>
 
         <div className="tarjeta animacion-entrada">
@@ -114,12 +119,16 @@ const CitasPage = () => {
             ) : (
               <CitaTable
                 citas={citas}
+                mascotaMap={new Map(mascotas.map((m) => [m.id, m]))}
+                veterinarioMap={new Map(veterinarios.map((v) => [v.id, v]))}
+                servicioMap={new Map(servicios.map((s) => [s.id, s]))}
                 onEstadoChange={handleEstadoChange}
                 onReprogramar={(cita) => {
                   setCitaReprogramar(cita);
                   setShowReprogramarModal(true);
                 }}
                 onCancelar={(id) => setCancelarId(id)}
+                showActions={puedeGestionar}
               />
             )}
           </div>
