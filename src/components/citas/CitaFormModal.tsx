@@ -36,13 +36,24 @@ export default function CitaFormModal({ show, onClose, onSuccess, mascotas, serv
     if (!fecha) {
       errors.fecha = "La fecha es obligatoria.";
     } else {
+      const [year, month, day] = fecha.split("-").map(Number);
+      const fechaLocal = new Date(year, month - 1, day);
+      fechaLocal.setHours(0, 0, 0, 0);
       const hoy = new Date();
       hoy.setHours(0, 0, 0, 0);
-      if (new Date(fecha) < hoy) {
+      if (fechaLocal < hoy) {
         errors.fecha = "La fecha no puede ser pasada.";
+      } else if (fechaLocal.getTime() === hoy.getTime() && horaSeleccionada) {
+        const [h, m] = horaSeleccionada.split(":").map(Number);
+        const ahora = new Date();
+        const minsActual = ahora.getHours() * 60 + ahora.getMinutes();
+        const minsSel = h * 60 + m;
+        if (minsSel <= minsActual) {
+          errors.horaSeleccionada = "La hora debe ser mayor a la actual.";
+        }
       }
     }
-    if (!horaSeleccionada) errors.horaSeleccionada = "Selecciona un horario disponible.";
+    if (!horaSeleccionada && !errors.horaSeleccionada) errors.horaSeleccionada = "Selecciona un horario disponible.";
     return errors;
   };
 
@@ -104,7 +115,7 @@ export default function CitaFormModal({ show, onClose, onSuccess, mascotas, serv
                 <select className={`campo-entrada ${fieldErrors.petId ? 'campo-entrada--error' : ''}`} value={petId} onChange={(e) => { setPetId(e.target.value); clearFieldError('petId'); }} required>
                   <option value="">Seleccione mascota...</option>
                   {mascotas.map((m) => (
-                    <option key={m.id} value={m.id}>{m.nombre}</option>
+                    <option key={m.id} value={m.id}>{m.name}</option>
                   ))}
                 </select>
                 {fieldErrors.petId && <div className="campo-error">{fieldErrors.petId}</div>}
@@ -114,7 +125,7 @@ export default function CitaFormModal({ show, onClose, onSuccess, mascotas, serv
                 <select className={`campo-entrada ${fieldErrors.veterinarianId ? 'campo-entrada--error' : ''}`} value={veterinarianId} onChange={(e) => { setVeterinarianId(e.target.value); clearFieldError('veterinarianId'); }} required>
                   <option value="">Seleccione veterinario...</option>
                   {veterinarios.map((v) => (
-                    <option key={v.id} value={v.id}>{v.nombre} {v.apellido}</option>
+                    <option key={v.id} value={v.id}>{v.names} {v.lastNames}</option>
                   ))}
                 </select>
                 {fieldErrors.veterinarianId && <div className="campo-error">{fieldErrors.veterinarianId}</div>}
@@ -124,7 +135,7 @@ export default function CitaFormModal({ show, onClose, onSuccess, mascotas, serv
                 <select className={`campo-entrada ${fieldErrors.serviceId ? 'campo-entrada--error' : ''}`} value={serviceId} onChange={(e) => { setServiceId(e.target.value); clearFieldError('serviceId'); }} required>
                   <option value="">Seleccione servicio...</option>
                   {servicios.map((s) => (
-                    <option key={s.id} value={s.id}>{s.nombre}</option>
+                    <option key={s.id} value={s.id}>{s.name}</option>
                   ))}
                 </select>
                 {fieldErrors.serviceId && <div className="campo-error">{fieldErrors.serviceId}</div>}

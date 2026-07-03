@@ -21,7 +21,7 @@ export default function CitaReprogramarModal({ show, onClose, onSuccess, cita }:
 
   useEffect(() => {
     if (cita) {
-      const t = setTimeout(() => setFecha(cita.fechaHora.substring(0, 10)));
+      const t = setTimeout(() => setFecha(cita.dateTime.substring(0, 10)));
       return () => clearTimeout(t);
     }
   }, [cita]);
@@ -96,9 +96,9 @@ export default function CitaReprogramarModal({ show, onClose, onSuccess, cita }:
               </div>
               <div className="campo-grupo">
                 <label className="campo-etiqueta">Horario disponible *</label>
-                <HorariosDisponibles
-                  vetId={cita.veterinario.id}
-                  serviceId={cita.servicio.id}
+                  <HorariosDisponibles
+                  vetId={cita.veterinarianId}
+                  serviceId={cita.serviceId}
                   fecha={fecha}
                   value={horaSeleccionada}
                   onChange={(v) => { setHoraSeleccionada(v); setFieldErrors((p) => { const n = { ...p }; delete n.horaSeleccionada; return n; }); }}

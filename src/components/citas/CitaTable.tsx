@@ -1,14 +1,18 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { ESTADOS_CITA, ESTADO_LABEL } from "../../constants";
-import type { CitaResponse } from "../../types";
+import type { CitaResponse, MascotaResponse, ServicioResponse, VeterinarioResponse } from "../../types";
 import DataTable from "../common/DataTable";
 
 interface Props {
   citas: CitaResponse[];
+  mascotaMap: Map<number, MascotaResponse>;
+  veterinarioMap: Map<number, VeterinarioResponse>;
+  servicioMap: Map<number, ServicioResponse>;
   onEstadoChange: (id: number, nuevoEstado: string) => void;
   onReprogramar: (cita: CitaResponse) => void;
   onCancelar: (id: number) => void;
+  showActions?: boolean;
 }
 
 interface DropdownAbierto {
@@ -29,7 +33,7 @@ function mapearBadge(estado: string): string {
   return mapa[estado] || 'bg-secondary';
 }
 
-export default function CitaTable({ citas, onEstadoChange, onReprogramar, onCancelar }: Props) {
+export default function CitaTable({ citas, mascotaMap, veterinarioMap, servicioMap, onEstadoChange, onReprogramar, onCancelar, showActions = true }: Props) {
   const [dropdown, setDropdown] = useState<DropdownAbierto | null>(null);
   const menuRef = useRef<HTMLUListElement>(null);
 
@@ -62,42 +66,49 @@ export default function CitaTable({ citas, onEstadoChange, onReprogramar, onCanc
   return (
     <>
       <DataTable
-        columns={["#", "Fecha y Hora", "Mascota", "Veterinario", "Servicio", "Estado", "Acciones"]}
+        columns={["#", "Fecha y Hora", "Mascota", "Veterinario", "Servicio", "Estado", ...(showActions ? ["Acciones"] : [])]}
         emptyMessage="No hay citas registradas."
-        colSpan={7}
+        colSpan={showActions ? 7 : 6}
       >
-        {citas.map((cita, index) => (
-          <tr key={cita.id}>
-            <td><span className="numero-fila">{index + 1}</span></td>
-            <td>{new Date(cita.fechaHora).toLocaleString()}</td>
-            <td>{cita.mascota?.nombre}</td>
-            <td>{cita.veterinario?.nombre} {cita.veterinario?.apellido}</td>
-            <td>{cita.servicio?.nombre}</td>
-            <td>
-              <span className={`etiqueta ${mapearBadge(cita.estado)}`}>
-                {ESTADO_LABEL[cita.estado as keyof typeof ESTADO_LABEL] || cita.estado}
-              </span>
-            </td>
-            <td>
-              <div className="acciones-tabla">
-                <button
-                  className="boton boton--advertencia boton--icono"
-                  type="button"
-                  onClick={(e) => abrirDropdown(e, cita.id)}
-                  title="Cambiar estado"
-                >
-                  <i className="bi bi-gear-fill"></i>
-                </button>
-                <button className="boton boton--informacion boton--icono" onClick={() => onReprogramar(cita)} title="Reprogramar">
-                  <i className="bi bi-clock-history"></i>
-                </button>
-                <button className="boton boton--peligro boton--icono" onClick={() => onCancelar(cita.id)} title="Cancelar">
-                  <i className="bi bi-x-circle"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
-        ))}
+        {citas.map((cita, index) => {
+          const mascota = mascotaMap.get(cita.petId);
+          const veterinario = veterinarioMap.get(cita.veterinarianId);
+          const servicio = servicioMap.get(cita.serviceId);
+          return (
+            <tr key={cita.id}>
+              <td><span className="numero-fila">{index + 1}</span></td>
+              <td>{new Date(cita.dateTime).toLocaleString()}</td>
+              <td>{mascota?.name ?? `ID: ${cita.petId}`}</td>
+              <td>{veterinario ? `${veterinario.names} ${veterinario.lastNames}` : `ID: ${cita.veterinarianId}`}</td>
+              <td>{servicio?.name ?? `ID: ${cita.serviceId}`}</td>
+              <td>
+                <span className={`etiqueta ${mapearBadge(cita.status)}`}>
+                  {ESTADO_LABEL[cita.status as keyof typeof ESTADO_LABEL] || cita.status}
+                </span>
+              </td>
+              {showActions && (
+                <td>
+                  <div className="acciones-tabla">
+                    <button
+                      className="boton boton--advertencia boton--icono"
+                      type="button"
+                      onClick={(e) => abrirDropdown(e, cita.id)}
+                      title="Cambiar estado"
+                    >
+                      <i className="bi bi-gear-fill"></i>
+                    </button>
+                    <button className="boton boton--informacion boton--icono" onClick={() => onReprogramar(cita)} title="Reprogramar">
+                      <i className="bi bi-clock-history"></i>
+                    </button>
+                    <button className="boton boton--peligro boton--icono" onClick={() => onCancelar(cita.id)} title="Cancelar">
+                      <i className="bi bi-x-circle"></i>
+                    </button>
+                  </div>
+                </td>
+              )}
+            </tr>
+          );
+        })}
       </DataTable>
 
       {dropdown &&
@@ -107,7 +118,7 @@ export default function CitaTable({ citas, onEstadoChange, onReprogramar, onCanc
             className="dropdown-menu dropdown-menu--custom"
             style={{ position: "fixed", top: dropdown.top, left: dropdown.left }}
           >
-            {ESTADOS_CITA.filter((est) => est !== citas.find((c) => c.id === dropdown.citaId)?.estado).map((est) => (
+            {ESTADOS_CITA.filter((est) => est !== citas.find((c) => c.id === dropdown.citaId)?.status).map((est) => (
               <li key={est}>
                 <button className="dropdown-item" onClick={() => seleccionarEstado(dropdown.citaId, est)}>
                   {ESTADO_LABEL[est]}

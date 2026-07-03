@@ -12,6 +12,7 @@ interface Props {
   onDelete: (id: number) => void;
   onToggle: (id: number) => void;
   onVincular: (id: number) => void;
+  showActions?: boolean;
 }
 
 function DueñoInfo({ mascotaId }: { mascotaId: number }) {
@@ -32,7 +33,8 @@ function DueñoInfo({ mascotaId }: { mascotaId: number }) {
 
   if (loading) return <span style={{ color: 'var(--color-texto-claro)', fontSize: 'var(--tamano-sm)' }}>Cargando...</span>;
   if (!dueno) return <span style={{ color: 'var(--color-texto-claro)', fontStyle: 'italic' }}>Sin dueño</span>;
-  return <span>{dueno.nombre} {dueno.apellido}</span>;
+  const nombre = dueno.usuario ? `${dueno.usuario.names} ${dueno.usuario.lastNames}` : dueno.dni;
+  return <span>{nombre}</span>;
 }
 
 export default function MascotaTable({
@@ -41,35 +43,39 @@ export default function MascotaTable({
   onDelete,
   onToggle,
   onVincular,
+  showActions = true,
 }: Props) {
+  const cols = ["#", "Nombre", "Especie", "Raza", "Sexo", "Dueño", "Estado", ...(showActions ? ["Acciones"] : [])];
   return (
     <DataTable
-      columns={["#", "Nombre", "Especie", "Raza", "Sexo", "Dueño", "Estado", "Acciones"]}
+      columns={cols}
       emptyMessage="No hay mascotas registradas."
-      colSpan={8}
+      colSpan={cols.length}
     >
       {mascotas.map((mascota, index) => (
         <tr key={mascota.id}>
           <td><span className="numero-fila">{index + 1}</span></td>
-          <td>{mascota.nombre}</td>
+          <td>{mascota.name}</td>
           <td>{mascota.especie}</td>
-          <td>{mascota.raza}</td>
-          <td>{mascota.sexo}</td>
+          <td>{mascota.breed}</td>
+          <td>{mascota.gender}</td>
           <td><DueñoInfo mascotaId={mascota.id} /></td>
           <td>
-            <span className={`etiqueta ${mascota.activo ? 'etiqueta--activo' : 'etiqueta--inactivo'}`}>
-              {mascota.activo ? 'Activo' : 'Inactivo'}
+            <span className={`etiqueta ${mascota.active ? 'etiqueta--activo' : 'etiqueta--inactivo'}`}>
+              {mascota.active ? 'Activo' : 'Inactivo'}
             </span>
           </td>
-          <td>
-            <ActionButtons
-              activo={mascota.activo}
-              onEdit={() => onEdit(mascota.id)}
-              onToggle={() => onToggle(mascota.id)}
-              onDelete={() => onDelete(mascota.id)}
-              onVincular={() => onVincular(mascota.id)}
-            />
-          </td>
+          {showActions && (
+            <td>
+              <ActionButtons
+                activo={mascota.active}
+                onEdit={() => onEdit(mascota.id)}
+                onToggle={() => onToggle(mascota.id)}
+                onDelete={() => onDelete(mascota.id)}
+                onVincular={() => onVincular(mascota.id)}
+              />
+            </td>
+          )}
         </tr>
       ))}
     </DataTable>

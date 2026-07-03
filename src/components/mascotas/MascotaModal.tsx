@@ -149,16 +149,16 @@ export default function MascotaModal({
       const mascota = await obtenerMascotaPorId(mascotaId!);
       setForm((prev) => ({
         ...prev,
-        nombre: mascota.nombre,
+        nombre: mascota.name,
         especie: mascota.especie,
-        raza: mascota.raza,
-        sexo: mascota.sexo,
-        fechaNacimiento: mascota.fechaNacimiento,
+        raza: mascota.breed,
+        sexo: mascota.gender,
+        fechaNacimiento: mascota.dateOfBirth,
         microchip: mascota.microchip || "",
-        condicionReproductiva: mascota.condicionReproductiva || "",
-        alergias: mascota.alergias || "",
-        enfermedadesCronicas: mascota.enfermedadesCronicas || "",
-        alertasMedicas: mascota.alertasMedicas || "",
+        condicionReproductiva: mascota.reproductiveCondition || "",
+        alergias: mascota.allergies || "",
+        enfermedadesCronicas: mascota.chronicDiseases || "",
+        alertasMedicas: mascota.medicalAlerts || "",
       }));
     } catch (error) {
       console.error(error);
@@ -218,8 +218,7 @@ export default function MascotaModal({
         allergies: form.alergias || undefined,
         chronicDiseases: form.enfermedadesCronicas || undefined,
         medicalAlerts: form.alertasMedicas || undefined,
-        ownerId: isCreating ? form.ownerId : 0,
-        ownerRelation: isCreating ? form.ownerRelation : "",
+        ...(isCreating ? { ownerId: form.ownerId, ownerRelation: form.ownerRelation } : {}),
       };
 
       if (mascotaId) {
@@ -316,7 +315,7 @@ export default function MascotaModal({
                       </option>
                       {duenos.map((dueno) => (
                         <option key={dueno.id} value={dueno.id}>
-                          {dueno.nombre} {dueno.apellido}
+                          {dueno.usuario ? `${dueno.usuario.names} ${dueno.usuario.lastNames}` : dueno.dni}
                         </option>
                       ))}
                     </select>

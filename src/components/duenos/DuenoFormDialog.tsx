@@ -2,14 +2,22 @@ import { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 
 import BaseFormDialog from "../common/BaseFormDialog";
-import type { DuenoRequest } from "../../types";
+
+export interface DuenoFormData {
+  firstName: string;
+  lastName: string;
+  dni: string;
+  email: string;
+  phone: string;
+  address: string;
+}
 
 type DuenoFormDialogProps = {
   isOpen: boolean;
   onClose: () => void;
-  initialData?: DuenoRequest | null;
+  initialData?: DuenoFormData | null;
   mode: "create" | "edit";
-  onSubmit: (data: DuenoRequest) => Promise<void>;
+  onSubmit: (data: DuenoFormData) => Promise<void>;
 };
 
 type DuenoFormState = {
@@ -30,7 +38,7 @@ const initialFormState: DuenoFormState = {
   address: "",
 };
 
-function mapRequestToFormState(data: DuenoRequest): DuenoFormState {
+function mapDataToFormState(data: DuenoFormData): DuenoFormState {
   return {
     firstName: data.firstName,
     lastName: data.lastName,
@@ -101,7 +109,7 @@ const DuenoFormDialog = ({
     const timer = setTimeout(() => {
       setFormData(
         initialData && isOpen
-          ? mapRequestToFormState(initialData)
+          ? mapDataToFormState(initialData)
           : initialFormState
       );
       setSubmitError("");
@@ -148,8 +156,8 @@ const DuenoFormDialog = ({
         lastName: formData.lastName.trim(),
         dni: formData.dni.trim(),
         email: formData.email.trim(),
-        phone: formData.phone.trim() || undefined,
-        address: formData.address.trim() || undefined,
+        phone: formData.phone.trim() || "",
+        address: formData.address.trim() || "",
       });
 
       onClose();

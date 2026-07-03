@@ -32,7 +32,7 @@ export default function HorariosDisponibles({
       setLoading(true);
       try {
         const data = await obtenerDisponibilidad(vetId, fecha, serviceId);
-        setSlots(data.horariosDisponibles);
+        setSlots(data.availableSlots);
       } catch {
         setSlots([]);
       } finally {

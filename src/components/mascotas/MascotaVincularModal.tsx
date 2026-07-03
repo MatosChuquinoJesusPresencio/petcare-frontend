@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import type { Dueno } from "../../types";
-import { getDuenos, vincularDueno, cambiarDuenoPrincipal } from "../../services";
+import { getDuenos, cambiarDuenoPrincipal } from "../../services";
 import NotificationToast from "../common/NotificationToast";
 import type { ToastInfo } from "../common/NotificationToast";
 
@@ -21,7 +21,6 @@ export default function MascotaVincularModal({
   const [duenos, setDuenos] = useState<Dueno[]>([]);
   const [duenoId, setDuenoId] = useState(0);
   const [relacion, setRelacion] = useState("Tutor");
-  const [esPrincipal, setEsPrincipal] = useState(false);
   const [toast, setToast] = useState<ToastInfo | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
@@ -70,11 +69,7 @@ export default function MascotaVincularModal({
     setFieldErrors({});
 
     try {
-      if (esPrincipal) {
-        await cambiarDuenoPrincipal(mascotaId, duenoId, relacion);
-      } else {
-        await vincularDueno(mascotaId, duenoId, relacion);
-      }
+      await cambiarDuenoPrincipal(mascotaId, { ownerId: duenoId, relation: relacion, reason: "Cambio manual desde el sistema" });
       await onSuccess();
       onClose();
     } catch (error) {
@@ -114,7 +109,7 @@ export default function MascotaVincularModal({
                   <option value="">Seleccione dueño</option>
                   {duenos.map((dueno) => (
                     <option key={dueno.id} value={dueno.id}>
-                      {dueno.nombre} {dueno.apellido}
+                      {dueno.usuario ? `${dueno.usuario.names} ${dueno.usuario.lastNames}` : `DNI: ${dueno.dni}`}
                     </option>
                   ))}
                 </select>
@@ -133,21 +128,10 @@ export default function MascotaVincularModal({
                 {fieldErrors.relacion && <div className="campo-error">{fieldErrors.relacion}</div>}
               </div>
 
-              <div className="campo-grupo">
-                <label className="campo-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={esPrincipal}
-                    onChange={(e) => setEsPrincipal(e.target.checked)}
-                  />
-                  Establecer como dueño principal
-                </label>
-              </div>
-
               <div className="dialogo-pie" style={{ padding: 'var(--espaciado-md) 0 0', borderTop: 'none' }}>
                 <button type="button" className="boton boton--neutro" onClick={onClose}>Cancelar</button>
                 <button type="submit" className="boton boton--primario">
-                  {esPrincipal ? "Cambiar dueño principal" : "Vincular"}
+                  Cambiar dueño principal
                 </button>
               </div>
             </form>
