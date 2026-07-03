@@ -14,6 +14,7 @@ import type { ToastInfo } from "../components/common/NotificationToast";
 import MascotaTable from "../components/mascotas/MascotaTable";
 import MascotaModal from "../components/mascotas/MascotaModal";
 import MascotaVincularModal from "../components/mascotas/MascotaVincularModal";
+import TransferenciaHistorialModal from "../components/mascotas/TransferenciaHistorialModal";
 import PageHeader from "../components/common/PageHeader";
 
 const MascotasPage = () => {
@@ -26,6 +27,8 @@ const MascotasPage = () => {
   const [mascotaEditarId, setMascotaEditarId] = useState<number | null>(null);
   const [showVincularModal, setShowVincularModal] = useState(false);
   const [mascotaVincularId, setMascotaVincularId] = useState<number | null>(null);
+  const [showHistorialModal, setShowHistorialModal] = useState(false);
+  const [mascotaHistorialId, setMascotaHistorialId] = useState<number | null>(null);
   const [confirmDeleteMascota, setConfirmDeleteMascota] = useState<number | null>(null);
   const [toast, setToast] = useState<ToastInfo | null>(null);
 
@@ -101,6 +104,11 @@ const MascotasPage = () => {
     setShowVincularModal(true);
   };
 
+  const handleHistorial = (id: number) => {
+    setMascotaHistorialId(id);
+    setShowHistorialModal(true);
+  };
+
   return (
     <div className="contenedor-pagina">
       <div className="container">
@@ -161,6 +169,7 @@ const MascotasPage = () => {
                 onDelete={(id) => setConfirmDeleteMascota(id)}
                 onToggle={handleToggleMascota}
                 onVincular={handleVincular}
+                onHistorial={handleHistorial}
                 showActions={puedeGestionar}
               />
             )}
@@ -188,6 +197,12 @@ const MascotasPage = () => {
             setToast({ message: "Dueño vinculado correctamente.", type: "success" });
             await cargarMascotas();
           }}
+        />
+
+        <TransferenciaHistorialModal
+          show={showHistorialModal}
+          mascotaId={mascotaHistorialId}
+          onClose={() => setShowHistorialModal(false)}
         />
 
         <ConfirmDialog

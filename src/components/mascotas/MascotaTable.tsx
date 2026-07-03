@@ -12,6 +12,7 @@ interface Props {
   onDelete: (id: number) => void;
   onToggle: (id: number) => void;
   onVincular: (id: number) => void;
+  onHistorial?: (id: number) => void;
   showActions?: boolean;
 }
 
@@ -43,6 +44,7 @@ export default function MascotaTable({
   onDelete,
   onToggle,
   onVincular,
+  onHistorial,
   showActions = true,
 }: Props) {
   const cols = ["#", "Nombre", "Especie", "Raza", "Sexo", "Dueño", "Estado", ...(showActions ? ["Acciones"] : [])];
@@ -67,13 +69,20 @@ export default function MascotaTable({
           </td>
           {showActions && (
             <td>
-              <ActionButtons
-                activo={mascota.active}
-                onEdit={() => onEdit(mascota.id)}
-                onToggle={() => onToggle(mascota.id)}
-                onDelete={() => onDelete(mascota.id)}
-                onVincular={() => onVincular(mascota.id)}
-              />
+              <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'center' }}>
+                <ActionButtons
+                  activo={mascota.active}
+                  onEdit={() => onEdit(mascota.id)}
+                  onToggle={() => onToggle(mascota.id)}
+                  onDelete={() => onDelete(mascota.id)}
+                  onVincular={() => onVincular(mascota.id)}
+                />
+                {onHistorial && (
+                  <button className="boton boton--informacion boton--icono" title="Ver historial de transferencias" onClick={(e) => { e.stopPropagation(); onHistorial(mascota.id); }}>
+                    <i className="bi bi-clock-history"></i>
+                  </button>
+                )}
+              </div>
             </td>
           )}
         </tr>
