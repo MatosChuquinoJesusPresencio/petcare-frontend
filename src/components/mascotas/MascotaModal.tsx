@@ -207,7 +207,7 @@ export default function MascotaModal({
     setFieldErrors({});
 
     try {
-      const data: MascotaRequest = {
+      const baseData = {
         name: form.nombre,
         species: form.especie,
         breed: form.raza,
@@ -218,13 +218,17 @@ export default function MascotaModal({
         allergies: form.alergias || undefined,
         chronicDiseases: form.enfermedadesCronicas || undefined,
         medicalAlerts: form.alertasMedicas || undefined,
-        ...(isCreating ? { ownerId: form.ownerId, ownerRelation: form.ownerRelation } : {}),
       };
 
       if (mascotaId) {
-        await actualizarMascota(mascotaId, data);
+        await actualizarMascota(mascotaId, baseData as MascotaRequest);
       } else {
-        await crearMascota(data);
+        const dataNuevaMascota: MascotaRequest = {
+          ...baseData,
+          ownerId: form.ownerId,
+          ownerRelation: form.ownerRelation,
+        };
+        await crearMascota(dataNuevaMascota);
       }
 
       await onSuccess();
