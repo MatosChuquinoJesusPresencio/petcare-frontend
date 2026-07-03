@@ -8,7 +8,7 @@ import NotificationToast from "../components/common/NotificationToast";
 import type { ToastInfo } from "../components/common/NotificationToast";
 
 import { NIVELES_URGENCIA, URGENCIA_LABEL } from "../constants";
-import type { CitaResponse, SalaEsperaResponse, TriajeResponse } from "../types";
+import type { CitaResponse, TriajeResponse } from "../types";
 import { crearTriaje, obtenerCitas, obtenerSalaEspera, obtenerTriajes } from "../services";
 
 function badgeUrgencia(nivel: string): string {
@@ -28,10 +28,11 @@ const TriajePage = () => {
   const [openModal, setOpenModal] = useState(false);
   const [toast, setToast] = useState<ToastInfo | null>(null);
   const [citas, setCitas] = useState<CitaResponse[]>([]);
+  const [submitError, setSubmitError] = useState("");
 
   const [appointmentId, setAppointmentId] = useState("");
   const [reasonForVisit, setReasonForVisit] = useState("");
-  const [urgencyLevel, setUrgencyLevel] = useState(NIVELES_URGENCIA[0]);
+  const [urgencyLevel, setUrgencyLevel] = useState<string>(NIVELES_URGENCIA[0]);
   const [visibleSigns, setVisibleSigns] = useState("");
   const [observations, setObservations] = useState("");
   const [weight, setWeight] = useState("");
@@ -157,6 +158,7 @@ const TriajePage = () => {
           submitLabel="Guardar"
           submitBusyLabel="Guardando..."
           isSubmitting={false}
+          submitError={submitError}
           modalId="triajeModal"
         >
           <div className="row g-3">
