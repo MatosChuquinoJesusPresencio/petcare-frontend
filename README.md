@@ -25,13 +25,19 @@ Aplicación web para la gestión de una clínica veterinaria. Permite administra
 
 ## Características
 
-- Autenticación con refresh de tokens y roles (ADMINISTRADOR, VETERINARIO, ASISTENTE, DUENO)
+- Autenticación con refresh de tokens y control de acceso por rol (ADMINISTRADOR, VETERINARIO, ASISTENTE, DUENO)
 - Dashboard con resumen del negocio
 - CRUD completo de servicios
 - Gestión de citas con reprogramación y cancelación
-- Administración de mascotas con vinculación a dueños
+- Administración de mascotas con vinculación a dueños y cambio de dueño principal
 - Gestión de dueños y contactos de emergencia
-- Diseño responsive con sidebar colapsable
+- Sala de espera con registro de llegada y cambio de estado
+- Triaje clínico con signos vitales y nivel de urgencia
+- Atención clínica con diagnóstico, tratamiento y seguimiento
+- Administración de veterinarios con gestión de horarios y estado activo/inactivo
+- Bloqueos de disponibilidad de veterinarios
+- Historial de transferencias de mascotas entre dueños
+- Diseño responsive con sidebar colapsable y scroll interno
 - Sistema de notificaciones toast
 
 ## Requisitos
@@ -68,11 +74,11 @@ src/
 ├── assets/         # Recursos estáticos (logos, imágenes)
 ├── components/     # Componentes React
 │   ├── auth/       #   Protección de rutas
-│   ├── citas/      #   Módulo de citas
-│   ├── common/     #   Componentes reutilizables
+│   ├── citas/      #   Módulo de citas (formulario, tabla, reprogramar)
+│   ├── common/     #   Componentes reutilizables (DataTable, modales, etc.)
 │   ├── duenos/     #   Módulo de dueños
-│   ├── layout/     #   Header, Footer
-│   └── mascotas/   #   Módulo de mascotas
+│   ├── layout/     #   Header, sidebar, Footer
+│   └── mascotas/   #   Módulo de mascotas (tabla, modal, vincular)
 ├── constants/      # Constantes del dominio
 ├── contexts/       # Contextos de React
 ├── css/            # Estilos
@@ -81,6 +87,16 @@ src/
 ├── hooks/          # Custom hooks
 ├── layouts/        # Layout principal
 ├── pages/          # Páginas de la aplicación
+│   ├── AtencionPage        # Atención clínica
+│   ├── CitasPage           # Gestión de citas
+│   ├── DashboardPage       # Panel principal
+│   ├── DuenosPage          # Dueños
+│   ├── LoginPage           # Inicio de sesión
+│   ├── MascotasPage        # Mascotas
+│   ├── SalaEsperaPage      # Sala de espera
+│   ├── ServiciosPage       # Servicios
+│   ├── TriajePage          # Triaje clínico
+│   └── VeterinariosPage    # Administración de veterinarios
 ├── providers/      # Providers de React
 ├── routers/        # Configuración de rutas
 ├── services/       # Servicios de API
