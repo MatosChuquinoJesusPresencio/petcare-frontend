@@ -7,7 +7,7 @@ interface ApiErrorResponse {
 }
 
 export const getErrorMessage = (error: unknown): string => {
-  if (error instanceof AxiosError && error.response) {
+  if (error instanceof AxiosError && error.response?.data && typeof error.response.data === 'object') {
     const data = error.response.data as ApiErrorResponse
     const { status, mensaje } = data
 

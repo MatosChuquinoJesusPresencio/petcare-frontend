@@ -89,7 +89,7 @@ export default function MascotaVincularModal({
           <div className="dialogo-encabezado">
             <h5 className="dialogo-titulo">
               <i className="bi bi-person-plus me-1"></i>
-              Vincular Dueño
+              Cambiar Dueño Principal
             </h5>
             <button type="button" className="dialogo-cerrar" onClick={onClose}>
               <i className="bi bi-x-lg"></i>

@@ -14,16 +14,12 @@ export interface RegisterRequest {
 
 export interface AuthResponse {
   id: number
-  token: string | null
-  refreshToken: string | null
   username: string
   role: string
 }
 
 export interface TokenRefreshResponse {
   accessToken: string
-  refreshToken: string
-  tokenType: string
 }
 
 export interface ApiError {

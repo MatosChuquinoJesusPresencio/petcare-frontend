@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import Logo from '../components/common/Logo';
+import { getErrorMessage } from '../utils/errorHandler';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -10,7 +11,6 @@ const LoginPage = () => {
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
 
   if (isAuthenticated) {
     return <Navigate to="/" replace />;
@@ -24,9 +24,8 @@ const LoginPage = () => {
 
     try {
       await login({ email: cleanEmail, password });
-      navigate('/');
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Error desconocido');
+      setErrorMsg(getErrorMessage(err));
       setPassword('');
     } finally {
       setIsSubmitting(false);

@@ -184,7 +184,7 @@ const ServiciosPage = () => {
                 colSpan={puedeGestionar ? 7 : 6}
               >
                 {servicios.map((servicio, index) => (
-                  <tr key={servicio.id || index}>
+                  <tr key={servicio.id}>
                     <td><span className="numero-fila">{index + 1}</span></td>
                     <td>{servicio.name}</td>
                     <td>{servicio.description}</td>

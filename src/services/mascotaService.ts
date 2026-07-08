@@ -37,7 +37,7 @@ export async function toggleMascota(id: number): Promise<MascotaResponse> {
 }
 
 export async function vincularDueno(mascotaId: number, duenoId: number, relacion: string): Promise<void> {
-  await apiClient.post(`/api/mascotas/${mascotaId}/vincular-dueno/${duenoId}?relacion=${relacion}`);
+  await apiClient.post(`/api/mascotas/${mascotaId}/vincular-dueno/${duenoId}`, null, { params: { relacion } });
 }
 
 export async function cambiarDuenoPrincipal(mascotaId: number, data: CambioDuenoPrincipalRequest): Promise<void> {

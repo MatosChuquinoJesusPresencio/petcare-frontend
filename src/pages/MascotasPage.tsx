@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
 import { useAuth } from "../hooks/useAuth";
-import type { MascotaResponse } from "../types";
+import type { Dueno, MascotaResponse } from "../types";
 
-import { eliminarMascota, obtenerMascotas, toggleMascota } from "../services";
+import { eliminarMascota, obtenerDuenoPrincipal, obtenerMascotas, toggleMascota } from "../services";
 
 import { SEXOS_MASCOTA, SEXO_LABEL } from "../constants";
 import ConfirmDialog from "../components/common/ConfirmDialog";
@@ -21,6 +21,7 @@ const MascotasPage = () => {
   const { user } = useAuth();
   const puedeGestionar = user?.role === 'ADMINISTRADOR' || user?.role === 'ASISTENTE';
   const [mascotas, setMascotas] = useState<MascotaResponse[]>([]);
+  const [duenoMap, setDuenoMap] = useState<Record<number, Dueno | null>>({});
   const [loading, setLoading] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
@@ -50,6 +51,16 @@ const MascotasPage = () => {
       else if (filtroActivo === "inactivos") params.activo = false;
       const data = await obtenerMascotas(params);
       setMascotas(data);
+      const map: Record<number, Dueno | null> = {};
+      await Promise.all(data.map(async (m) => {
+        try {
+          const d = await obtenerDuenoPrincipal(m.id);
+          map[m.id] = d;
+        } catch {
+          map[m.id] = null;
+        }
+      }));
+      setDuenoMap(map);
     } catch (error) {
       console.error(error);
       setToast({ message: "No se pudieron cargar las mascotas.", type: "error" });
@@ -165,6 +176,7 @@ const MascotasPage = () => {
             ) : (
               <MascotaTable
                 mascotas={mascotas}
+                duenoMap={duenoMap}
                 onEdit={handleEditar}
                 onDelete={(id) => setConfirmDeleteMascota(id)}
                 onToggle={handleToggleMascota}

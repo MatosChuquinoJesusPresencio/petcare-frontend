@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { obtenerDisponibilidad } from "../../services";
 
@@ -19,16 +19,20 @@ export default function HorariosDisponibles({
 }: HorariosDisponiblesProps) {
   const [slots, setSlots] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const onChangeRef = useRef(onChange);
 
   useEffect(() => {
-    const t0 = setTimeout(() => onChange(""));
-    const t1 = setTimeout(() => setSlots([]));
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
+  useEffect(() => {
+    const t0 = setTimeout(() => onChangeRef.current(""));
 
     if (!vetId || !fecha || !serviceId) {
-      return () => { clearTimeout(t0); clearTimeout(t1); };
+      return () => { clearTimeout(t0); };
     }
 
-    const t2 = setTimeout(async () => {
+    const t1 = setTimeout(async () => {
       setLoading(true);
       try {
         const data = await obtenerDisponibilidad(vetId, fecha, serviceId);
@@ -40,8 +44,7 @@ export default function HorariosDisponibles({
       }
     }, 300);
 
-    return () => { clearTimeout(t0); clearTimeout(t1); clearTimeout(t2); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => { clearTimeout(t0); clearTimeout(t1); };
   }, [vetId, fecha, serviceId]);
 
   if (!vetId || !fecha || !serviceId) {

@@ -41,7 +41,7 @@ export default function BaseFormDialog({
             </button>
           </div>
           <div className="dialogo-cuerpo">
-            <form onSubmit={onSubmit}>
+            <form onSubmit={onSubmit} noValidate>
               {children}
 
               {submitError && (

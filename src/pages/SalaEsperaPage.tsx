@@ -66,6 +66,7 @@ const SalaEsperaPage = () => {
 
   const handleRegistrarLlegada = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!nuevoAppointmentId) return;
     try {
       await registrarLlegada({ appointmentId: Number(nuevoAppointmentId), observations: nuevoObservations || undefined });
       setShowRegistrar(false);

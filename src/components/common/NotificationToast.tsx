@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export interface ToastInfo {
   message: string;
@@ -16,11 +16,17 @@ export default function NotificationToast({
   onClose,
   duration = 5000,
 }: NotificationToastProps) {
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
   useEffect(() => {
     if (!toast) return;
-    const t = setTimeout(onClose, duration);
+    const t = setTimeout(() => onCloseRef.current(), duration);
     return () => clearTimeout(t);
-  }, [toast, duration, onClose]);
+  }, [toast, duration]);
 
   if (!toast) return null;
 

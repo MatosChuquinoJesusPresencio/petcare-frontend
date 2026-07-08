@@ -27,13 +27,13 @@
 .notificacion--exito {
   background: var(--color-exito) !important;
   color: #ffffff !important;
-  border: 1px solid var(--color-exito-oscuro) !important;
+  border: 1px solid var(--color-exito) !important;
 }
 
 .notificacion--error {
   background: var(--color-peligro) !important;
   color: #ffffff !important;
-  border: 1px solid var(--color-peligro-oscuro) !important;
+  border: 1px solid var(--color-peligro) !important;
 }
 
 .notificacion-icono {

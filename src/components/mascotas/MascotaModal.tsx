@@ -145,8 +145,9 @@ export default function MascotaModal({
   };
 
   const cargarMascota = async () => {
+    if (!mascotaId) return;
     try {
-      const mascota = await obtenerMascotaPorId(mascotaId!);
+      const mascota = await obtenerMascotaPorId(mascotaId);
       setForm((prev) => ({
         ...prev,
         nombre: mascota.name,

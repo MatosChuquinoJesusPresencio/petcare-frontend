@@ -30,12 +30,11 @@ const Header = () => {
   }, []);
 
   useEffect(() => {
-    const main = document.querySelector('.contenido-principal');
-    if (main && !esMovil) {
-      main.classList.toggle('contenido-principal--expandido', !abierto);
-    } else if (main) {
-      main.classList.remove('contenido-principal--expandido');
-    }
+    document.documentElement.classList.toggle('sidebar-expandida', !esMovil && abierto);
+    document.documentElement.classList.toggle('sidebar-colapsada', !esMovil && !abierto);
+    return () => {
+      document.documentElement.classList.remove('sidebar-expandida', 'sidebar-colapsada');
+    };
   }, [abierto, esMovil]);
 
   const puedeVer = (roles: string[]) => user !== null && roles.includes(user.role);

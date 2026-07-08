@@ -301,7 +301,7 @@
     margin-left: 240px;
   }
 
-  .contenido-principal--expandido {
+  :root.sidebar-colapsada .contenido-principal {
     margin-left: 0;
   }
 

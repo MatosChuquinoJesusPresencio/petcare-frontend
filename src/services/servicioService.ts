@@ -22,12 +22,12 @@ export async function createServicio(
   return response.data;
 }
 
-export async function updateServicio(id: number, servicio: ServicioRequest) {
+export async function updateServicio(id: number, servicio: ServicioRequest): Promise<ServicioResponse> {
   const response = await apiClient.put<ServicioResponse>(`/api/servicios/${id}`, servicio);
   return response.data;
 }
 
-export async function deleteServicio(id: number) {
+export async function deleteServicio(id: number): Promise<void> {
   await apiClient.delete(`/api/servicios/${id}`);
 }
 

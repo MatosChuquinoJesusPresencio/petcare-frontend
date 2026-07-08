@@ -184,6 +184,10 @@ const DuenosPage = () => {
   }
 
   function handleOpenEditDuenoModal(dueno: Dueno) {
+    if (!dueno.usuario) {
+      setToast({ message: "No se puede editar un dueño sin usuario asociado.", type: "error" });
+      return;
+    }
     setSelectedDueno(dueno);
     setOpenDuenoModal(true);
   }
@@ -282,7 +286,7 @@ const DuenosPage = () => {
               >
                 {duenos.map((dueno, index) => (
                   <tr
-                    key={dueno.id || index}
+                    key={dueno.id}
                     onClick={() => setSelectedDueno(dueno)}
                     style={{
                       cursor: "pointer",
@@ -298,7 +302,7 @@ const DuenosPage = () => {
                     {puedeGestionar && (
                       <td>
                         <ActionButtons
-                          activo={true}
+                          activo={dueno.usuario?.active ?? true}
                           onEdit={() => handleOpenEditDuenoModal(dueno)}
                           onToggle={() => handleToggleDueno(dueno.id)}
                           onDelete={() => setConfirmDelete(dueno.id)}
@@ -363,8 +367,8 @@ const DuenosPage = () => {
               </div>
             ) : (
               <div className="row g-3">
-                {contactos.map((contacto, idx) => (
-                  <div key={contacto.id || idx} className="col-md-6">
+                {contactos.map((contacto) => (
+                  <div key={contacto.id} className="col-md-6">
                     <div style={{
                       padding: 'var(--espaciado-md)', border: '1px solid var(--color-borde-claro)',
                       borderRadius: 'var(--radio-borde)', display: 'flex',

@@ -17,13 +17,20 @@ export default function TransferenciaHistorialModal({ show, mascotaId, onClose }
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (show && mascotaId) {
+    if (!show || !mascotaId) return;
+    let cancelled = false;
+    (async () => {
       setLoading(true);
-      obtenerTransferenciasPorMascota(mascotaId)
-        .then(setTransferencias)
-        .catch(() => {})
-        .finally(() => setLoading(false));
-    }
+      try {
+        const data = await obtenerTransferenciasPorMascota(mascotaId);
+        if (!cancelled) setTransferencias(data);
+      } catch {
+        if (!cancelled) setTransferencias([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
   }, [show, mascotaId]);
 
   if (!show) return null;

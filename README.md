@@ -10,22 +10,21 @@
 
 Aplicación web para la gestión de una clínica veterinaria. Permite administrar citas, mascotas, dueños, servicios y usuarios del sistema.
 
-**Despliegue:** [https://petcare-frontend-alpha.vercel.app/](https://petcare-frontend-rho.vercel.app/login)
-
 ## Tecnologías
 
-- **React 19** con TypeScript
+- **React 19** con TypeScript (strict mode habilitado)
 - **Vite 8** como bundler
 - **React Router v7** para enrutamiento
-- **Axios** para consumo de API
+- **Axios** para consumo de API (interceptor con refresh queue + race condition handling)
 - **pnpm** como gestor de paquetes
 - **Bootstrap 5** + **Bootstrap Icons** para grid e iconos
 - **CSS Modules** con tokens de diseño personalizados
-- **React Compiler** habilitado
 
 ## Características
 
 - Autenticación con refresh de tokens y control de acceso por rol (ADMINISTRADOR, VETERINARIO, ASISTENTE, DUENO)
+- Interceptor Axios con cola de promesas para evitar race conditions en refresh de tokens
+- Manejo de sesión expirada con evento `auth:session-expired`
 - Dashboard con resumen del negocio
 - CRUD completo de servicios
 - Gestión de citas con reprogramación y cancelación
@@ -38,7 +37,7 @@ Aplicación web para la gestión de una clínica veterinaria. Permite administra
 - Bloqueos de disponibilidad de veterinarios
 - Historial de transferencias de mascotas entre dueños
 - Diseño responsive con sidebar colapsable y scroll interno
-- Sistema de notificaciones toast
+- Sistema de notificaciones toast con auto-cierre y cleanup en unmount
 
 ## Requisitos
 
@@ -55,7 +54,9 @@ pnpm install
 
 | Variable | Descripción | Valor por defecto |
 |---|---|---|
-| `VITE_URL_API` | URL base del backend | `http://localhost:8080` |
+| `VITE_URL_API` | URL base del backend (producción) | `http://localhost:8080` |
+
+En desarrollo, el proxy de Vite redirige `/api/*` al backend. En producción (Vercel), la variable debe apuntar al backend desplegado.
 
 ## Scripts disponibles
 
@@ -65,12 +66,13 @@ pnpm install
 | `pnpm build` | Compila TypeScript y empaqueta con Vite |
 | `pnpm preview` | Previsualiza la build de producción |
 | `pnpm lint` | Ejecuta ESLint sobre el código |
+| `pnpm typecheck` | Ejecuta `tsc --noEmit` (verificación de tipos) |
 
 ## Estructura del proyecto
 
 ```
 src/
-├── api/            # Cliente HTTP (Axios)
+├── api/            # Cliente HTTP (Axios) con interceptor de refresh
 ├── assets/         # Recursos estáticos (logos, imágenes)
 ├── components/     # Componentes React
 │   ├── auth/       #   Protección de rutas
@@ -101,12 +103,22 @@ src/
 ├── routers/        # Configuración de rutas
 ├── services/       # Servicios de API
 ├── types/          # Tipos TypeScript
-└── utils/          # Utilidades
+└── utils/          # Utilidades (error handler, etc.)
 ```
 
 ## Despliegue
 
-La aplicación está desplegada en Vercel:
-[https://petcare-frontend-alpha.vercel.app/](https://petcare-frontend-alpha.vercel.app/)
+### Vercel
 
-Configurado mediante `vercel.json` con rewrites SPA para manejo de rutas del cliente.
+La aplicación está configurada para deploy en Vercel:
+
+1. Conectar repositorio a Vercel
+2. Configurar:
+   - **Framework Preset**: Vite
+   - **Build Command**: `pnpm build`
+   - **Output Directory**: `dist`
+3. Agregar variable de entorno:
+   - `VITE_URL_API`: URL del backend desplegado (ej: `https://petcare-backend.onrender.com`)
+4. Vercel deploya automáticamente en cada push
+
+El archivo `vercel.json` maneja los rewrites SPA para el enrutamiento del cliente.
