@@ -24,6 +24,7 @@ const apiClient = axios.create({
   baseURL: import.meta.env.DEV ? '' : import.meta.env.VITE_URL_API,
   headers: { 'Content-Type': 'application/json' },
   withCredentials: true,
+  timeout: 15000,
 })
 
 apiClient.interceptors.response.use(

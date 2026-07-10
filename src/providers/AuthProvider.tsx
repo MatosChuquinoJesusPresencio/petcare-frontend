@@ -13,7 +13,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     window.addEventListener('auth:session-expired', onSessionExpired)
 
     authService.me()
-      .then((data) => setUser({ id: data.id, email: data.username, role: data.role }))
+      .then((data) => {
+        if (data?.id && data?.role) {
+          setUser({ id: data.id, email: data.username, role: data.role })
+        } else {
+          setUser(null)
+        }
+      })
       .catch(() => setUser(null))
       .finally(() => setIsLoading(false))
 
