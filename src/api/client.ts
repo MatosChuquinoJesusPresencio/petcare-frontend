@@ -36,7 +36,7 @@ apiClient.interceptors.response.use(
       return Promise.reject(error)
     }
 
-    if (originalRequest.url?.endsWith('/api/auth/me') || originalRequest.url?.endsWith('/api/auth/refresh') || originalRequest.url?.endsWith('/api/auth/login')) {
+    if (originalRequest.url?.endsWith('/api/auth/refresh') || originalRequest.url?.endsWith('/api/auth/login')) {
       return Promise.reject(error)
     }
 
