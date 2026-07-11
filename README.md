@@ -38,6 +38,10 @@ Aplicación web para la gestión de una clínica veterinaria. Permite administra
 - Historial de transferencias de mascotas entre dueños
 - Diseño responsive con sidebar colapsable y scroll interno
 - Sistema de notificaciones toast con auto-cierre y cleanup en unmount
+- **Componente SearchableSelect** reutilizable para campos con búsqueda + opciones predefinidas + escritura libre
+- **Constantes de mascotas**: 11 especies, 50+ razas de perro, 30+ de gato, aves, reptiles, conejos, etc.
+- **Validación de DNI** (exactamente 8 dígitos) y **teléfono** (exactamente 9 dígitos) en todos los formularios
+- **Dropdowns buscables** en formulario de mascotas para especie, raza (filtrada por especie) y condición reproductiva
 
 ## Requisitos
 
@@ -77,11 +81,11 @@ src/
 ├── components/     # Componentes React
 │   ├── auth/       #   Protección de rutas
 │   ├── citas/      #   Módulo de citas (formulario, tabla, reprogramar)
-│   ├── common/     #   Componentes reutilizables (DataTable, modales, etc.)
+│   ├── common/     #   Componentes reutilizables (DataTable, modales, SearchableSelect, etc.)
 │   ├── duenos/     #   Módulo de dueños
 │   ├── layout/     #   Header, sidebar, Footer
 │   └── mascotas/   #   Módulo de mascotas (tabla, modal, vincular)
-├── constants/      # Constantes del dominio
+├── constants/      # Constantes del dominio (citas, mascotas, roles, etc.)
 ├── contexts/       # Contextos de React
 ├── css/            # Estilos
 │   ├── componentes/#   Estilos por componente
