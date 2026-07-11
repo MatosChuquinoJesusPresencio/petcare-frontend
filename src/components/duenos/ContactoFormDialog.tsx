@@ -35,8 +35,8 @@ function validate(formData: ContactoFormState): Record<string, string> {
 
   if (!formData.phone.trim()) {
     errors.phone = "El número telefónico es obligatorio.";
-  } else if (!/^[\d\s+\-()]{6,20}$/.test(formData.phone.trim())) {
-    errors.phone = "Ingresa un teléfono válido (6-20 dígitos).";
+  } else if (!/^\d{9}$/.test(formData.phone.trim())) {
+    errors.phone = "El teléfono debe tener exactamente 9 dígitos.";
   }
 
   return errors;

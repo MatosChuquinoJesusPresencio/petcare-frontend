@@ -77,8 +77,8 @@ function validate(formData: DuenoFormState): Record<string, string> {
     errors.dni = "El DNI debe contener solo dígitos.";
   } else if (formData.dni.trim().length < 8) {
     errors.dni = "Mínimo 8 dígitos.";
-  } else if (formData.dni.trim().length > 20) {
-    errors.dni = "Máximo 20 dígitos.";
+  } else if (formData.dni.trim().length > 8) {
+    errors.dni = "El DNI debe tener exactamente 8 dígitos.";
   }
 
   if (!formData.email.trim()) {
@@ -87,8 +87,8 @@ function validate(formData: DuenoFormState): Record<string, string> {
     errors.email = "Ingresa un correo válido (ej. usuario@dominio.com).";
   }
 
-  if (formData.phone.trim() && !/^[\d\s+\-()]{6,20}$/.test(formData.phone.trim())) {
-    errors.phone = "Ingresa un teléfono válido (6-20 dígitos).";
+  if (formData.phone.trim() && !/^\d{9}$/.test(formData.phone.trim())) {
+    errors.phone = "El teléfono debe tener exactamente 9 dígitos.";
   }
 
   return errors;

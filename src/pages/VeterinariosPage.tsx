@@ -32,6 +32,7 @@ const VeterinariosPage = () => {
 
   const [showNuevo, setShowNuevo] = useState(false);
   const [nuevoForm, setNuevoForm] = useState({ firstName: "", lastName: "", email: "", phone: "", password: "" });
+  const [nuevoFormErrors, setNuevoFormErrors] = useState<Record<string, string>>({});
 
   const [showDisponibilidad, setShowDisponibilidad] = useState<number | null>(null);
   const [disponibilidades, setDisponibilidades] = useState<Record<number, DisponibilidadVeterinarioResponse[]>>({});
@@ -75,11 +76,22 @@ const VeterinariosPage = () => {
 
   const handleNuevoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const errors: Record<string, string> = {};
+    if (!nuevoForm.firstName.trim()) errors.firstName = "El nombre es obligatorio.";
+    if (!nuevoForm.lastName.trim()) errors.lastName = "El apellido es obligatorio.";
+    if (!nuevoForm.email.trim()) errors.email = "El email es obligatorio.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nuevoForm.email.trim())) errors.email = "Email inválido.";
+    if (nuevoForm.phone.trim() && !/^\d{9}$/.test(nuevoForm.phone.trim())) errors.phone = "El teléfono debe tener exactamente 9 dígitos.";
+    if (!nuevoForm.password) errors.password = "La contraseña es obligatoria.";
+    else if (nuevoForm.password.length < 6) errors.password = "Mínimo 6 caracteres.";
+    if (Object.keys(errors).length > 0) { setNuevoFormErrors(errors); return; }
+    setNuevoFormErrors({});
     try {
       const data: RegisterRequest = { ...nuevoForm, role: "VETERINARIO" };
       await crearUsuario(data);
       setShowNuevo(false);
       setNuevoForm({ firstName: "", lastName: "", email: "", phone: "", password: "" });
+      setNuevoFormErrors({});
       await cargar();
       setToast({ message: "Veterinario creado correctamente.", type: "success" });
     } catch (err) {
@@ -326,31 +338,36 @@ const VeterinariosPage = () => {
             <div className="col-md-6">
               <div className="campo-grupo">
                 <label className="campo-etiqueta">Nombres *</label>
-                <input type="text" className="campo-entrada" value={nuevoForm.firstName} onChange={(e) => setNuevoForm((p) => ({ ...p, firstName: e.target.value }))} required />
+                <input type="text" className={`campo-entrada ${nuevoFormErrors.firstName ? 'campo-entrada--error' : ''}`} value={nuevoForm.firstName} onChange={(e) => { setNuevoForm((p) => ({ ...p, firstName: e.target.value })); setNuevoFormErrors((p) => { const n = { ...p }; delete n.firstName; return n; }); }} required />
+                {nuevoFormErrors.firstName && <div className="campo-error">{nuevoFormErrors.firstName}</div>}
               </div>
             </div>
             <div className="col-md-6">
               <div className="campo-grupo">
                 <label className="campo-etiqueta">Apellidos *</label>
-                <input type="text" className="campo-entrada" value={nuevoForm.lastName} onChange={(e) => setNuevoForm((p) => ({ ...p, lastName: e.target.value }))} required />
+                <input type="text" className={`campo-entrada ${nuevoFormErrors.lastName ? 'campo-entrada--error' : ''}`} value={nuevoForm.lastName} onChange={(e) => { setNuevoForm((p) => ({ ...p, lastName: e.target.value })); setNuevoFormErrors((p) => { const n = { ...p }; delete n.lastName; return n; }); }} required />
+                {nuevoFormErrors.lastName && <div className="campo-error">{nuevoFormErrors.lastName}</div>}
               </div>
             </div>
             <div className="col-md-6">
               <div className="campo-grupo">
                 <label className="campo-etiqueta">Email *</label>
-                <input type="email" className="campo-entrada" value={nuevoForm.email} onChange={(e) => setNuevoForm((p) => ({ ...p, email: e.target.value }))} required />
+                <input type="email" className={`campo-entrada ${nuevoFormErrors.email ? 'campo-entrada--error' : ''}`} value={nuevoForm.email} onChange={(e) => { setNuevoForm((p) => ({ ...p, email: e.target.value })); setNuevoFormErrors((p) => { const n = { ...p }; delete n.email; return n; }); }} required />
+                {nuevoFormErrors.email && <div className="campo-error">{nuevoFormErrors.email}</div>}
               </div>
             </div>
             <div className="col-md-6">
               <div className="campo-grupo">
                 <label className="campo-etiqueta">Teléfono</label>
-                <input type="text" className="campo-entrada" value={nuevoForm.phone} onChange={(e) => setNuevoForm((p) => ({ ...p, phone: e.target.value }))} />
+                <input type="text" className={`campo-entrada ${nuevoFormErrors.phone ? 'campo-entrada--error' : ''}`} value={nuevoForm.phone} onChange={(e) => { setNuevoForm((p) => ({ ...p, phone: e.target.value })); setNuevoFormErrors((p) => { const n = { ...p }; delete n.phone; return n; }); }} />
+                {nuevoFormErrors.phone && <div className="campo-error">{nuevoFormErrors.phone}</div>}
               </div>
             </div>
             <div className="col-12">
               <div className="campo-grupo">
                 <label className="campo-etiqueta">Contraseña *</label>
-                <input type="password" className="campo-entrada" value={nuevoForm.password} onChange={(e) => setNuevoForm((p) => ({ ...p, password: e.target.value }))} required />
+                <input type="password" className={`campo-entrada ${nuevoFormErrors.password ? 'campo-entrada--error' : ''}`} value={nuevoForm.password} onChange={(e) => { setNuevoForm((p) => ({ ...p, password: e.target.value })); setNuevoFormErrors((p) => { const n = { ...p }; delete n.password; return n; }); }} required />
+                {nuevoFormErrors.password && <div className="campo-error">{nuevoFormErrors.password}</div>}
               </div>
             </div>
           </div>

@@ -14,8 +14,11 @@ export type { RolUsuario } from "./usuarioConstants";
 export {
   SEXOS_MASCOTA,
   SEXO_LABEL,
+  ESPECIES,
+  RAZAS_POR_ESPECIE,
+  CONDICIONES_REPRODUCTIVAS,
 } from "./mascotaConstants";
-export type { SexoMascota } from "./mascotaConstants";
+export type { SexoMascota, Especie } from "./mascotaConstants";
 
 export {
   NIVELES_URGENCIA,

@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 
 import NotificationToast from "../common/NotificationToast";
 import type { ToastInfo } from "../common/NotificationToast";
+import SearchableSelect from "../common/SearchableSelect";
 
-import { SEXOS_MASCOTA, SEXO_LABEL } from "../../constants";
+import { SEXOS_MASCOTA, SEXO_LABEL, ESPECIES, RAZAS_POR_ESPECIE, CONDICIONES_REPRODUCTIVAS } from "../../constants";
 import type { Dueno, MascotaRequest } from "../../types";
 import {
   actualizarMascota,
@@ -272,19 +273,26 @@ export default function MascotaModal({
                 </div>
 
                 <div className="col-md-6">
-                  <div className="campo-grupo">
-                    <label className="campo-etiqueta">Especie</label>
-                    <input type="text" className={`campo-entrada ${fieldErrors.especie ? 'campo-entrada--error' : ''}`} name="especie" value={form.especie} onChange={handleChange} required />
-                    {fieldErrors.especie && <div className="campo-error">{fieldErrors.especie}</div>}
-                  </div>
+                  <SearchableSelect
+                    label="Especie"
+                    options={ESPECIES}
+                    value={form.especie}
+                    onChange={(val) => setForm((prev) => ({ ...prev, especie: val, raza: prev.raza }))}
+                    required
+                    error={fieldErrors.especie}
+                  />
                 </div>
 
                 <div className="col-md-6">
-                  <div className="campo-grupo">
-                    <label className="campo-etiqueta">Raza</label>
-                    <input type="text" className={`campo-entrada ${fieldErrors.raza ? 'campo-entrada--error' : ''}`} name="raza" value={form.raza} onChange={handleChange} required />
-                    {fieldErrors.raza && <div className="campo-error">{fieldErrors.raza}</div>}
-                  </div>
+                  <SearchableSelect
+                    label="Raza"
+                    options={form.especie && RAZAS_POR_ESPECIE[form.especie] ? RAZAS_POR_ESPECIE[form.especie] : []}
+                    value={form.raza}
+                    onChange={(val) => setForm((prev) => ({ ...prev, raza: val }))}
+                    required
+                    placeholder={form.especie ? "Buscar raza..." : "Primero seleccione especie"}
+                    error={fieldErrors.raza}
+                  />
                 </div>
 
                 <div className="col-md-6">
@@ -348,11 +356,14 @@ export default function MascotaModal({
                 </div>
 
                 <div className="col-md-6">
-                  <div className="campo-grupo">
-                    <label className="campo-etiqueta">Condición Reproductiva</label>
-                    <input type="text" className={`campo-entrada ${fieldErrors.condicionReproductiva ? 'campo-entrada--error' : ''}`} name="condicionReproductiva" value={form.condicionReproductiva} onChange={handleChange} />
-                    {fieldErrors.condicionReproductiva && <div className="campo-error">{fieldErrors.condicionReproductiva}</div>}
-                  </div>
+                  <SearchableSelect
+                    label="Condición Reproductiva"
+                    options={CONDICIONES_REPRODUCTIVAS}
+                    value={form.condicionReproductiva}
+                    onChange={(val) => setForm((prev) => ({ ...prev, condicionReproductiva: val }))}
+                    placeholder="Buscar o escribir..."
+                    error={fieldErrors.condicionReproductiva}
+                  />
                 </div>
 
                 <div className="col-md-6">
