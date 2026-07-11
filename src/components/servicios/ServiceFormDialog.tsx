@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 
 import BaseFormDialog from "../common/BaseFormDialog";
+import { getErrorMessage } from "../../utils/errorHandler";
 import type { ServicioRequest } from "../../types";
 
 type ServiceFormDialogProps = {
@@ -138,9 +139,8 @@ const ServiceFormDialog = ({
         referentialCost: Number(formData.referentialCost),
       });
       onClose();
-    } catch (error) {
-      console.error("Error al crear servicio:", error);
-      setSubmitError("No se pudo guardar el servicio. Intenta nuevamente.");
+    } catch (err) {
+      setSubmitError(getErrorMessage(err));
     } finally {
       setIsSubmitting(false);
     }

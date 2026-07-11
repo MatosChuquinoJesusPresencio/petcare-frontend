@@ -9,6 +9,7 @@ import type { ToastInfo } from "../components/common/NotificationToast";
 
 import type { AtencionClinicaResponse, CitaResponse, TriajeResponse } from "../types";
 import { crearAtencionClinica, obtenerAtencionesClinicas, obtenerCitas, obtenerTriajes } from "../services";
+import { getErrorMessage } from "../utils/errorHandler";
 
 const AtencionPage = () => {
   const { user } = useAuth();
@@ -39,8 +40,8 @@ const AtencionPage = () => {
       const conAtencion = new Set(atenciones.map((a) => a.appointmentId));
       setTriajes(triajesData);
       setCitas([...confirmadas, ...atendidas].filter((c) => !conAtencion.has(c.id)));
-    } catch {
-      setToast({ message: "No se pudieron cargar las citas.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     }
   }, []);
 
@@ -49,8 +50,8 @@ const AtencionPage = () => {
       setLoading(true);
       const data = await obtenerAtencionesClinicas();
       setAtenciones(data);
-    } catch {
-      setToast({ message: "No se pudieron cargar las atenciones clínicas.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     } finally {
       setLoading(false);
     }
@@ -91,8 +92,8 @@ const AtencionPage = () => {
       setOpenModal(false);
       await cargar();
       setToast({ message: "Atención clínica registrada correctamente.", type: "success" });
-    } catch {
-      setToast({ message: "No se pudo registrar la atención clínica.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     }
   };
 

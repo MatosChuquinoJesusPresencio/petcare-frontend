@@ -11,6 +11,7 @@ import {
   getDuenos,
   obtenerMascotaPorId,
 } from "../../services";
+import { getErrorMessage } from "../../utils/errorHandler";
 
 interface Props {
   show: boolean;
@@ -234,9 +235,8 @@ export default function MascotaModal({
 
       await onSuccess();
       onClose();
-    } catch (error) {
-      console.error(error);
-      setToast({ message: "No se pudo guardar la mascota.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     }
   };
 

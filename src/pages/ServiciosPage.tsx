@@ -23,6 +23,7 @@ import type {
   ServicioRequest,
   ServicioResponse,
 } from "../types";
+import { getErrorMessage } from "../utils/errorHandler";
 
 const ServiciosPage = () => {
   const { user } = useAuth();
@@ -56,9 +57,8 @@ const ServiciosPage = () => {
 
       const data = await getServicios(params);
       setServicios(data);
-    } catch (error) {
-      console.error("Error al cargar servicios:", error);
-      setLoadError("No se pudieron cargar los servicios.");
+    } catch (err) {
+      setLoadError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -70,15 +70,19 @@ const ServiciosPage = () => {
   }, [cargarServicios]);
 
   async function handleSaveServicio(data: ServicioRequest) {
-    if (selectedServicio) {
-      await updateServicio(selectedServicio.id, data);
-    } else {
-      await createServicio(data);
-    }
+    try {
+      if (selectedServicio) {
+        await updateServicio(selectedServicio.id, data);
+      } else {
+        await createServicio(data);
+      }
 
-    await cargarServicios();
-    setSelectedServicio(null);
-    setToast({ message: "Servicio guardado correctamente.", type: "success" });
+      await cargarServicios();
+      setSelectedServicio(null);
+      setToast({ message: "Servicio guardado correctamente.", type: "success" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
+    }
   }
 
   function handleOpenCreateModal() {
@@ -101,9 +105,8 @@ const ServiciosPage = () => {
       await deleteServicio(id);
       await cargarServicios();
       setToast({ message: "Servicio eliminado correctamente.", type: "success" });
-    } catch (error) {
-      console.error("Error al eliminar servicio:", error);
-      setToast({ message: "No se pudo eliminar el servicio.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     } finally {
       setConfirmDeleteServicio(null);
     }
@@ -114,9 +117,8 @@ const ServiciosPage = () => {
       await toggleServicio(id);
       await cargarServicios();
       setToast({ message: "Estado del servicio actualizado correctamente.", type: "success" });
-    } catch (error) {
-      console.error("Error al cambiar estado:", error);
-      setToast({ message: "No se pudo cambiar el estado del servicio.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     }
   }
 

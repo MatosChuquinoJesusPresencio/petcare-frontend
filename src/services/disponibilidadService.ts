@@ -24,3 +24,8 @@ export async function actualizarDisponibilidad(id: number, data: DisponibilidadR
 export async function eliminarDisponibilidad(id: number): Promise<void> {
   await apiClient.delete(`/api/disponibilidad/${id}`);
 }
+
+export async function toggleDisponibilidad(id: number): Promise<DisponibilidadVeterinarioResponse> {
+  const response = await apiClient.patch<DisponibilidadVeterinarioResponse>(`/api/disponibilidad/${id}/toggle`);
+  return response.data;
+}

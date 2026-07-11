@@ -20,6 +20,7 @@ import NotificationToast from "../components/common/NotificationToast";
 import type { ToastInfo } from "../components/common/NotificationToast";
 
 import PageHeader from "../components/common/PageHeader";
+import { getErrorMessage } from "../utils/errorHandler";
 
 const CitasPage = () => {
   const { user } = useAuth();
@@ -42,8 +43,8 @@ const CitasPage = () => {
       setLoading(true);
       const data = await obtenerCitas();
       setCitas(data);
-    } catch (error) {
-      console.error("Error fetching citas", error);
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     } finally {
       setLoading(false);
     }
@@ -59,8 +60,8 @@ const CitasPage = () => {
       setMascotas(mascotasData);
       setServicios(serviciosData);
       setVeterinarios(veterinariosData);
-    } catch (error) {
-      console.error("Error fetching dependencias", error);
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     }
   }, []);
 
@@ -75,9 +76,8 @@ const CitasPage = () => {
       await cambiarEstadoCita(id, nuevoEstado);
       await fetchCitas();
       setToast({ message: "Estado de la cita actualizado correctamente.", type: "success" });
-    } catch (error) {
-      console.error("Error cambiando estado", error);
-      setToast({ message: "Error al cambiar el estado", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     }
   };
 
@@ -87,9 +87,8 @@ const CitasPage = () => {
       await cancelarCita(cancelarId);
       await fetchCitas();
       setToast({ message: "Cita cancelada correctamente.", type: "success" });
-    } catch (error) {
-      console.error("Error cancelando", error);
-      setToast({ message: "Error al cancelar la cita", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     } finally {
       setCancelarId(null);
     }

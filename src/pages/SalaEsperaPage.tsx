@@ -10,6 +10,7 @@ import type { ToastInfo } from "../components/common/NotificationToast";
 import { ESTADOS_SALA_ESPERA, SALA_ESPERA_ESTADO_LABEL } from "../constants";
 import type { CitaResponse, SalaEsperaResponse } from "../types";
 import { cambiarEstadoSalaEspera, obtenerCitas, obtenerSalaEspera, registrarLlegada } from "../services";
+import { getErrorMessage } from "../utils/errorHandler";
 
 function badgeClass(status: string): string {
   const map: Record<string, string> = {
@@ -38,8 +39,8 @@ const SalaEsperaPage = () => {
       setLoading(true);
       const data = await obtenerSalaEspera();
       setLista(data);
-    } catch {
-      setToast({ message: "No se pudo cargar la sala de espera.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     } finally {
       setLoading(false);
     }
@@ -59,8 +60,8 @@ const SalaEsperaPage = () => {
       ]);
       const enSala = new Set(sala.map((s) => s.appointmentId));
       setCitas([...programadas, ...confirmadas].filter((c) => !enSala.has(c.id)));
-    } catch {
-      setToast({ message: "No se pudieron cargar las citas.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     }
   }, []);
 
@@ -74,8 +75,8 @@ const SalaEsperaPage = () => {
       setNuevoObservations("");
       await cargar();
       setToast({ message: "Llegada registrada correctamente.", type: "success" });
-    } catch {
-      setToast({ message: "No se pudo registrar la llegada.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     }
   };
 
@@ -84,8 +85,8 @@ const SalaEsperaPage = () => {
       await cambiarEstadoSalaEspera(id, { status });
       await cargar();
       setToast({ message: "Estado actualizado correctamente.", type: "success" });
-    } catch {
-      setToast({ message: "No se pudo actualizar el estado.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     }
   };
 

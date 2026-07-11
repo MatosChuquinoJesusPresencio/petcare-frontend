@@ -16,6 +16,7 @@ import MascotaModal from "../components/mascotas/MascotaModal";
 import MascotaVincularModal from "../components/mascotas/MascotaVincularModal";
 import TransferenciaHistorialModal from "../components/mascotas/TransferenciaHistorialModal";
 import PageHeader from "../components/common/PageHeader";
+import { getErrorMessage } from "../utils/errorHandler";
 
 const MascotasPage = () => {
   const { user } = useAuth();
@@ -61,9 +62,8 @@ const MascotasPage = () => {
         }
       }));
       setDuenoMap(map);
-    } catch (error) {
-      console.error(error);
-      setToast({ message: "No se pudieron cargar las mascotas.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     } finally {
       setLoading(false);
     }
@@ -90,9 +90,8 @@ const MascotasPage = () => {
       await toggleMascota(id);
       await cargarMascotas();
       setToast({ message: "Estado de la mascota actualizado correctamente.", type: "success" });
-    } catch (error) {
-      console.error(error);
-      setToast({ message: "No se pudo cambiar el estado de la mascota.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     }
   };
 
@@ -102,9 +101,8 @@ const MascotasPage = () => {
       await eliminarMascota(confirmDeleteMascota);
       await cargarMascotas();
       setToast({ message: "Mascota desactivada correctamente.", type: "success" });
-    } catch (error) {
-      console.error(error);
-      setToast({ message: "No se pudo desactivar la mascota.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     } finally {
       setConfirmDeleteMascota(null);
     }

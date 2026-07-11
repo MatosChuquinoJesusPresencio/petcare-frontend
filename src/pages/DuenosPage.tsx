@@ -33,6 +33,7 @@ import type {
   ContactoEmergenciaRequest,
   Dueno,
 } from "../types";
+import { getErrorMessage } from "../utils/errorHandler";
 
 const DuenosPage = () => {
   const { user } = useAuth();
@@ -80,9 +81,8 @@ const DuenosPage = () => {
 
       const data = await getDuenos(params);
       setDuenos(data);
-    } catch (error) {
-      console.error("Error al cargar dueños:", error);
-      setLoadError("No se pudieron cargar los registros de dueños.");
+    } catch (err) {
+      setLoadError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -96,9 +96,8 @@ const DuenosPage = () => {
       if (searchContactoRelacion.trim()) params.relacion = searchContactoRelacion.trim();
       const data = await getContactosByDuenoId(duenoId, params);
       setContactos(data);
-    } catch (error) {
-      console.error("Error al cargar contactos de emergencia:", error);
-      setToast({ message: "No se pudieron cargar los contactos de emergencia.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     }
   }
 
@@ -122,31 +121,35 @@ const DuenosPage = () => {
   }, [selectedDueno, searchContactoNombre, searchContactoTelefono, searchContactoRelacion]);
 
   async function handleSaveDueno(data: DuenoFormData) {
-    if (selectedDueno) {
-      const duenoEditado = await updateDueno(selectedDueno.id, {
-        dni: data.dni,
-        phone: data.phone || undefined,
-        address: data.address || undefined,
-        userId: selectedDueno.usuario?.id ?? undefined,
-      });
-      if (selectedDueno.id === duenoEditado.id) {
-        setSelectedDueno(duenoEditado);
+    try {
+      if (selectedDueno) {
+        const duenoEditado = await updateDueno(selectedDueno.id, {
+          dni: data.dni,
+          phone: data.phone || undefined,
+          address: data.address || undefined,
+          userId: selectedDueno.usuario?.id ?? undefined,
+        });
+        if (selectedDueno.id === duenoEditado.id) {
+          setSelectedDueno(duenoEditado);
+        }
+      } else {
+        await createDueno({
+          dni: data.dni,
+          phone: data.phone || undefined,
+          address: data.address || undefined,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          password: data.dni,
+        });
       }
-    } else {
-      await createDueno({
-        dni: data.dni,
-        phone: data.phone || undefined,
-        address: data.address || undefined,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        password: data.dni,
-      });
-    }
 
-    await cargarDuenos();
-    setOpenDuenoModal(false);
-    setToast({ message: "Dueño guardado correctamente.", type: "success" });
+      await cargarDuenos();
+      setOpenDuenoModal(false);
+      setToast({ message: "Dueño guardado correctamente.", type: "success" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
+    }
   }
 
   async function handleToggleDueno(id: number) {
@@ -154,9 +157,8 @@ const DuenosPage = () => {
       await toggleDueno(id);
       await cargarDuenos();
       setToast({ message: "Estado del dueño actualizado correctamente.", type: "success" });
-    } catch (error) {
-      console.error("Error al cambiar estado:", error);
-      setToast({ message: "No se pudo cambiar el estado del dueño.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     }
   }
 
@@ -170,9 +172,8 @@ const DuenosPage = () => {
       }
       await cargarDuenos();
       setToast({ message: "Dueño eliminado correctamente.", type: "success" });
-    } catch (error) {
-      console.error("Error al eliminar dueño:", error);
-      setToast({ message: "No se pudo eliminar el dueño.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     } finally {
       setConfirmDelete(null);
     }
@@ -198,10 +199,14 @@ const DuenosPage = () => {
 
   async function handleSaveContacto(data: ContactoEmergenciaRequest) {
     if (!selectedDueno) return;
-    await createContacto(selectedDueno.id, data);
-    await cargarContactos(selectedDueno.id);
-    setOpenContactoModal(false);
-    setToast({ message: "Contacto de emergencia creado correctamente.", type: "success" });
+    try {
+      await createContacto(selectedDueno.id, data);
+      await cargarContactos(selectedDueno.id);
+      setOpenContactoModal(false);
+      setToast({ message: "Contacto de emergencia creado correctamente.", type: "success" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
+    }
   }
 
   async function handleDeleteContacto(id: number) {
@@ -211,9 +216,8 @@ const DuenosPage = () => {
         await cargarContactos(selectedDueno.id);
       }
       setToast({ message: "Contacto de emergencia eliminado correctamente.", type: "success" });
-    } catch (error) {
-      console.error("Error al eliminar contacto:", error);
-      setToast({ message: "No se pudo eliminar el contacto de emergencia.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     } finally {
       setConfirmDeleteContacto(null);
     }

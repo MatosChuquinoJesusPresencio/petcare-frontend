@@ -7,15 +7,18 @@ import BaseFormDialog from "../components/common/BaseFormDialog";
 import ConfirmDialog from "../components/common/ConfirmDialog";
 import NotificationToast from "../components/common/NotificationToast";
 import type { ToastInfo } from "../components/common/NotificationToast";
+import { getErrorMessage } from "../utils/errorHandler";
 
 import type { DisponibilidadRequest, DisponibilidadVeterinarioResponse, RegisterRequest, VeterinarioResponse } from "../types";
 import {
+  actualizarDisponibilidad,
   cambiarEstadoUsuario,
   crearDisponibilidad,
   crearUsuario,
   eliminarDisponibilidad,
   obtenerDisponibilidadPorVeterinario,
   obtenerTodosVeterinarios,
+  toggleDisponibilidad as toggleActivoDisponibilidad,
 } from "../services";
 
 const DIAS_SEMANA = ["", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
@@ -38,6 +41,9 @@ const VeterinariosPage = () => {
   const [addDispVetId, setAddDispVetId] = useState<number | null>(null);
   const [addDispForm, setAddDispForm] = useState({ dayOfWeek: 1, startTime: "08:00", endTime: "17:00" });
 
+  const [editDisp, setEditDisp] = useState<DisponibilidadVeterinarioResponse | null>(null);
+  const [editDispForm, setEditDispForm] = useState({ dayOfWeek: 1, startTime: "08:00", endTime: "17:00" });
+
   const [deleteDispId, setDeleteDispId] = useState<number | null>(null);
 
   const cargar = useCallback(async () => {
@@ -45,8 +51,8 @@ const VeterinariosPage = () => {
       setLoading(true);
       const data = await obtenerTodosVeterinarios();
       setVeterinarios(data);
-    } catch {
-      setToast({ message: "No se pudieron cargar los veterinarios.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     } finally {
       setLoading(false);
     }
@@ -62,8 +68,8 @@ const VeterinariosPage = () => {
       await cambiarEstadoUsuario(id, !current);
       await cargar();
       setToast({ message: `Veterinario ${current ? "deshabilitado" : "habilitado"} correctamente.`, type: "success" });
-    } catch {
-      setToast({ message: "No se pudo cambiar el estado.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     }
   };
 
@@ -76,12 +82,12 @@ const VeterinariosPage = () => {
       setNuevoForm({ firstName: "", lastName: "", email: "", phone: "", password: "" });
       await cargar();
       setToast({ message: "Veterinario creado correctamente.", type: "success" });
-    } catch {
-      setToast({ message: "No se pudo crear el veterinario.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     }
   };
 
-  const toggleDisponibilidad = async (vetId: number) => {
+  const toggleSeccionDisponibilidad = async (vetId: number) => {
     if (showDisponibilidad === vetId) {
       setShowDisponibilidad(null);
       return;
@@ -92,12 +98,17 @@ const VeterinariosPage = () => {
       try {
         const data = await obtenerDisponibilidadPorVeterinario(vetId);
         setDisponibilidades((p) => ({ ...p, [vetId]: data }));
-      } catch {
-        setToast({ message: "No se pudieron cargar los horarios.", type: "error" });
+      } catch (err) {
+        setToast({ message: getErrorMessage(err), type: "error" });
       } finally {
         setCargandoDisp((p) => ({ ...p, [vetId]: false }));
       }
     }
+  };
+
+  const refrescarDisponibilidad = async (vetId: number) => {
+    const updated = await obtenerDisponibilidadPorVeterinario(vetId);
+    setDisponibilidades((p) => ({ ...p, [vetId]: updated }));
   };
 
   const handleAddDispSubmit = async (e: React.FormEvent) => {
@@ -108,11 +119,40 @@ const VeterinariosPage = () => {
       await crearDisponibilidad(data);
       setShowAddDisp(false);
       setAddDispForm({ dayOfWeek: 1, startTime: "08:00", endTime: "17:00" });
-      const updated = await obtenerDisponibilidadPorVeterinario(addDispVetId);
-      setDisponibilidades((p) => ({ ...p, [addDispVetId]: updated }));
+      await refrescarDisponibilidad(addDispVetId);
       setToast({ message: "Horario agregado correctamente.", type: "success" });
-    } catch {
-      setToast({ message: "No se pudo agregar el horario.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
+    }
+  };
+
+  const handleEditDisp = (d: DisponibilidadVeterinarioResponse) => {
+    setEditDisp(d);
+    setEditDispForm({ dayOfWeek: d.dayOfWeek, startTime: d.startTime.substring(0, 5), endTime: d.endTime.substring(0, 5) });
+  };
+
+  const handleEditDispSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editDisp || showDisponibilidad === null) return;
+    try {
+      const data: DisponibilidadRequest = { veterinarianId: showDisponibilidad, ...editDispForm };
+      await actualizarDisponibilidad(editDisp.id, data);
+      setEditDisp(null);
+      await refrescarDisponibilidad(showDisponibilidad);
+      setToast({ message: "Horario actualizado correctamente.", type: "success" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
+    }
+  };
+
+  const handleToggleDisp = async (d: DisponibilidadVeterinarioResponse) => {
+    if (showDisponibilidad === null) return;
+    try {
+      await toggleActivoDisponibilidad(d.id);
+      await refrescarDisponibilidad(showDisponibilidad);
+      setToast({ message: `Horario ${d.active ? "deshabilitado" : "habilitado"} correctamente.`, type: "success" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     }
   };
 
@@ -121,14 +161,12 @@ const VeterinariosPage = () => {
     try {
       await eliminarDisponibilidad(deleteDispId);
       setDeleteDispId(null);
-      const vetId = showDisponibilidad;
-      if (vetId !== null) {
-        const updated = await obtenerDisponibilidadPorVeterinario(vetId);
-        setDisponibilidades((p) => ({ ...p, [vetId]: updated }));
+      if (showDisponibilidad !== null) {
+        await refrescarDisponibilidad(showDisponibilidad);
       }
       setToast({ message: "Horario eliminado correctamente.", type: "success" });
-    } catch {
-      setToast({ message: "No se pudo eliminar el horario.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     }
   };
 
@@ -186,7 +224,7 @@ const VeterinariosPage = () => {
                       <td>
                         <button
                           className="boton boton--pequeno boton--borde"
-                          onClick={() => toggleDisponibilidad(v.id)}
+                          onClick={() => toggleSeccionDisponibilidad(v.id)}
                         >
                           <i className={`bi ${showDisponibilidad === v.id ? 'bi-chevron-up' : 'bi-clock'} me-1`}></i>
                           {showDisponibilidad === v.id ? "Ocultar" : "Horarios"}
@@ -217,7 +255,7 @@ const VeterinariosPage = () => {
                                     <th>Inicio</th>
                                     <th>Fin</th>
                                     <th>Estado</th>
-                                    <th></th>
+                                    <th>Acciones</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -233,9 +271,21 @@ const VeterinariosPage = () => {
                                       </td>
                                       <td>
                                         {puedeGestionar && (
-                                          <button className="boton boton--pequeno boton--peligro" onClick={() => setDeleteDispId(d.id)}>
-                                            <i className="bi bi-trash"></i>
-                                          </button>
+                                          <div className="acciones-tabla">
+                                            <button className="boton boton--pequeno boton--borde" onClick={() => handleEditDisp(d)} title="Editar">
+                                              <i className="bi bi-pencil"></i>
+                                            </button>
+                                            <button
+                                              className={`boton boton--pequeno ${d.active ? 'boton--peligro' : 'boton--exito'}`}
+                                              onClick={() => handleToggleDisp(d)}
+                                              title={d.active ? "Deshabilitar" : "Habilitar"}
+                                            >
+                                              <i className={`bi ${d.active ? 'bi-pause-circle' : 'bi-play-circle'}`}></i>
+                                            </button>
+                                            <button className="boton boton--pequeno boton--peligro" onClick={() => setDeleteDispId(d.id)} title="Eliminar">
+                                              <i className="bi bi-trash"></i>
+                                            </button>
+                                          </div>
                                         )}
                                       </td>
                                     </tr>
@@ -341,10 +391,45 @@ const VeterinariosPage = () => {
           </div>
         </BaseFormDialog>
 
+        <BaseFormDialog
+          isOpen={editDisp !== null}
+          onClose={() => setEditDisp(null)}
+          onSubmit={handleEditDispSubmit}
+          title="Editar Horario"
+          submitLabel="Actualizar"
+          isSubmitting={false}
+          submitError=""
+          modalId="editDispModal"
+          size="md"
+        >
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">Día de la semana *</label>
+            <select className="campo-entrada" value={editDispForm.dayOfWeek} onChange={(e) => setEditDispForm((p) => ({ ...p, dayOfWeek: Number(e.target.value) }))} required>
+              {DIAS_SEMANA.slice(1).map((dia, idx) => (
+                <option key={idx + 1} value={idx + 1}>{dia}</option>
+              ))}
+            </select>
+          </div>
+          <div className="row g-3">
+            <div className="col-md-6">
+              <div className="campo-grupo">
+                <label className="campo-etiqueta">Hora inicio *</label>
+                <input type="time" className="campo-entrada" value={editDispForm.startTime} onChange={(e) => setEditDispForm((p) => ({ ...p, startTime: e.target.value }))} required />
+              </div>
+            </div>
+            <div className="col-md-6">
+              <div className="campo-grupo">
+                <label className="campo-etiqueta">Hora fin *</label>
+                <input type="time" className="campo-entrada" value={editDispForm.endTime} onChange={(e) => setEditDispForm((p) => ({ ...p, endTime: e.target.value }))} required />
+              </div>
+            </div>
+          </div>
+        </BaseFormDialog>
+
         <ConfirmDialog
           isOpen={deleteDispId !== null}
           title="Eliminar horario"
-          message="¿Estás seguro de eliminar este horario de atención?"
+          message="¿Estás seguro de eliminar este horario de atención? Esta acción no se puede deshacer."
           confirmText="Eliminar"
           cancelText="Cancelar"
           variant="danger"

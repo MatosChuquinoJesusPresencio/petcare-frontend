@@ -10,6 +10,7 @@ import type { ToastInfo } from "../components/common/NotificationToast";
 import { NIVELES_URGENCIA, URGENCIA_LABEL } from "../constants";
 import type { CitaResponse, TriajeResponse } from "../types";
 import { crearTriaje, obtenerCitas, obtenerSalaEspera, obtenerTriajes } from "../services";
+import { getErrorMessage } from "../utils/errorHandler";
 
 function badgeUrgencia(nivel: string): string {
   const map: Record<string, string> = {
@@ -52,8 +53,8 @@ const TriajePage = () => {
         sala.filter((s) => s.status === "PENDIENTE" || s.status === "EN_ATENCION").map((s) => s.appointmentId)
       );
       setCitas([...programadas, ...confirmadas].filter((c) => enSala.has(c.id) && !conTriaje.has(c.id)));
-    } catch {
-      setToast({ message: "No se pudieron cargar las citas.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     }
   }, []);
 
@@ -62,8 +63,8 @@ const TriajePage = () => {
       setLoading(true);
       const data = await obtenerTriajes();
       setTriajes(data);
-    } catch {
-      setToast({ message: "No se pudieron cargar los triajes.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     } finally {
       setLoading(false);
     }
@@ -98,8 +99,8 @@ const TriajePage = () => {
       setOpenModal(false);
       await cargar();
       setToast({ message: "Triaje registrado correctamente.", type: "success" });
-    } catch {
-      setToast({ message: "No se pudo registrar el triaje.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     }
   };
 

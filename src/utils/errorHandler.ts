@@ -2,6 +2,7 @@ import { AxiosError } from 'axios'
 
 interface ApiErrorResponse {
   mensaje?: string | Record<string, string>
+  detail?: string
   error?: string
   status?: number
 }
@@ -21,6 +22,7 @@ export const getErrorMessage = (error: unknown): string => {
     }
 
     if (typeof mensaje === 'string') return mensaje
+    if (data.detail) return data.detail
     if (data.error) return data.error
   }
 

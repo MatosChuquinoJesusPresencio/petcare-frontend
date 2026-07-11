@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 
 import BaseFormDialog from "../common/BaseFormDialog";
+import { getErrorMessage } from "../../utils/errorHandler";
 
 export interface DuenoFormData {
   firstName: string;
@@ -161,9 +162,8 @@ const DuenoFormDialog = ({
       });
 
       onClose();
-    } catch (error) {
-      console.error("Error al procesar dueño:", error);
-      setSubmitError("No se pudo guardar el registro del dueño. Intenta nuevamente.");
+    } catch (err) {
+      setSubmitError(getErrorMessage(err));
     } finally {
       setIsSubmitting(false);
     }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import type { Dueno } from "../../types";
 import { getDuenos, cambiarDuenoPrincipal } from "../../services";
+import { getErrorMessage } from "../../utils/errorHandler";
 import NotificationToast from "../common/NotificationToast";
 import type { ToastInfo } from "../common/NotificationToast";
 
@@ -28,9 +29,8 @@ export default function MascotaVincularModal({
     try {
       const data = await getDuenos();
       setDuenos(data);
-    } catch (error) {
-      console.error(error);
-      setToast({ message: "No se pudieron cargar los dueños.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     }
   };
 
@@ -72,9 +72,8 @@ export default function MascotaVincularModal({
       await cambiarDuenoPrincipal(mascotaId, { ownerId: duenoId, relation: relacion, reason: "Cambio manual desde el sistema" });
       await onSuccess();
       onClose();
-    } catch (error) {
-      console.error(error);
-      setToast({ message: "No se pudo vincular el dueño.", type: "error" });
+    } catch (err) {
+      setToast({ message: getErrorMessage(err), type: "error" });
     }
   };
 
