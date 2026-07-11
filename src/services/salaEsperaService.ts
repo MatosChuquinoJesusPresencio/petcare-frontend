@@ -1,14 +1,14 @@
 import apiClient from "../api/client";
-import type { SalaEsperaRequest, SalaEsperaEstadoRequest, SalaEsperaResponse } from "../types";
+import type { SalaEsperaRequest, SalaEsperaEstadoRequest, SalaEsperaResponse, PaginatedResponse } from "../types";
 
 export async function obtenerSalaEspera(): Promise<SalaEsperaResponse[]> {
-  const response = await apiClient.get<SalaEsperaResponse[]>("/api/sala-espera");
-  return response.data;
+  const response = await apiClient.get<PaginatedResponse<SalaEsperaResponse>>("/api/sala-espera");
+  return response.data.content;
 }
 
 export async function obtenerSalaEsperaPorEstado(estado: string): Promise<SalaEsperaResponse[]> {
-  const response = await apiClient.get<SalaEsperaResponse[]>(`/api/sala-espera/estado/${estado}`);
-  return response.data;
+  const response = await apiClient.get<PaginatedResponse<SalaEsperaResponse>>(`/api/sala-espera/estado/${estado}`);
+  return response.data.content;
 }
 
 export async function registrarLlegada(data: SalaEsperaRequest): Promise<SalaEsperaResponse> {

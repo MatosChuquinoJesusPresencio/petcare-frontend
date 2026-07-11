@@ -1,14 +1,14 @@
 import apiClient from "../api/client";
-import type { RegisterRequest, VeterinarioResponse } from "../types";
+import type { RegisterRequest, VeterinarioResponse, PaginatedResponse } from "../types";
 
 export async function obtenerVeterinarios(): Promise<VeterinarioResponse[]> {
-  const response = await apiClient.get<VeterinarioResponse[]>("/api/usuarios/veterinarios");
-  return response.data;
+  const response = await apiClient.get<PaginatedResponse<VeterinarioResponse>>("/api/usuarios/veterinarios");
+  return response.data.content;
 }
 
 export async function obtenerTodosVeterinarios(): Promise<VeterinarioResponse[]> {
-  const response = await apiClient.get<VeterinarioResponse[]>("/api/usuarios/veterinarios/todos");
-  return response.data;
+  const response = await apiClient.get<PaginatedResponse<VeterinarioResponse>>("/api/usuarios/veterinarios/todos");
+  return response.data.content;
 }
 
 export async function cambiarEstadoUsuario(id: number, active: boolean): Promise<VeterinarioResponse> {
