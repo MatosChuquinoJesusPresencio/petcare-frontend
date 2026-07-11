@@ -59,11 +59,6 @@ apiClient.interceptors.response.use(
       return apiClient(originalRequest)
     } catch (refreshError) {
       processQueue(refreshError)
-      try {
-        await apiClient.post('/api/auth/logout')
-      } catch {
-        // ignore logout errors during session expiry
-      }
       window.dispatchEvent(new CustomEvent('auth:session-expired'))
       return Promise.reject(refreshError)
     } finally {
