@@ -15,7 +15,7 @@ Aplicación web para la gestión de una clínica veterinaria. Permite administra
 - **React 19** con TypeScript (strict mode habilitado)
 - **Vite 8** como bundler
 - **React Router v7** para enrutamiento
-- **Axios** para consumo de API (interceptor con refresh queue + race condition handling)
+- **Axios** para consumo de API (interceptor con refresh automático, cola de promesas y recuperación de sesión)
 - **pnpm** como gestor de paquetes
 - **Bootstrap 5** + **Bootstrap Icons** para grid e iconos
 - **CSS Modules** con tokens de diseño personalizados
@@ -23,8 +23,10 @@ Aplicación web para la gestión de una clínica veterinaria. Permite administra
 ## Características
 
 - Autenticación con refresh de tokens y control de acceso por rol (ADMINISTRADOR, VETERINARIO, ASISTENTE, DUENO)
-- Interceptor Axios con cola de promesas para evitar race conditions en refresh de tokens
-- Manejo de sesión expirada con evento `auth:session-expired`
+- **Interceptor resiliente**: refresh automático incluido en `/api/auth/me` para recuperar sesión tras inactividad
+- **Cola de promesas** en interceptor para evitar race conditions en refresh de tokens simultáneos
+- **Sesión estable**: no destruye cookies en error de refresh, solo despacha evento `auth:session-expired`
+- **Sesiones simultáneas**: soporta múltiples dispositivos/navegadores con el mismo usuario
 - Dashboard con resumen del negocio
 - CRUD completo de servicios
 - Gestión de citas con reprogramación y cancelación
