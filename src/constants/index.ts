@@ -31,3 +31,12 @@ export {
   SALA_ESPERA_ESTADO_LABEL,
 } from "./salaEsperaConstants";
 export type { EstadoSalaEspera } from "./salaEsperaConstants";
+
+export {
+  TABLAS_AUDITABLES,
+  TABLA_LABEL,
+  TIPOS_OPERACION_AUDITORIA,
+  OPERACION_LABEL,
+  OPERACION_BADGE,
+} from "./auditoriaConstants";
+export type { TablaAuditable, TipoOperacionAuditoria } from "./auditoriaConstants";
