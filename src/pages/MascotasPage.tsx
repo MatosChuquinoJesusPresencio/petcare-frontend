@@ -15,7 +15,9 @@ import MascotaTable from "../components/mascotas/MascotaTable";
 import MascotaModal from "../components/mascotas/MascotaModal";
 import MascotaVincularModal from "../components/mascotas/MascotaVincularModal";
 import TransferenciaHistorialModal from "../components/mascotas/TransferenciaHistorialModal";
+import HistorialVacunacionTable from "../components/vacunaciones/HistorialVacunacionTable";
 import PageHeader from "../components/common/PageHeader";
+import BaseFormDialog from "../components/common/BaseFormDialog";
 import { getErrorMessage } from "../utils/errorHandler";
 
 const MascotasPage = () => {
@@ -31,6 +33,8 @@ const MascotasPage = () => {
   const [mascotaVincularId, setMascotaVincularId] = useState<number | null>(null);
   const [showHistorialModal, setShowHistorialModal] = useState(false);
   const [mascotaHistorialId, setMascotaHistorialId] = useState<number | null>(null);
+  const [showVacunas, setShowVacunas] = useState(false);
+  const [mascotaVacunasId, setMascotaVacunasId] = useState<number | null>(null);
   const [confirmDeleteMascota, setConfirmDeleteMascota] = useState<number | null>(null);
   const [toast, setToast] = useState<ToastInfo | null>(null);
 
@@ -118,6 +122,11 @@ const MascotasPage = () => {
     setShowHistorialModal(true);
   };
 
+  const handleVacunas = (id: number) => {
+    setMascotaVacunasId(id);
+    setShowVacunas(true);
+  };
+
   return (
     <div className="contenedor-pagina">
       <div className="container">
@@ -180,6 +189,7 @@ const MascotasPage = () => {
                 onToggle={handleToggleMascota}
                 onVincular={handleVincular}
                 onHistorial={handleHistorial}
+                onVacunas={handleVacunas}
                 showActions={puedeGestionar}
               />
             )}
@@ -214,6 +224,20 @@ const MascotasPage = () => {
           mascotaId={mascotaHistorialId}
           onClose={() => setShowHistorialModal(false)}
         />
+
+        <BaseFormDialog
+          isOpen={showVacunas}
+          onClose={() => setShowVacunas(false)}
+          onSubmit={(e) => { e.preventDefault(); setShowVacunas(false); }}
+          title="Historial de Vacunación"
+          submitLabel="Cerrar"
+          isSubmitting={false}
+          submitError=""
+          modalId="vacunasModal"
+          size="lg"
+        >
+          {mascotaVacunasId && <HistorialVacunacionTable mascotaId={mascotaVacunasId} />}
+        </BaseFormDialog>
 
         <ConfirmDialog
           isOpen={confirmDeleteMascota !== null}

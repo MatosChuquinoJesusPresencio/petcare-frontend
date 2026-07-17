@@ -3,14 +3,14 @@ import type { FormEvent, ReactNode } from "react";
 interface BaseFormDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (e: FormEvent<HTMLFormElement>) => Promise<void>;
+  onSubmit: (e: FormEvent<HTMLFormElement>) => void | Promise<void>;
   title: string;
   submitLabel?: string;
   submitBusyLabel?: string;
   isSubmitting: boolean;
   submitError: string;
   modalId: string;
-  size?: "md" | "lg";
+  size?: "sm" | "md" | "lg";
   children: ReactNode;
 }
 

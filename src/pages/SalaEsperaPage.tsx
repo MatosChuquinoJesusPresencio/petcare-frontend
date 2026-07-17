@@ -7,7 +7,7 @@ import BaseFormDialog from "../components/common/BaseFormDialog";
 import NotificationToast from "../components/common/NotificationToast";
 import type { ToastInfo } from "../components/common/NotificationToast";
 
-import { ESTADOS_SALA_ESPERA, SALA_ESPERA_ESTADO_LABEL } from "../constants";
+import { SALA_ESPERA_ESTADO_LABEL } from "../constants";
 import type { CitaResponse, SalaEsperaResponse } from "../types";
 import { cambiarEstadoSalaEspera, obtenerCitas, obtenerSalaEspera, registrarLlegada } from "../services";
 import { getErrorMessage } from "../utils/errorHandler";
@@ -17,7 +17,6 @@ function badgeClass(status: string): string {
     PENDIENTE: 'etiqueta--pendiente',
     EN_ATENCION: 'etiqueta--en_atencion',
     ATENDIDO: 'etiqueta--completado',
-    NO_ASISTIO: 'etiqueta--no_asistio',
     REPROGRAMADO: 'etiqueta--reprogramada',
   };
   return map[status] || 'etiqueta--secundario';
@@ -90,8 +89,10 @@ const SalaEsperaPage = () => {
     }
   };
 
-  const otrosEstados = (actual: string) =>
-    ESTADOS_SALA_ESPERA.filter((e) => e !== actual);
+  const otrosEstados = (actual: string) => {
+    if (actual === "PENDIENTE") return ["REPROGRAMADO"];
+    return [];
+  };
 
   return (
     <div className="contenedor-pagina">
@@ -141,7 +142,7 @@ const SalaEsperaPage = () => {
                               className="boton boton--pequeno boton--borde"
                               onClick={() => handleCambiarEstado(item.id, est)}
                             >
-                              {SALA_ESPERA_ESTADO_LABEL[est]}
+                              {SALA_ESPERA_ESTADO_LABEL[est as keyof typeof SALA_ESPERA_ESTADO_LABEL]}
                             </button>
                           ))}
                         </div>
