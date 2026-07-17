@@ -123,8 +123,17 @@ La aplicación está configurada para deploy en Vercel:
    - **Framework Preset**: Vite
    - **Build Command**: `pnpm build`
    - **Output Directory**: `dist`
+   - **Install Command**: `pnpm install`
 3. Agregar variable de entorno:
    - `VITE_URL_API`: URL del backend desplegado (ej: `https://petcare-backend.onrender.com`)
 4. Vercel deploya automáticamente en cada push
 
 El archivo `vercel.json` maneja los rewrites SPA para el enrutamiento del cliente.
+
+### Variables de entorno en Vercel
+
+| Variable | Descripción | Ejemplo |
+|---|---|---|
+| `VITE_URL_API` | URL base del backend en producción | `https://petcare-backend.onrender.com` |
+
+**Importante:** En desarrollo, el proxy de Vite redirige `/api/*` al backend local (`localhost:8080`). En producción (Vercel), `VITE_URL_API` se usa como `baseURL` directo del Axios client, por lo que las peticiones van directamente al backend desplegado.
