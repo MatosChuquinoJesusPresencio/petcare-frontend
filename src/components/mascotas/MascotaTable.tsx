@@ -11,6 +11,7 @@ interface Props {
   onToggle: (id: number) => void;
   onVincular: (id: number) => void;
   onHistorial?: (id: number) => void;
+  onVacunas?: (id: number) => void;
   showActions?: boolean;
 }
 
@@ -22,6 +23,7 @@ export default function MascotaTable({
   onToggle,
   onVincular,
   onHistorial,
+  onVacunas,
   showActions = true,
 }: Props) {
   const cols = ["#", "Nombre", "Especie", "Raza", "Sexo", "Dueño", "Estado", ...(showActions ? ["Acciones"] : [])];
@@ -70,6 +72,11 @@ export default function MascotaTable({
                 {onHistorial && (
                   <button className="boton boton--informacion boton--icono" title="Ver historial de transferencias" onClick={(e) => { e.stopPropagation(); onHistorial(mascota.id); }}>
                     <i className="bi bi-clock-history"></i>
+                  </button>
+                )}
+                {onVacunas && (
+                  <button className="boton boton--informacion boton--icono" title="Historial de vacunación" onClick={(e) => { e.stopPropagation(); onVacunas(mascota.id); }}>
+                    <i className="bi bi-shield-check"></i>
                   </button>
                 )}
               </div>

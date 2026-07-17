@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 
-import NotificationToast from "../common/NotificationToast";
-import type { ToastInfo } from "../common/NotificationToast";
+import BaseFormDialog from "../common/BaseFormDialog";
 import SearchableSelect from "../common/SearchableSelect";
 
 import { SEXOS_MASCOTA, SEXO_LABEL, ESPECIES, RAZAS_POR_ESPECIE, CONDICIONES_REPRODUCTIVAS } from "../../constants";
@@ -134,8 +133,9 @@ export default function MascotaModal({
 }: Props) {
   const [form, setForm] = useState<FormState>(initialForm);
   const [duenos, setDuenos] = useState<Dueno[]>([]);
-  const [toast, setToast] = useState<ToastInfo | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [saving, setSaving] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const cargarDuenos = async () => {
     try {
@@ -209,6 +209,8 @@ export default function MascotaModal({
     }
     setFieldErrors({});
 
+    setSaving(true);
+    setSubmitError("");
     try {
       const baseData = {
         name: form.nombre,
@@ -237,7 +239,9 @@ export default function MascotaModal({
       await onSuccess();
       onClose();
     } catch (err) {
-      setToast({ message: getErrorMessage(err), type: "error" });
+      setSubmitError(getErrorMessage(err));
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -246,161 +250,143 @@ export default function MascotaModal({
   const isEditing = !!mascotaId;
 
   return (
-    <>
-      <NotificationToast toast={toast} onClose={() => setToast(null)} />
-      <div className="dialogo-fondo" onClick={onClose}></div>
-      <div className="dialogo-contenedor" id="mascotaModal">
-        <div className="dialogo-ventana dialogo-ventana--grande">
-          <div className="dialogo-encabezado">
-            <h5 className="dialogo-titulo">
-              <i className="bi bi-paw me-1"></i>
-              {isEditing ? "Editar Mascota" : "Nueva Mascota"}
-            </h5>
-            <button type="button" className="dialogo-cerrar" onClick={onClose}>
-              <i className="bi bi-x-lg"></i>
-            </button>
+    <BaseFormDialog
+      isOpen={show}
+      onClose={onClose}
+      onSubmit={handleSubmit}
+      title={isEditing ? "Editar Mascota" : "Nueva Mascota"}
+      submitLabel={isEditing ? "Actualizar" : "Guardar"}
+      isSubmitting={saving}
+      submitError={submitError}
+      modalId="mascotaModal"
+    >
+      <div className="row">
+        <div className="col-md-6">
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">Nombre</label>
+            <input type="text" className={`campo-entrada ${fieldErrors.nombre ? 'campo-entrada--error' : ''}`} name="nombre" value={form.nombre} onChange={handleChange} required />
+            {fieldErrors.nombre && <div className="campo-error">{fieldErrors.nombre}</div>}
           </div>
+        </div>
 
-          <div className="dialogo-cuerpo">
-            <form onSubmit={handleSubmit}>
-              <div className="row">
-                <div className="col-md-6">
-                  <div className="campo-grupo">
-                    <label className="campo-etiqueta">Nombre</label>
-                    <input type="text" className={`campo-entrada ${fieldErrors.nombre ? 'campo-entrada--error' : ''}`} name="nombre" value={form.nombre} onChange={handleChange} required />
-                    {fieldErrors.nombre && <div className="campo-error">{fieldErrors.nombre}</div>}
-                  </div>
-                </div>
+        <div className="col-md-6">
+          <SearchableSelect
+            label="Especie"
+            options={ESPECIES}
+            value={form.especie}
+            onChange={(val) => setForm((prev) => ({ ...prev, especie: val, raza: prev.raza }))}
+            required
+            error={fieldErrors.especie}
+          />
+        </div>
 
-                <div className="col-md-6">
-                  <SearchableSelect
-                    label="Especie"
-                    options={ESPECIES}
-                    value={form.especie}
-                    onChange={(val) => setForm((prev) => ({ ...prev, especie: val, raza: prev.raza }))}
-                    required
-                    error={fieldErrors.especie}
-                  />
-                </div>
+        <div className="col-md-6">
+          <SearchableSelect
+            label="Raza"
+            options={form.especie && RAZAS_POR_ESPECIE[form.especie] ? RAZAS_POR_ESPECIE[form.especie] : []}
+            value={form.raza}
+            onChange={(val) => setForm((prev) => ({ ...prev, raza: val }))}
+            required
+            placeholder={form.especie ? "Buscar raza..." : "Primero seleccione especie"}
+            error={fieldErrors.raza}
+          />
+        </div>
 
-                <div className="col-md-6">
-                  <SearchableSelect
-                    label="Raza"
-                    options={form.especie && RAZAS_POR_ESPECIE[form.especie] ? RAZAS_POR_ESPECIE[form.especie] : []}
-                    value={form.raza}
-                    onChange={(val) => setForm((prev) => ({ ...prev, raza: val }))}
-                    required
-                    placeholder={form.especie ? "Buscar raza..." : "Primero seleccione especie"}
-                    error={fieldErrors.raza}
-                  />
-                </div>
+        <div className="col-md-6">
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">Sexo</label>
+            <select className="campo-entrada" value={form.sexo} onChange={(e) => setForm({ ...form, sexo: e.target.value })}>
+              {SEXOS_MASCOTA.map((sexo) => (
+                <option key={sexo} value={sexo}>{SEXO_LABEL[sexo]}</option>
+              ))}
+            </select>
+          </div>
+        </div>
 
-                <div className="col-md-6">
-                  <div className="campo-grupo">
-                    <label className="campo-etiqueta">Sexo</label>
-                    <select className="campo-entrada" value={form.sexo} onChange={(e) => setForm({ ...form, sexo: e.target.value })}>
-                      {SEXOS_MASCOTA.map((sexo) => (
-                        <option key={sexo} value={sexo}>{SEXO_LABEL[sexo]}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
+        <div className="col-md-6">
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">Fecha Nacimiento</label>
+            <input type="date" className={`campo-entrada ${fieldErrors.fechaNacimiento ? 'campo-entrada--error' : ''}`} name="fechaNacimiento" value={form.fechaNacimiento} onChange={handleChange} required />
+            {fieldErrors.fechaNacimiento && <div className="campo-error">{fieldErrors.fechaNacimiento}</div>}
+          </div>
+        </div>
 
-                <div className="col-md-6">
-                  <div className="campo-grupo">
-                    <label className="campo-etiqueta">Fecha Nacimiento</label>
-                    <input type="date" className={`campo-entrada ${fieldErrors.fechaNacimiento ? 'campo-entrada--error' : ''}`} name="fechaNacimiento" value={form.fechaNacimiento} onChange={handleChange} required />
-                    {fieldErrors.fechaNacimiento && <div className="campo-error">{fieldErrors.fechaNacimiento}</div>}
-                  </div>
-                </div>
+        <div className="col-md-6">
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">Dueño Principal</label>
+            <select
+              className={`campo-entrada ${fieldErrors.ownerId ? 'campo-entrada--error' : ''}`}
+              value={form.ownerId}
+              onChange={(e) => { setForm((prev) => ({ ...prev, ownerId: Number(e.target.value) })); setFieldErrors((p) => { const n = { ...p }; delete n.ownerId; return n; }); }}
+              required={!isEditing}
+            >
+              <option value="">
+                {isEditing ? "No cambiar dueño (opcional)" : "Seleccione dueño"}
+              </option>
+              {duenos.map((dueno) => (
+                <option key={dueno.id} value={dueno.id}>
+                  {dueno.usuario ? `${dueno.usuario.names} ${dueno.usuario.lastNames}` : dueno.dni}
+                </option>
+              ))}
+            </select>
+            {fieldErrors.ownerId && <div className="campo-error">{fieldErrors.ownerId}</div>}
+            {isEditing && (
+              <div className="campo-ayuda">El dueño principal no se modifica desde aquí. Usa "Vincular Dueño" para agregar owners adicionales.</div>
+            )}
+          </div>
+        </div>
 
-                <div className="col-md-6">
-                  <div className="campo-grupo">
-                    <label className="campo-etiqueta">Dueño Principal</label>
-                    <select
-                      className={`campo-entrada ${fieldErrors.ownerId ? 'campo-entrada--error' : ''}`}
-                      value={form.ownerId}
-                      onChange={(e) => { setForm((prev) => ({ ...prev, ownerId: Number(e.target.value) })); setFieldErrors((p) => { const n = { ...p }; delete n.ownerId; return n; }); }}
-                      required={!isEditing}
-                    >
-                      <option value="">
-                        {isEditing ? "No cambiar dueño (opcional)" : "Seleccione dueño"}
-                      </option>
-                      {duenos.map((dueno) => (
-                        <option key={dueno.id} value={dueno.id}>
-                          {dueno.usuario ? `${dueno.usuario.names} ${dueno.usuario.lastNames}` : dueno.dni}
-                        </option>
-                      ))}
-                    </select>
-                    {fieldErrors.ownerId && <div className="campo-error">{fieldErrors.ownerId}</div>}
-                    {isEditing && (
-                      <div className="campo-ayuda">El dueño principal no se modifica desde aquí. Usa "Vincular Dueño" para agregar owners adicionales.</div>
-                    )}
-                  </div>
-                </div>
+        <div className="col-md-6">
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">Relación</label>
+            <input type="text" className={`campo-entrada ${fieldErrors.ownerRelation ? 'campo-entrada--error' : ''}`} name="ownerRelation" value={form.ownerRelation} onChange={handleChange} required={!isEditing} />
+            {fieldErrors.ownerRelation && <div className="campo-error">{fieldErrors.ownerRelation}</div>}
+          </div>
+        </div>
 
-                <div className="col-md-6">
-                  <div className="campo-grupo">
-                    <label className="campo-etiqueta">Relación</label>
-                    <input type="text" className={`campo-entrada ${fieldErrors.ownerRelation ? 'campo-entrada--error' : ''}`} name="ownerRelation" value={form.ownerRelation} onChange={handleChange} required={!isEditing} />
-                    {fieldErrors.ownerRelation && <div className="campo-error">{fieldErrors.ownerRelation}</div>}
-                  </div>
-                </div>
+        <div className="col-md-6">
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">Microchip</label>
+            <input type="text" className={`campo-entrada ${fieldErrors.microchip ? 'campo-entrada--error' : ''}`} name="microchip" value={form.microchip} onChange={handleChange} />
+            {fieldErrors.microchip && <div className="campo-error">{fieldErrors.microchip}</div>}
+          </div>
+        </div>
 
-                <div className="col-md-6">
-                  <div className="campo-grupo">
-                    <label className="campo-etiqueta">Microchip</label>
-                    <input type="text" className={`campo-entrada ${fieldErrors.microchip ? 'campo-entrada--error' : ''}`} name="microchip" value={form.microchip} onChange={handleChange} />
-                    {fieldErrors.microchip && <div className="campo-error">{fieldErrors.microchip}</div>}
-                  </div>
-                </div>
+        <div className="col-md-6">
+          <SearchableSelect
+            label="Condición Reproductiva"
+            options={CONDICIONES_REPRODUCTIVAS}
+            value={form.condicionReproductiva}
+            onChange={(val) => setForm((prev) => ({ ...prev, condicionReproductiva: val }))}
+            placeholder="Buscar o escribir..."
+            error={fieldErrors.condicionReproductiva}
+          />
+        </div>
 
-                <div className="col-md-6">
-                  <SearchableSelect
-                    label="Condición Reproductiva"
-                    options={CONDICIONES_REPRODUCTIVAS}
-                    value={form.condicionReproductiva}
-                    onChange={(val) => setForm((prev) => ({ ...prev, condicionReproductiva: val }))}
-                    placeholder="Buscar o escribir..."
-                    error={fieldErrors.condicionReproductiva}
-                  />
-                </div>
+        <div className="col-md-6">
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">Alergias</label>
+            <input type="text" className={`campo-entrada ${fieldErrors.alergias ? 'campo-entrada--error' : ''}`} name="alergias" value={form.alergias} onChange={handleChange} />
+            {fieldErrors.alergias && <div className="campo-error">{fieldErrors.alergias}</div>}
+          </div>
+        </div>
 
-                <div className="col-md-6">
-                  <div className="campo-grupo">
-                    <label className="campo-etiqueta">Alergias</label>
-                    <input type="text" className={`campo-entrada ${fieldErrors.alergias ? 'campo-entrada--error' : ''}`} name="alergias" value={form.alergias} onChange={handleChange} />
-                    {fieldErrors.alergias && <div className="campo-error">{fieldErrors.alergias}</div>}
-                  </div>
-                </div>
+        <div className="col-md-6">
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">Enfermedades Crónicas</label>
+            <input type="text" className={`campo-entrada ${fieldErrors.enfermedadesCronicas ? 'campo-entrada--error' : ''}`} name="enfermedadesCronicas" value={form.enfermedadesCronicas} onChange={handleChange} />
+            {fieldErrors.enfermedadesCronicas && <div className="campo-error">{fieldErrors.enfermedadesCronicas}</div>}
+          </div>
+        </div>
 
-                <div className="col-md-6">
-                  <div className="campo-grupo">
-                    <label className="campo-etiqueta">Enfermedades Crónicas</label>
-                    <input type="text" className={`campo-entrada ${fieldErrors.enfermedadesCronicas ? 'campo-entrada--error' : ''}`} name="enfermedadesCronicas" value={form.enfermedadesCronicas} onChange={handleChange} />
-                    {fieldErrors.enfermedadesCronicas && <div className="campo-error">{fieldErrors.enfermedadesCronicas}</div>}
-                  </div>
-                </div>
-
-                <div className="col-md-6">
-                  <div className="campo-grupo">
-                    <label className="campo-etiqueta">Alertas Médicas</label>
-                    <input type="text" className={`campo-entrada ${fieldErrors.alertasMedicas ? 'campo-entrada--error' : ''}`} name="alertasMedicas" value={form.alertasMedicas} onChange={handleChange} />
-                    {fieldErrors.alertasMedicas && <div className="campo-error">{fieldErrors.alertasMedicas}</div>}
-                  </div>
-                </div>
-              </div>
-
-              <div className="dialogo-pie" style={{ padding: 'var(--espaciado-md) 0 0', borderTop: 'none' }}>
-                <button type="button" className="boton boton--neutro" onClick={onClose}>Cancelar</button>
-                <button type="submit" className="boton boton--primario">
-                  {isEditing ? "Actualizar" : "Guardar"}
-                </button>
-              </div>
-            </form>
+        <div className="col-md-6">
+          <div className="campo-grupo">
+            <label className="campo-etiqueta">Alertas Médicas</label>
+            <input type="text" className={`campo-entrada ${fieldErrors.alertasMedicas ? 'campo-entrada--error' : ''}`} name="alertasMedicas" value={form.alertasMedicas} onChange={handleChange} />
+            {fieldErrors.alertasMedicas && <div className="campo-error">{fieldErrors.alertasMedicas}</div>}
           </div>
         </div>
       </div>
-    </>
+    </BaseFormDialog>
   );
 }

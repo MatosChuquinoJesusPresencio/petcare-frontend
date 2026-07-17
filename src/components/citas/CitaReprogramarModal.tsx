@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import HorariosDisponibles from "./HorariosDisponibles";
 import { getErrorMessage } from "../../utils/errorHandler";
+import BaseFormDialog from "../common/BaseFormDialog";
 
 import type { CitaResponse } from "../../types";
 import { reprogramarCita } from "../../services";
@@ -18,6 +19,7 @@ export default function CitaReprogramarModal({ show, onClose, onSuccess, cita }:
   const [horaSeleccionada, setHoraSeleccionada] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (cita) {
@@ -58,62 +60,52 @@ export default function CitaReprogramarModal({ show, onClose, onSuccess, cita }:
 
     const dateTime = `${fecha}T${horaSeleccionada}`;
 
+    setSaving(true);
     try {
       await reprogramarCita(cita.id, dateTime);
       onClose();
       await onSuccess();
     } catch (err: unknown) {
       setError(getErrorMessage(err));
+    } finally {
+      setSaving(false);
     }
   };
 
   return (
-    <>
-      <div className="dialogo-fondo" onClick={onClose}></div>
-      <div className="dialogo-contenedor" tabIndex={-1}>
-        <div className="dialogo-ventana">
-          <div className="dialogo-encabezado">
-            <h5 className="dialogo-titulo">
-              <i className="bi bi-clock-history me-1"></i>
-              Reprogramar Cita
-            </h5>
-            <button type="button" className="dialogo-cerrar" onClick={onClose}>
-              <i className="bi bi-x-lg"></i>
-            </button>
-          </div>
-          <div className="dialogo-cuerpo">
-            <form id="formReprogramar" onSubmit={handleSubmit}>
-              <div className="campo-grupo">
-                <label className="campo-etiqueta">Nueva Fecha *</label>
-                <input
-                  type="date"
-                  className={`campo-entrada ${fieldErrors.fecha ? 'campo-entrada--error' : ''}`}
-                  value={fecha}
-                  onChange={(e) => { setFecha(e.target.value); setFieldErrors((p) => { const n = { ...p }; delete n.fecha; return n; }); }}
-                  required
-                />
-                {fieldErrors.fecha && <div className="campo-error">{fieldErrors.fecha}</div>}
-              </div>
-              <div className="campo-grupo">
-                <label className="campo-etiqueta">Horario disponible *</label>
-                  <HorariosDisponibles
-                  vetId={cita.veterinarianId}
-                  serviceId={cita.serviceId}
-                  fecha={fecha}
-                  value={horaSeleccionada}
-                  onChange={(v) => { setHoraSeleccionada(v); setFieldErrors((p) => { const n = { ...p }; delete n.horaSeleccionada; return n; }); }}
-                />
-                {fieldErrors.horaSeleccionada && <div className="campo-error">{fieldErrors.horaSeleccionada}</div>}
-              </div>
-              {error && <div className="dialogo-error">{error}</div>}
-              <div className="dialogo-pie" style={{ padding: 'var(--espaciado-md) 0 0', borderTop: 'none' }}>
-                <button type="button" className="boton boton--neutro" onClick={onClose}>Cancelar</button>
-                <button type="submit" form="formReprogramar" className="boton boton--primario" disabled={!horaSeleccionada}>Reprogramar</button>
-              </div>
-            </form>
-          </div>
-        </div>
+    <BaseFormDialog
+      isOpen={show}
+      onClose={onClose}
+      onSubmit={handleSubmit}
+      title="Reprogramar Cita"
+      submitLabel="Reprogramar"
+      isSubmitting={saving}
+      submitError={error || ""}
+      modalId="cita-reprogramar-dialog"
+      size="md"
+    >
+      <div className="campo-grupo">
+        <label className="campo-etiqueta">Nueva Fecha *</label>
+        <input
+          type="date"
+          className={`campo-entrada ${fieldErrors.fecha ? 'campo-entrada--error' : ''}`}
+          value={fecha}
+          onChange={(e) => { setFecha(e.target.value); setFieldErrors((p) => { const n = { ...p }; delete n.fecha; return n; }); }}
+          required
+        />
+        {fieldErrors.fecha && <div className="campo-error">{fieldErrors.fecha}</div>}
       </div>
-    </>
+      <div className="campo-grupo">
+        <label className="campo-etiqueta">Horario disponible *</label>
+          <HorariosDisponibles
+          vetId={cita.veterinarianId}
+          serviceId={cita.serviceId}
+          fecha={fecha}
+          value={horaSeleccionada}
+          onChange={(v) => { setHoraSeleccionada(v); setFieldErrors((p) => { const n = { ...p }; delete n.horaSeleccionada; return n; }); }}
+        />
+        {fieldErrors.horaSeleccionada && <div className="campo-error">{fieldErrors.horaSeleccionada}</div>}
+      </div>
+    </BaseFormDialog>
   );
 }

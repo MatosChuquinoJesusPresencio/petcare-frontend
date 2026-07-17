@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import type { Dueno } from "../../types";
 import { getDuenos, cambiarDuenoPrincipal } from "../../services";
 import { getErrorMessage } from "../../utils/errorHandler";
-import NotificationToast from "../common/NotificationToast";
-import type { ToastInfo } from "../common/NotificationToast";
+import BaseFormDialog from "../common/BaseFormDialog";
 
 interface Props {
   show: boolean;
@@ -22,15 +21,16 @@ export default function MascotaVincularModal({
   const [duenos, setDuenos] = useState<Dueno[]>([]);
   const [duenoId, setDuenoId] = useState(0);
   const [relacion, setRelacion] = useState("Tutor");
-  const [toast, setToast] = useState<ToastInfo | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [saving, setSaving] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const cargarDuenos = async () => {
     try {
       const data = await getDuenos();
       setDuenos(data);
-    } catch (err) {
-      setToast({ message: getErrorMessage(err), type: "error" });
+    } catch {
+      setSubmitError("Error al cargar dueños");
     }
   };
 
@@ -68,75 +68,62 @@ export default function MascotaVincularModal({
     }
     setFieldErrors({});
 
+    setSaving(true);
+    setSubmitError("");
     try {
       await cambiarDuenoPrincipal(mascotaId, { ownerId: duenoId, relation: relacion, reason: "Cambio manual desde el sistema" });
       await onSuccess();
       onClose();
     } catch (err) {
-      setToast({ message: getErrorMessage(err), type: "error" });
+      setSubmitError(getErrorMessage(err));
+    } finally {
+      setSaving(false);
     }
   };
 
   if (!show) return null;
 
   return (
-    <>
-      <NotificationToast toast={toast} onClose={() => setToast(null)} />
-      <div className="dialogo-fondo" onClick={onClose}></div>
-      <div className="dialogo-contenedor">
-        <div className="dialogo-ventana">
-          <div className="dialogo-encabezado">
-            <h5 className="dialogo-titulo">
-              <i className="bi bi-person-plus me-1"></i>
-              Cambiar Dueño Principal
-            </h5>
-            <button type="button" className="dialogo-cerrar" onClick={onClose}>
-              <i className="bi bi-x-lg"></i>
-            </button>
-          </div>
-
-          <div className="dialogo-cuerpo">
-            <form onSubmit={handleSubmit}>
-              <div className="campo-grupo">
-                <label className="campo-etiqueta">Dueño</label>
-                <select
-                  className={`campo-entrada ${fieldErrors.duenoId ? 'campo-entrada--error' : ''}`}
-                  value={duenoId}
-                  onChange={(e) => { setDuenoId(Number(e.target.value)); setFieldErrors((p) => { const n = { ...p }; delete n.duenoId; return n; }); }}
-                  required
-                >
-                  <option value="">Seleccione dueño</option>
-                  {duenos.map((dueno) => (
-                    <option key={dueno.id} value={dueno.id}>
-                      {dueno.usuario ? `${dueno.usuario.names} ${dueno.usuario.lastNames}` : `DNI: ${dueno.dni}`}
-                    </option>
-                  ))}
-                </select>
-                {fieldErrors.duenoId && <div className="campo-error">{fieldErrors.duenoId}</div>}
-              </div>
-
-              <div className="campo-grupo">
-                <label className="campo-etiqueta">Relación</label>
-                <input
-                  type="text"
-                  className={`campo-entrada ${fieldErrors.relacion ? 'campo-entrada--error' : ''}`}
-                  value={relacion}
-                  onChange={(e) => { setRelacion(e.target.value); setFieldErrors((p) => { const n = { ...p }; delete n.relacion; return n; }); }}
-                  required
-                />
-                {fieldErrors.relacion && <div className="campo-error">{fieldErrors.relacion}</div>}
-              </div>
-
-              <div className="dialogo-pie" style={{ padding: 'var(--espaciado-md) 0 0', borderTop: 'none' }}>
-                <button type="button" className="boton boton--neutro" onClick={onClose}>Cancelar</button>
-                <button type="submit" className="boton boton--primario">
-                  Cambiar dueño principal
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+    <BaseFormDialog
+      isOpen={show}
+      onClose={onClose}
+      onSubmit={handleSubmit}
+      title="Cambiar Dueño Principal"
+      submitLabel="Cambiar dueño principal"
+      isSubmitting={saving}
+      submitError={submitError}
+      modalId="vincular-modal"
+      size="md"
+    >
+      <div className="campo-grupo">
+        <label className="campo-etiqueta">Dueño</label>
+        <select
+          className={`campo-entrada ${fieldErrors.duenoId ? 'campo-entrada--error' : ''}`}
+          value={duenoId}
+          onChange={(e) => { setDuenoId(Number(e.target.value)); setFieldErrors((p) => { const n = { ...p }; delete n.duenoId; return n; }); }}
+          required
+        >
+          <option value="">Seleccione dueño</option>
+          {duenos.map((dueno) => (
+            <option key={dueno.id} value={dueno.id}>
+              {dueno.usuario ? `${dueno.usuario.names} ${dueno.usuario.lastNames}` : `DNI: ${dueno.dni}`}
+            </option>
+          ))}
+        </select>
+        {fieldErrors.duenoId && <div className="campo-error">{fieldErrors.duenoId}</div>}
       </div>
-    </>
+
+      <div className="campo-grupo">
+        <label className="campo-etiqueta">Relación</label>
+        <input
+          type="text"
+          className={`campo-entrada ${fieldErrors.relacion ? 'campo-entrada--error' : ''}`}
+          value={relacion}
+          onChange={(e) => { setRelacion(e.target.value); setFieldErrors((p) => { const n = { ...p }; delete n.relacion; return n; }); }}
+          required
+        />
+        {fieldErrors.relacion && <div className="campo-error">{fieldErrors.relacion}</div>}
+      </div>
+    </BaseFormDialog>
   );
 }
