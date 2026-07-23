@@ -1,7 +1,7 @@
 import axios from 'axios'
 import type { InternalAxiosRequestConfig } from 'axios'
 
-type RetryConfig = InternalAxiosRequestConfig & { _retry?: boolean }
+type RetryConfig = InternalAxiosRequestConfig & { _retry?: boolean; _networkRetry?: boolean }
 
 let isRefreshing = false
 let failedQueue: Array<{
@@ -24,7 +24,7 @@ const apiClient = axios.create({
   baseURL: import.meta.env.DEV ? '' : import.meta.env.VITE_URL_API,
   headers: { 'Content-Type': 'application/json' },
   withCredentials: true,
-  timeout: 15000,
+  timeout: 30000,
 })
 
 apiClient.interceptors.response.use(
@@ -32,7 +32,20 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config as RetryConfig | undefined
 
-    if (!originalRequest || error.response?.status !== 401) {
+    if (!originalRequest) {
+      return Promise.reject(error)
+    }
+
+    const isNetworkError = !error.response
+    const isUnauthorized = [401, 403].includes(error.response?.status)
+
+    if (isNetworkError && !originalRequest._networkRetry) {
+      originalRequest._networkRetry = true
+      await new Promise((r) => setTimeout(r, 3000))
+      return apiClient(originalRequest)
+    }
+
+    if (!isUnauthorized) {
       return Promise.reject(error)
     }
 
