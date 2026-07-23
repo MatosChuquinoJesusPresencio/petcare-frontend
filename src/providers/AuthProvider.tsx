@@ -12,16 +12,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const onSessionExpired = () => setUser(null)
     window.addEventListener('auth:session-expired', onSessionExpired)
 
-    authService.me()
-      .then((data) => {
+    const fetchUser = async (retries = 1) => {
+      try {
+        const data = await authService.me()
         if (data?.id && data?.role) {
           setUser({ id: data.id, email: data.username, role: data.role })
         } else {
           setUser(null)
         }
-      })
-      .catch(() => setUser(null))
-      .finally(() => setIsLoading(false))
+      } catch {
+        if (retries > 0) {
+          await new Promise((r) => setTimeout(r, 2000))
+          return fetchUser(retries - 1)
+        }
+        setUser(null)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchUser()
 
     return () => window.removeEventListener('auth:session-expired', onSessionExpired)
   }, [])
